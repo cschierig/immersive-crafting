@@ -1,8 +1,8 @@
 package com.carlschierig.immersive_crafting.serialization;
 
-import com.carlschierig.immersive_crafting.ICRegistries;
-import com.carlschierig.immersive_crafting.predicate.condition.ICCondition;
-import com.carlschierig.immersive_crafting.predicate.condition.ICConditionSerializer;
+import com.carlschierig.immersive_crafting.api.predicate.condition.ICCondition;
+import com.carlschierig.immersive_crafting.api.predicate.condition.ICConditionSerializer;
+import com.carlschierig.immersive_crafting.api.registry.ICRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.ArrayList;

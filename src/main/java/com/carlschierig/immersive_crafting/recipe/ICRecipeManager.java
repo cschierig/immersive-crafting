@@ -1,10 +1,13 @@
-package com.carlschierig.immersive_crafting.crafting;
+package com.carlschierig.immersive_crafting.recipe;
 
-import com.carlschierig.immersive_crafting.ICRegistries;
 import com.carlschierig.immersive_crafting.ImmersiveCrafting;
-import com.carlschierig.immersive_crafting.context.RecipeContext;
+import com.carlschierig.immersive_crafting.api.context.RecipeContext;
+import com.carlschierig.immersive_crafting.api.recipe.ICRecipe;
+import com.carlschierig.immersive_crafting.api.recipe.ICRecipeType;
+import com.carlschierig.immersive_crafting.api.registry.ICRegistries;
 import com.google.common.collect.ImmutableMap;
-import com.google.gson.*;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
@@ -17,18 +20,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public final class ICRecipeManager implements SimpleSynchronousResourceReloader {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private Map<ICRecipeType<?>, Map<ResourceLocation, ICRecipe>> recipes = ImmutableMap.of();
+public final class ICRecipeManager implements com.carlschierig.immersive_crafting.api.recipe.ICRecipeManager, SimpleSynchronousResourceReloader {
+	private Map<ICRecipeType<?>, Map<ResourceLocation, ICRecipe>> recipes = ImmutableMap.of();
 
 	/**
 	 * Returns the first recipe which matches the given {@link RecipeContext}
+	 *
 	 * @param context the context against which recipes should be tested.
 	 * @return The first recipe which matches the predicate, if any.
 	 */
 	@SuppressWarnings("unchecked")
 	public <T extends ICRecipe> Optional<T> getRecipe(ICRecipeType<T> type, RecipeContext context) {
-		return ((Map<?, T>)recipes.get(type)).values().stream().filter(recipe -> recipe.matches(context)).findFirst();
+		return ((Map<?, T>) recipes.get(type)).values().stream().filter(recipe -> recipe.matches(context)).findFirst();
 	}
 
 	@Override

@@ -1,14 +1,16 @@
-package com.carlschierig.immersive_crafting.predicate;
+package com.carlschierig.immersive_crafting.api.predicate;
 
+import com.carlschierig.immersive_crafting.api.predicate.condition.ICCondition;
+import com.carlschierig.immersive_crafting.api.predicate.condition.ICConditionSerializer;
 import com.carlschierig.immersive_crafting.predicate.condition.AndCondition;
-import com.carlschierig.immersive_crafting.predicate.condition.ICCondition;
-import com.carlschierig.immersive_crafting.predicate.condition.ICConditionSerializer;
 import com.carlschierig.immersive_crafting.predicate.condition.ICConditionSerializers;
 import com.carlschierig.immersive_crafting.serialization.ICByteBufHelper;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class ICPredicate extends AndCondition {
 	public ICPredicate(ICCondition[] conditions) {
@@ -42,6 +44,19 @@ public class ICPredicate extends AndCondition {
 		@Override
 		public void toNetwork(FriendlyByteBuf buf, ICPredicate instance) {
 			ICByteBufHelper.writeList(buf, Arrays.asList(instance.conditions), ICByteBufHelper::writeICCondition);
+		}
+	}
+
+	public static class Builder {
+		private final List<ICCondition> conditions = new ArrayList<>();
+
+		public Builder addCondition(ICCondition condition) {
+			conditions.add(condition);
+			return this;
+		}
+
+		public ICPredicate build() {
+			return new ICPredicate(conditions.toArray(ICCondition[]::new));
 		}
 	}
 }

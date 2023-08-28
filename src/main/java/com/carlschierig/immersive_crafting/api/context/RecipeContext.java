@@ -1,4 +1,4 @@
-package com.carlschierig.immersive_crafting.context;
+package com.carlschierig.immersive_crafting.api.context;
 
 import java.util.HashMap;
 import java.util.Map;

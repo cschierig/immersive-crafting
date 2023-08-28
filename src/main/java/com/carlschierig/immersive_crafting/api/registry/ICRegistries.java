@@ -1,10 +1,9 @@
-package com.carlschierig.immersive_crafting;
+package com.carlschierig.immersive_crafting.api.registry;
 
-import com.carlschierig.immersive_crafting.crafting.ICRecipe;
-import com.carlschierig.immersive_crafting.crafting.ICRecipeSerializer;
-import com.carlschierig.immersive_crafting.crafting.ICRecipeType;
-import com.carlschierig.immersive_crafting.predicate.condition.ICCondition;
-import com.carlschierig.immersive_crafting.predicate.condition.ICConditionSerializer;
+import com.carlschierig.immersive_crafting.api.predicate.condition.ICConditionSerializer;
+import com.carlschierig.immersive_crafting.api.recipe.ICRecipeSerializer;
+import com.carlschierig.immersive_crafting.api.recipe.ICRecipeType;
+import com.carlschierig.immersive_crafting.registry.ICRegistryKeys;
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
