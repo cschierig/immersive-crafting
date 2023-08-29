@@ -8,11 +8,11 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 
 public class ICRegistryKeys {
-	public static final ResourceKey<Registry<ICConditionSerializer<?>>> CONDITION_SERIALIZER = createRegistryKey("condition_serializer");
-	public static final ResourceKey<Registry<ICRecipeType<?>>> RECIPE_TYPE = createRegistryKey("recipe_type");
-	public static final ResourceKey<Registry<ICRecipeSerializer<?>>> RECIPE_SERIALIZER = createRegistryKey("recipe_serializer");
+    public static final ResourceKey<Registry<ICConditionSerializer<?>>> CONDITION_SERIALIZER = createRegistryKey("condition_serializer");
+    public static final ResourceKey<Registry<ICRecipeType<?>>> RECIPE_TYPE = createRegistryKey("recipe_type");
+    public static final ResourceKey<Registry<ICRecipeSerializer<?>>> RECIPE_SERIALIZER = createRegistryKey("recipe_serializer");
 
-	private static <T> ResourceKey<Registry<T>> createRegistryKey(String path) {
-		return ResourceKey.createRegistryKey(ICUtil.createResourceLocation(path));
-	}
+    private static <T> ResourceKey<Registry<T>> createRegistryKey(String path) {
+        return ResourceKey.createRegistryKey(ICUtil.createResourceLocation(path));
+    }
 }

@@ -25,55 +25,55 @@ import java.util.function.Consumer;
  * @see net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider
  */
 public abstract class ICRecipeProvider implements DataProvider {
-	protected final FabricDataOutput output;
-	private final PackOutput.PathProvider pathProvider;
+    protected final FabricDataOutput output;
+    private final PackOutput.PathProvider pathProvider;
 
-	public ICRecipeProvider(FabricDataOutput output) {
-		this.output = output;
-		pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "ic_recipes");
-	}
+    public ICRecipeProvider(FabricDataOutput output) {
+        this.output = output;
+        pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "ic_recipes");
+    }
 
-	/**
-	 * Implement this method and offer recipes to the exporters using their builders
-	 *
-	 * @param exporter
-	 */
-	public abstract void buildRecipes(Consumer<ICRecipe> exporter);
+    /**
+     * Implement this method and offer recipes to the exporters using their builders
+     *
+     * @param exporter
+     */
+    public abstract void buildRecipes(Consumer<ICRecipe> exporter);
 
-	@Override
-	public CompletableFuture<?> run(CachedOutput writer) {
-		Set<ResourceLocation> generatedRecipes = new HashSet<>();
-		List<CompletableFuture<?>> list = new ArrayList<>();
-		buildRecipes(recipe -> {
-			ResourceLocation identifier = getRecipeIdentifier(recipe.getId());
+    @Override
+    public CompletableFuture<?> run(CachedOutput writer) {
+        Set<ResourceLocation> generatedRecipes = new HashSet<>();
+        List<CompletableFuture<?>> list = new ArrayList<>();
+        buildRecipes(recipe -> {
+            ResourceLocation identifier = getRecipeIdentifier(recipe.getId());
 
-			if (!generatedRecipes.add(identifier)) {
-				throw new IllegalStateException("Duplicate recipe " + identifier);
-			}
+            if (!generatedRecipes.add(identifier)) {
+                throw new IllegalStateException("Duplicate recipe " + identifier);
+            }
 
-			// TODO: ask quilt to provide FabricDataGenConditions api
-			var recipeJson = serializeRecipe(recipe);
-			list.add(DataProvider.saveStable(writer, recipeJson, pathProvider.json(identifier)));
-		});
+            // TODO: ask quilt to provide FabricDataGenConditions api
+            var recipeJson = serializeRecipe(recipe);
+            list.add(DataProvider.saveStable(writer, recipeJson, pathProvider.json(identifier)));
+        });
 
-		return CompletableFuture.allOf(list.toArray(CompletableFuture<?>[]::new));
-	}
+        return CompletableFuture.allOf(list.toArray(CompletableFuture<?>[]::new));
+    }
 
-	@SuppressWarnings("unchecked")
-	private <T extends ICRecipe> JsonObject serializeRecipe(T recipe) {
-		var serializer = (ICRecipeSerializer<T>) recipe.getSerializer();
-		return serializer.toJson(recipe);
-	}
+    @SuppressWarnings("unchecked")
+    private <T extends ICRecipe> JsonObject serializeRecipe(T recipe) {
+        var serializer = (ICRecipeSerializer<T>) recipe.getSerializer();
+        return serializer.toJson(recipe);
+    }
 
-	@Override
-	public String getName() {
-		return "Immersive Crafting Recipes";
-	}
+    @Override
+    public String getName() {
+        return "Immersive Crafting Recipes";
+    }
 
-	/**
-	 * Override this method to change the recipe identifier. The default implementation normalizes the namespace to the mod ID.
-	 */
-	protected ResourceLocation getRecipeIdentifier(ResourceLocation identifier) {
-		return new ResourceLocation(output.getModId(), identifier.getPath());
-	}
+    /**
+     * Override this method to change the recipe identifier. The default implementation normalizes the namespace to the mod ID.
+     */
+    protected ResourceLocation getRecipeIdentifier(ResourceLocation identifier) {
+        return new ResourceLocation(output.getModId(), identifier.getPath());
+    }
 }

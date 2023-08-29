@@ -5,11 +5,11 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
 public interface ICRecipeSerializer<T extends ICRecipe> {
-	T fromJson(ResourceLocation id, JsonObject object);
+    T fromJson(ResourceLocation id, JsonObject object);
 
-	JsonObject toJson(T instance);
+    JsonObject toJson(T instance);
 
-	T fromNetwork(ResourceLocation id, FriendlyByteBuf buf);
+    T fromNetwork(ResourceLocation id, FriendlyByteBuf buf);
 
-	void toNetwork(FriendlyByteBuf buf, T instance);
+    void toNetwork(FriendlyByteBuf buf, T instance);
 }

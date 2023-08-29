@@ -11,15 +11,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ImmersiveCrafting implements ModInitializer {
-	public static final String MODID = "immersive_crafting";
-	public static final Logger LOG = LoggerFactory.getLogger(MODID);
-	public static final ICRecipeManager RECIPE_MANAGER = new ICRecipeManager();
+    public static final String MODID = "immersive_crafting";
+    public static final Logger LOG = LoggerFactory.getLogger(MODID);
+    public static final ICRecipeManager RECIPE_MANAGER = new ICRecipeManager();
 
-	@Override
-	public void onInitialize(ModContainer mod) {
-		ResourceLoader.get(PackType.SERVER_DATA).registerReloader(RECIPE_MANAGER);
+    @Override
+    public void onInitialize(ModContainer mod) {
+        ResourceLoader.get(PackType.SERVER_DATA).registerReloader(RECIPE_MANAGER);
 
-		ICRecipeTypes.init();
-		ICRecipeSerializers.init();
-	}
+        ICRecipeTypes.init();
+        ICRecipeSerializers.init();
+    }
 }

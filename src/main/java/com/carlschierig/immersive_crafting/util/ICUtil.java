@@ -6,10 +6,10 @@ import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
 public final class ICUtil {
-	private ICUtil() {
-	}
+    private ICUtil() {
+    }
 
-	public static ResourceLocation createResourceLocation(String value) {
-		return new ResourceLocation(ImmersiveCrafting.MODID, value);
-	}
+    public static ResourceLocation createResourceLocation(String value) {
+        return new ResourceLocation(ImmersiveCrafting.MODID, value);
+    }
 }

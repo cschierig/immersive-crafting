@@ -6,5 +6,5 @@ import java.util.function.Predicate;
 
 public interface ICCondition extends Predicate<RecipeContext> {
 
-	ICConditionSerializer<?> getSerializer();
+    ICConditionSerializer<?> getSerializer();
 }

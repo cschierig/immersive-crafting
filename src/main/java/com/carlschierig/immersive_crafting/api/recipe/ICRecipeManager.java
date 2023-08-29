@@ -6,5 +6,5 @@ import java.util.Optional;
 
 public interface ICRecipeManager {
 
-	<T extends ICRecipe> Optional<T> getRecipe(ICRecipeType<T> type, RecipeContext context);
+    <T extends ICRecipe> Optional<T> getRecipe(ICRecipeType<T> type, RecipeContext context);
 }

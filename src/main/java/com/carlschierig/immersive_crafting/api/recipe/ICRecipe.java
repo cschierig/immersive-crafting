@@ -7,14 +7,14 @@ import net.minecraft.world.item.ItemStack;
 import java.util.List;
 
 public abstract class ICRecipe {
-	public abstract boolean matches(RecipeContext context);
+    public abstract boolean matches(RecipeContext context);
 
-	public abstract List<ItemStack> assembleResults(RecipeContext context);
+    public abstract List<ItemStack> assembleResults(RecipeContext context);
 
-	public abstract ResourceLocation getId();
+    public abstract ResourceLocation getId();
 
-	public abstract ICRecipeSerializer<?> getSerializer();
+    public abstract ICRecipeSerializer<?> getSerializer();
 
-	public abstract ICRecipeType<?> getType();
+    public abstract ICRecipeType<?> getType();
 
 }
