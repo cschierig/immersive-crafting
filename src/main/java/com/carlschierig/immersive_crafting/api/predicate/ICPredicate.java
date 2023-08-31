@@ -4,7 +4,7 @@ import com.carlschierig.immersive_crafting.api.predicate.condition.ICCondition;
 import com.carlschierig.immersive_crafting.api.predicate.condition.ICConditionSerializer;
 import com.carlschierig.immersive_crafting.predicate.condition.AndCondition;
 import com.carlschierig.immersive_crafting.predicate.condition.ICConditionSerializers;
-import com.carlschierig.immersive_crafting.serialization.ICByteBufHelper;
+import com.carlschierig.immersive_crafting.util.ICByteBufHelper;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
 

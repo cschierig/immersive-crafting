@@ -1,9 +1,10 @@
 package com.carlschierig.immersive_crafting.predicate.condition;
 
 import com.carlschierig.immersive_crafting.api.context.RecipeContext;
+import com.carlschierig.immersive_crafting.api.context.ValidationContext;
 import com.carlschierig.immersive_crafting.api.predicate.condition.ICCondition;
 import com.carlschierig.immersive_crafting.api.predicate.condition.ICConditionSerializer;
-import com.carlschierig.immersive_crafting.serialization.ICByteBufHelper;
+import com.carlschierig.immersive_crafting.util.ICByteBufHelper;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -24,6 +25,11 @@ public class InvertedCondition implements ICCondition {
     @Override
     public ICConditionSerializer<?> getSerializer() {
         return ICConditionSerializers.INVERT;
+    }
+
+    @Override
+    public ValidationContext getRequirements() {
+        return original.getRequirements();
     }
 
     public static final class Serializer implements ICConditionSerializer<InvertedCondition> {

@@ -1,6 +1,14 @@
 package com.carlschierig.immersive_crafting.api.predicate.condition;
 
-import com.carlschierig.immersive_crafting.serialization.ICSerializer;
+import com.google.gson.JsonObject;
+import net.minecraft.network.FriendlyByteBuf;
 
-public interface ICConditionSerializer<T extends ICCondition> extends ICSerializer<T> {
+public interface ICConditionSerializer<T extends ICCondition> {
+    T fromJson(JsonObject json);
+
+    JsonObject toJson(T instance);
+
+    T fromNetwork(FriendlyByteBuf buf);
+
+    void toNetwork(FriendlyByteBuf buf, T instance);
 }

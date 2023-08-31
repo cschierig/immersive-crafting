@@ -5,27 +5,27 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 public final class RecipeContext {
-    private final Map<Class<? extends ContextHolder>, ContextHolder> holders;
+    private final Map<ContextType<?>, Object> holders;
 
-    private RecipeContext(Map<Class<? extends ContextHolder>, ContextHolder> holders) {
+    private RecipeContext(Map<ContextType<?>, Object> holders) {
         this.holders = holders;
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends ContextHolder> T getHolder(Class<T> holderClass) {
-        var holder = holders.get(holderClass);
+    public <T> T get(ContextType<T> type) {
+        var holder = holders.get(type);
         if (holder != null) {
             // can only break if the insertion logic is messed with
             return (T) holder;
         }
-        throw new NoSuchElementException("No '" + holderClass.getCanonicalName() + "' holder in this recipe context.");
+        throw new NoSuchElementException("No '" + type.getId() + "' context in this recipe context.");
     }
 
     public static final class Builder {
-        private final Map<Class<? extends ContextHolder>, ContextHolder> holders = new HashMap<>();
+        private final Map<ContextType<?>, Object> holders = new HashMap<>();
 
-        public <T extends ContextHolder> Builder putHolder(T holder) {
-            holders.put(holder.getClass(), holder);
+        public <T> Builder putHolder(ContextType<T> type, T object) {
+            holders.put(type, object);
             return this;
         }
 

@@ -1,4 +1,4 @@
-package com.carlschierig.immersive_crafting.serialization;
+package com.carlschierig.immersive_crafting.util;
 
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;

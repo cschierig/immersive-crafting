@@ -1,4 +1,4 @@
-package com.carlschierig.immersive_crafting.serialization;
+package com.carlschierig.immersive_crafting.util;
 
 import com.carlschierig.immersive_crafting.api.predicate.condition.ICCondition;
 import com.carlschierig.immersive_crafting.api.predicate.condition.ICConditionSerializer;

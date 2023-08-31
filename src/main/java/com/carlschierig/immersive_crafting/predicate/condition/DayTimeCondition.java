@@ -1,9 +1,10 @@
 package com.carlschierig.immersive_crafting.predicate.condition;
 
 import com.carlschierig.immersive_crafting.api.context.RecipeContext;
+import com.carlschierig.immersive_crafting.api.context.ValidationContext;
 import com.carlschierig.immersive_crafting.api.predicate.condition.ICCondition;
 import com.carlschierig.immersive_crafting.api.predicate.condition.ICConditionSerializer;
-import com.carlschierig.immersive_crafting.context.LevelContextHolder;
+import com.carlschierig.immersive_crafting.context.ContextTypes;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.GsonHelper;
@@ -25,8 +26,8 @@ public class DayTimeCondition implements ICCondition {
 
     @Override
     public boolean test(RecipeContext recipeContext) {
-        var holder = recipeContext.getHolder(LevelContextHolder.class);
-        var time = holder.getLevel().getDayTime();
+        var level = recipeContext.get(ContextTypes.LEVEL);
+        var time = level.getDayTime();
 
         if (startTime <= endTime) {
             return startTime <= time && time <= endTime;
@@ -38,6 +39,13 @@ public class DayTimeCondition implements ICCondition {
     @Override
     public ICConditionSerializer<?> getSerializer() {
         return ICConditionSerializers.DAY_TIME;
+    }
+
+    private static final ValidationContext context = ValidationContext.of(ContextTypes.LEVEL);
+
+    @Override
+    public ValidationContext getRequirements() {
+        return context;
     }
 
     public static final class Serializer implements ICConditionSerializer<DayTimeCondition> {

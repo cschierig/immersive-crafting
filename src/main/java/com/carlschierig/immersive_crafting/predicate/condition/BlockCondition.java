@@ -1,9 +1,10 @@
 package com.carlschierig.immersive_crafting.predicate.condition;
 
 import com.carlschierig.immersive_crafting.api.context.RecipeContext;
+import com.carlschierig.immersive_crafting.api.context.ValidationContext;
 import com.carlschierig.immersive_crafting.api.predicate.condition.ICCondition;
 import com.carlschierig.immersive_crafting.api.predicate.condition.ICConditionSerializer;
-import com.carlschierig.immersive_crafting.context.BlockContextHolder;
+import com.carlschierig.immersive_crafting.context.ContextTypes;
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
@@ -19,8 +20,15 @@ public class BlockCondition implements ICCondition {
 
     @Override
     public boolean test(RecipeContext context) {
-        BlockContextHolder holder = context.getHolder(BlockContextHolder.class);
-        return blockID.equals(BuiltInRegistries.BLOCK.getKey(holder.getBlock()));
+        var block = context.get(ContextTypes.BLOCK);
+        return blockID.equals(BuiltInRegistries.BLOCK.getKey(block));
+    }
+
+    private static final ValidationContext context = ValidationContext.of(ContextTypes.BLOCK);
+
+    @Override
+    public ValidationContext getRequirements() {
+        return context;
     }
 
     @Override

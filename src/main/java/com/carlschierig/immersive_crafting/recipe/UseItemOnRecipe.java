@@ -1,15 +1,16 @@
 package com.carlschierig.immersive_crafting.recipe;
 
 import com.carlschierig.immersive_crafting.api.context.RecipeContext;
+import com.carlschierig.immersive_crafting.api.context.ValidationContext;
 import com.carlschierig.immersive_crafting.api.predicate.ICPredicate;
 import com.carlschierig.immersive_crafting.api.recipe.ICRecipe;
 import com.carlschierig.immersive_crafting.api.recipe.ICRecipeSerializer;
 import com.carlschierig.immersive_crafting.api.recipe.ICRecipeType;
 import com.carlschierig.immersive_crafting.api.registry.ICRegistries;
-import com.carlschierig.immersive_crafting.context.PlayerContextHolder;
+import com.carlschierig.immersive_crafting.context.ContextTypes;
 import com.carlschierig.immersive_crafting.predicate.condition.ICConditionSerializers;
-import com.carlschierig.immersive_crafting.serialization.ICByteBufHelper;
-import com.carlschierig.immersive_crafting.serialization.ICGsonHelper;
+import com.carlschierig.immersive_crafting.util.ICByteBufHelper;
+import com.carlschierig.immersive_crafting.util.ICGsonHelper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -54,7 +55,7 @@ public class UseItemOnRecipe extends ICRecipe {
 
     @Override
     public boolean matches(RecipeContext context) {
-        var player = context.getHolder(PlayerContextHolder.class).getPlayer();
+        var player = context.get(ContextTypes.PLAYER);
         var inventory = player.getInventory();
         var selected = inventory.getSelected();
         return ingredient.test(selected)
@@ -102,6 +103,11 @@ public class UseItemOnRecipe extends ICRecipe {
         private static final String RESULT = "result";
         private static final String SPAWN_AT_PLAYER = "spawn_at_player";
 
+        private static final ValidationContext context = new ValidationContext.Builder()
+                .put(ContextTypes.PLAYER)
+                .put(ContextTypes.LEVEL)
+                .put(ContextTypes.BLOCK).build();
+
         @Override
         public UseItemOnRecipe fromJson(ResourceLocation id, JsonObject json) {
             String group = GsonHelper.getAsString(json, GROUP, "");
@@ -112,8 +118,10 @@ public class UseItemOnRecipe extends ICRecipe {
                 throw new JsonParseException("amount must not be greater than or equal to 1.");
             }
 
+            // todo: prettier validation
             var predicateObject = GsonHelper.getAsJsonObject(json, PREDICATE, new JsonObject());
             var predicate = ICConditionSerializers.PREDICATE.fromJson(predicateObject);
+            context.validate(predicate);
 
             var resultJson = GsonHelper.getAsJsonArray(json, RESULT);
             List<ItemStack> results = new ArrayList<>();
