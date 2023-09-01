@@ -1,9 +1,9 @@
 package com.carlschierig.immersivecrafting.mixin;
 
 import com.carlschierig.immersivecrafting.ImmersiveCrafting;
+import com.carlschierig.immersivecrafting.api.context.ContextTypes;
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
-import com.carlschierig.immersivecrafting.context.ContextTypes;
-import com.carlschierig.immersivecrafting.recipe.ICRecipeTypes;
+import com.carlschierig.immersivecrafting.api.recipe.ICRecipeTypes;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;

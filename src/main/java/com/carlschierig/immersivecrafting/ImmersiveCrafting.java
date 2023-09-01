@@ -1,8 +1,8 @@
 package com.carlschierig.immersivecrafting;
 
-import com.carlschierig.immersivecrafting.recipe.ICRecipeManager;
-import com.carlschierig.immersivecrafting.recipe.ICRecipeSerializers;
-import com.carlschierig.immersivecrafting.recipe.ICRecipeTypes;
+import com.carlschierig.immersivecrafting.api.recipe.ICRecipeManager;
+import com.carlschierig.immersivecrafting.api.recipe.ICRecipeTypes;
+import com.carlschierig.immersivecrafting.impl.recipe.ICRecipeSerializers;
 import net.minecraft.server.packs.PackType;
 import org.quiltmc.loader.api.ModContainer;
 import org.quiltmc.qsl.base.api.entrypoint.ModInitializer;

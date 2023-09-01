@@ -4,6 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+/**
+ * Provides a context for matching and assembling recipes.
+ * The context can be viewed as a snapshot of the level surrounding a player when a recipe is triggered.
+ * <p>
+ * Use {@link RecipeContext.Builder} to create new contexts.
+ */
 public final class RecipeContext {
     private final Map<ContextType<?>, Object> holders;
 
@@ -11,6 +17,14 @@ public final class RecipeContext {
         this.holders = holders;
     }
 
+    /**
+     * Returns the object associated with the given type or throws an exception if it isn't present.
+     *
+     * @param type The type for which the object should be returned.
+     * @param <T>  The type of object which is returned.
+     * @return the object associated with the given type.
+     * @throws NoSuchElementException if no object of that type is present.
+     */
     @SuppressWarnings("unchecked")
     public <T> T get(ContextType<T> type) {
         var holder = holders.get(type);

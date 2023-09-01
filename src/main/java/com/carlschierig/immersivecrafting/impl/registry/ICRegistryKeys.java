@@ -1,10 +1,10 @@
-package com.carlschierig.immersivecrafting.registry;
+package com.carlschierig.immersivecrafting.impl.registry;
 
 import com.carlschierig.immersivecrafting.api.context.ContextType;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializer;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeSerializer;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeType;
-import com.carlschierig.immersivecrafting.util.ICUtil;
+import com.carlschierig.immersivecrafting.impl.util.ICUtil;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 

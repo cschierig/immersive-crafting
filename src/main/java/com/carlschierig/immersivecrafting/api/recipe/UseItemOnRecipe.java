@@ -1,16 +1,14 @@
-package com.carlschierig.immersivecrafting.recipe;
+package com.carlschierig.immersivecrafting.api.recipe;
 
+import com.carlschierig.immersivecrafting.api.context.ContextTypes;
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
 import com.carlschierig.immersivecrafting.api.predicate.ICPredicate;
-import com.carlschierig.immersivecrafting.api.recipe.ICRecipe;
-import com.carlschierig.immersivecrafting.api.recipe.ICRecipeSerializer;
-import com.carlschierig.immersivecrafting.api.recipe.ICRecipeType;
+import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializers;
 import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
-import com.carlschierig.immersivecrafting.context.ContextTypes;
-import com.carlschierig.immersivecrafting.predicate.condition.ICConditionSerializers;
-import com.carlschierig.immersivecrafting.util.ICByteBufHelper;
-import com.carlschierig.immersivecrafting.util.ICGsonHelper;
+import com.carlschierig.immersivecrafting.impl.recipe.ICRecipeSerializers;
+import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelper;
+import com.carlschierig.immersivecrafting.impl.util.ICGsonHelper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -87,6 +85,16 @@ public class UseItemOnRecipe extends ICRecipe {
         return ICRecipeTypes.USE_ITEM;
     }
 
+    private static final ValidationContext context = new ValidationContext.Builder()
+            .put(ContextTypes.PLAYER)
+            .put(ContextTypes.LEVEL)
+            .put(ContextTypes.BLOCK).build();
+
+    @Override
+    public ValidationContext getRequirements() {
+        return context;
+    }
+
     public int getAmount() {
         return amount;
     }
@@ -103,10 +111,6 @@ public class UseItemOnRecipe extends ICRecipe {
         private static final String RESULT = "result";
         private static final String SPAWN_AT_PLAYER = "spawn_at_player";
 
-        private static final ValidationContext context = new ValidationContext.Builder()
-                .put(ContextTypes.PLAYER)
-                .put(ContextTypes.LEVEL)
-                .put(ContextTypes.BLOCK).build();
 
         @Override
         public UseItemOnRecipe fromJson(ResourceLocation id, JsonObject json) {
@@ -216,6 +220,7 @@ public class UseItemOnRecipe extends ICRecipe {
         }
 
         public Builder predicate(ICPredicate predicate) {
+            context.validate(predicate);
             this.predicate = predicate;
             return this;
         }

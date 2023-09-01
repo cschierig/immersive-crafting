@@ -1,10 +1,8 @@
-package com.carlschierig.immersivecrafting.predicate.condition;
+package com.carlschierig.immersivecrafting.api.predicate.condition;
 
+import com.carlschierig.immersivecrafting.api.context.ContextTypes;
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
-import com.carlschierig.immersivecrafting.api.predicate.condition.ICCondition;
-import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializer;
-import com.carlschierig.immersivecrafting.context.ContextTypes;
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;

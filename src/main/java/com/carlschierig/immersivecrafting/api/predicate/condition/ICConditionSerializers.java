@@ -1,9 +1,7 @@
-package com.carlschierig.immersivecrafting.predicate.condition;
+package com.carlschierig.immersivecrafting.api.predicate.condition;
 
 import com.carlschierig.immersivecrafting.ImmersiveCrafting;
 import com.carlschierig.immersivecrafting.api.predicate.ICPredicate;
-import com.carlschierig.immersivecrafting.api.predicate.condition.ICCondition;
-import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializer;
 import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;

@@ -1,10 +1,7 @@
 package com.carlschierig.immersivecrafting.api.predicate;
 
-import com.carlschierig.immersivecrafting.api.predicate.condition.ICCondition;
-import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializer;
-import com.carlschierig.immersivecrafting.predicate.condition.AndCondition;
-import com.carlschierig.immersivecrafting.predicate.condition.ICConditionSerializers;
-import com.carlschierig.immersivecrafting.util.ICByteBufHelper;
+import com.carlschierig.immersivecrafting.api.predicate.condition.*;
+import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelper;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
 
@@ -48,15 +45,25 @@ public class ICPredicate extends AndCondition {
     }
 
     public static class Builder {
-        private final List<ICCondition> conditions = new ArrayList<>();
+        private final List<ICCondition> builderConditions = new ArrayList<>();
 
-        public Builder addCondition(ICCondition condition) {
-            conditions.add(condition);
+        public Builder with(ICCondition condition) {
+            builderConditions.add(condition);
+            return this;
+        }
+
+        public Builder and(ICCondition... conditions) {
+            builderConditions.add(new AndCondition(conditions));
+            return this;
+        }
+
+        public Builder or(ICCondition... conditions) {
+            builderConditions.add(new OrCondition(conditions));
             return this;
         }
 
         public ICPredicate build() {
-            return new ICPredicate(conditions.toArray(ICCondition[]::new));
+            return new ICPredicate(builderConditions.toArray(ICCondition[]::new));
         }
     }
 }

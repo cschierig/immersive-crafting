@@ -1,8 +1,7 @@
 package com.carlschierig.immersivecrafting.api.predicate.condition;
 
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
-import com.carlschierig.immersivecrafting.predicate.condition.ICConditionSerializers;
-import com.carlschierig.immersivecrafting.util.ICByteBufHelper;
+import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelper;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.GsonHelper;
@@ -10,15 +9,20 @@ import net.minecraft.util.GsonHelper;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+/**
+ * A condition which consists of multiple child conditions.
+ * Subclasses can also use the {@link CompoundICCondition.Serializer} serializer.
+ */
 public abstract class CompoundICCondition implements ICCondition {
     protected final ICCondition[] conditions;
 
+    /**
+     * create a new compound condition from the given child conditions.
+     *
+     * @param conditions The children of the compound conditions.
+     */
     public CompoundICCondition(ICCondition[] conditions) {
         this.conditions = conditions;
-    }
-
-    public final ICCondition[] getConditions() {
-        return conditions;
     }
 
     @Override
@@ -26,9 +30,22 @@ public abstract class CompoundICCondition implements ICCondition {
         return ValidationContext.merge(Arrays.stream(conditions).map(ICCondition::getRequirements).collect(Collectors.toList()));
     }
 
+    /**
+     * A template {@link ICConditionSerializer} for {@link CompoundICCondition}s.
+     * Subclasses must override {@link Serializer#create(ICCondition[])} to determine how a new instance should
+     * be created.
+     *
+     * @param <T> The type of condition for which the serializer is used.
+     */
     public static abstract class Serializer<T extends CompoundICCondition> implements ICConditionSerializer<T> {
         private static final String CONDITIONS = "conditions";
 
+        /**
+         * Create a new compound condition of type {@link T} using the given {@link ICCondition[]}.
+         *
+         * @param conditions The conditions which should be passed to the constructor.
+         * @return a new compound condition of type {@link T}.
+         */
         protected abstract T create(ICCondition[] conditions);
 
         @Override

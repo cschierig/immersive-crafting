@@ -1,36 +1,57 @@
-# Quilt Template Mod
+# Immersive Crafting
 
-The official Quilt template mod. You can use it as a template for your own mods!
+Immersive Crafting is a library mod adding support for data-driven in-world crafting.
+Crafting recipes are completely data-driven and reside in the `data/{some-folder}/ic_recipes`
+folder. Recipes can also be generated using the fabric-datagen API.
 
-## Usage
+Immersive Crafting provides several built-in recipe types, such as crafting items
+when clicking with an item on a block. Everything is designed to be highly customizable.
 
-In order to use this mod as a template:
+## Documentation
 
-1. Create a new repository from this template with `Use this template`
-2. Clone the recently-created repo on your PC
-3. Make the necessary changes in order to make it yours:
-    - Update `gradle.properties` in order to use your Maven group and mod ID
-        - If you don't know which Maven group to use, and you are planning to host the mod's source code on GitHub,
-          use `io.github.<Your_Username_Here>`
-    - Update `quilt.mod.json` in order to reflect your mod's metadata
-        - If you are planning to include (jar-in-jar) a mod, don't forget to declare its dependency on it!
-        - The icon provided here is a placeholder one. If you aren't able to replace it yet, you can delete it and
-          remove the "icon" property
-    - Create a LICENSE file for this mod! If you don't know which license to use, check
-      out [here](https://choosealicense.com/).
-        - If you use `LICENSE.md`, don't forget to update the buildscript in order to use that file name!
-        - In `quilt.mod.json`, don't forget to put the license's [SPDX identifier](https://spdx.org/licenses/) under
-          the `"license"` property in `"metadata"`.
-        - The GPLv3 and AGPLv3 are not valid mod licenses, so you can use almost any license except for those.
-    - Update the Java sub-directory structure so it reflects your Maven group
-    - If the dependencies in `gradle/libs.versions.toml` aren't up-to-date, feel free to update them!
-      The [linked utility](https://lambdaurora.dev/tools/import_quilt.html) should help you in this easy and quick
-      process.
-4. The mod is now ready to be worked on!
+Up-to-date documentation can be found [here](https://github.com/cschierig/immersive-crafting/blob/dev/1.20.1/docs).
 
-## License
+## Example
 
-This template on the QuiltMC GitHub is licensed under the [Creative Common Zero v1.0 license](./LICENSE-TEMPLATE.md).
+The following example crafts a nether star from five diamonds when the player right-clicks
+on a quartz block with a stack of diamonds.
 
-Mods created with this template are not automatically licensed under the CC0, and are not required to give any kind of
-credit back to QuiltMC for this template.
+```json
+{
+  "type": "immersive_crafting:use_item_on",
+  "ingredient": {
+    "item": "minecraft:diamond"
+  },
+  "amount": 5,
+  "predicate": {
+    "immersive_crafting:day_time": {
+      "start_time": 13000,
+      "end_time": 0
+    },
+    "immersive_crafting:block": {
+      "block": "minecraft:quartz_block"
+    }
+  },
+  "result": [
+    {
+      "item": "minecraft:nether_star"
+    }
+  ]
+}
+```
+
+## Usage & Dependencies
+
+- Immersive Crafting depends on [Quilted Standard Libraries](https://modrinth.com/mod/qsl).
+- The mod is currently Quilt-exclusive. I might add support for other loaders in the future,
+  but I do not have the time to do so at the moment.
+
+<!-- modrinth_exclude.start -->
+
+## Contributing
+
+If you have encountered a problem or are in need of a feature, feel free to open an issue.
+I'm also accepting pull requests, but you should consider contacting me before submitting
+bigger changes to the project.
+
+<!-- modrinth_exclude.end -->

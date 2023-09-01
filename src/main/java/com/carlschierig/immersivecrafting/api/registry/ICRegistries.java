@@ -4,7 +4,7 @@ import com.carlschierig.immersivecrafting.api.context.ContextType;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializer;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeSerializer;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeType;
-import com.carlschierig.immersivecrafting.registry.ICRegistryKeys;
+import com.carlschierig.immersivecrafting.impl.registry.ICRegistryKeys;
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;

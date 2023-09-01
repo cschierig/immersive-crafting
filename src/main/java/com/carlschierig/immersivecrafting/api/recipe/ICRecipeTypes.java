@@ -1,8 +1,6 @@
-package com.carlschierig.immersivecrafting.recipe;
+package com.carlschierig.immersivecrafting.api.recipe;
 
 import com.carlschierig.immersivecrafting.ImmersiveCrafting;
-import com.carlschierig.immersivecrafting.api.recipe.ICRecipe;
-import com.carlschierig.immersivecrafting.api.recipe.ICRecipeType;
 import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;

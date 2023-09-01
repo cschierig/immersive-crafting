@@ -1,4 +1,4 @@
-package com.carlschierig.immersivecrafting.util;
+package com.carlschierig.immersivecrafting.impl.util;
 
 import com.carlschierig.immersivecrafting.ImmersiveCrafting;
 import net.minecraft.resources.ResourceLocation;

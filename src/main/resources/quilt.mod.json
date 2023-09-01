@@ -2,7 +2,7 @@
   "schema_version": 1,
   "quilt_loader": {
     "group": "com.carlschierig",
-    "id": "immersive_crafting",
+    "id": "immersivecrafting",
     "version": "${version}",
     "metadata": {
       "name": "Immersive Crafting",
@@ -14,7 +14,7 @@
         "issues": "https://github.com/cschierig/immersive-crafting/issues",
         "sources": "https://github.com/cschierig/immersive-crafting"
       },
-      "icon": "assets/immersive_crafting/icon.png"
+      "icon": "assets/immersivecrafting/icon.png"
     },
     "intermediate_mappings": "net.fabricmc:intermediary",
     "entrypoints": {
@@ -35,5 +35,5 @@
       }
     ]
   },
-  "mixin": "immersive_crafting.mixins.json"
+  "mixin": "immersivecrafting.mixins.json"
 }

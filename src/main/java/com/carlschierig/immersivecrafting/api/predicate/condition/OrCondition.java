@@ -1,9 +1,6 @@
-package com.carlschierig.immersivecrafting.predicate.condition;
+package com.carlschierig.immersivecrafting.api.predicate.condition;
 
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
-import com.carlschierig.immersivecrafting.api.predicate.condition.CompoundICCondition;
-import com.carlschierig.immersivecrafting.api.predicate.condition.ICCondition;
-import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializer;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditions;
 
 import java.util.function.Predicate;
@@ -11,7 +8,7 @@ import java.util.function.Predicate;
 public class OrCondition extends CompoundICCondition {
     private final Predicate<RecipeContext> predicate;
 
-    public OrCondition(ICCondition[] conditions) {
+    public OrCondition(ICCondition... conditions) {
         super(conditions);
         predicate = LootItemConditions.orConditions(conditions);
     }
