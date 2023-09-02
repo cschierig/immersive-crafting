@@ -20,7 +20,8 @@ public class RangePredicate implements Predicate<Float> {
     }
 
     public boolean test(Float value) {
-        return value >= min && value <= max;
+        var e = 0.0001f;
+        return value >= (min - e) && value <= (max + e);
     }
 
     private static final Serializer serializer = new Serializer();
@@ -39,7 +40,7 @@ public class RangePredicate implements Predicate<Float> {
                 throw new JsonParseException("Range must include minimum or maximum value.");
             }
             var min = GsonHelper.getAsFloat(json, MIN, Float.NEGATIVE_INFINITY);
-            var max = GsonHelper.getAsFloat(json, MIN, Float.POSITIVE_INFINITY);
+            var max = GsonHelper.getAsFloat(json, MAX, Float.POSITIVE_INFINITY);
             if (min > max) {
                 throw new JsonParseException("Minimum may not be larger than maximum.");
             }
@@ -53,7 +54,7 @@ public class RangePredicate implements Predicate<Float> {
                 json.addProperty(MIN, instance.min);
             }
             if (!Float.isInfinite(instance.max)) {
-                json.addProperty(MIN, instance.max);
+                json.addProperty(MAX, instance.max);
             }
             return json;
         }
