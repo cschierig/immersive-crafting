@@ -1,6 +1,7 @@
 package com.carlschierig.immersivecrafting.api.predicate.condition;
 
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
+import com.carlschierig.immersivecrafting.api.serialization.ICGsonHelper;
 import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelperImpl;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
@@ -50,13 +51,13 @@ public abstract class CompoundICCondition implements ICCondition {
 
         @Override
         public T fromJson(JsonObject json) {
-            var conditions = ICConditionSerializers.fromJson(GsonHelper.getAsJsonObject(json, CONDITIONS));
+            var conditions = ICGsonHelper.getAsConditions(GsonHelper.getAsJsonArray(json, CONDITIONS));
             return create(conditions);
         }
 
         @Override
         public JsonObject toJson(T instance) {
-            var conditions = ICConditionSerializers.toJson(instance.conditions);
+            var conditions = ICGsonHelper.conditionsToJson(instance.conditions);
             var json = new JsonObject();
             json.add(CONDITIONS, conditions);
             return json;

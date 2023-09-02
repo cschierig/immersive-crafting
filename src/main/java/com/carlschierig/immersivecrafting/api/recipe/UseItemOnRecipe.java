@@ -8,7 +8,7 @@ import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSer
 import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
 import com.carlschierig.immersivecrafting.impl.recipe.ICRecipeSerializers;
 import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelperImpl;
-import com.carlschierig.immersivecrafting.impl.util.ICGsonHelper;
+import com.carlschierig.immersivecrafting.impl.util.ICGsonHelperImpl;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -148,7 +148,7 @@ public class UseItemOnRecipe extends ICRecipe {
 
             var resultArray = new JsonArray();
             for (var resultStack : instance.results) {
-                resultArray.add(ICGsonHelper.itemStackToJson(resultStack));
+                resultArray.add(ICGsonHelperImpl.itemStackToJson(resultStack));
             }
             json.add(RESULT, resultArray);
 

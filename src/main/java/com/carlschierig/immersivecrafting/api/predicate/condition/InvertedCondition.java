@@ -2,10 +2,11 @@ package com.carlschierig.immersivecrafting.api.predicate.condition;
 
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
+import com.carlschierig.immersivecrafting.api.serialization.ICGsonHelper;
 import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelperImpl;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
 
 
 public class InvertedCondition implements ICCondition {
@@ -31,23 +32,21 @@ public class InvertedCondition implements ICCondition {
     }
 
     public static final class Serializer implements ICConditionSerializer<InvertedCondition> {
+        private static final String CONDITION = "condition";
 
         @Override
         public InvertedCondition fromJson(JsonObject json) {
-            // TODO: error handling
-            var first = json.entrySet().stream().findFirst().get();
-            var type = new ResourceLocation(first.getKey());
-            var condition = first.getValue().getAsJsonObject();
+            var condition = GsonHelper.getAsJsonObject(json, CONDITION);
 
-            return new InvertedCondition(ICConditionSerializers.fromJson(type, condition));
+            return new InvertedCondition(ICGsonHelper.getAsCondition(condition));
         }
 
         @Override
         public JsonObject toJson(InvertedCondition instance) {
             var json = new JsonObject();
 
-            var condition = instance.original;
-            ICConditionSerializers.addCondition(json, condition);
+            var condition = ICGsonHelper.conditionToJson(instance.original);
+            json.add(CONDITION, condition);
 
             return json;
         }
