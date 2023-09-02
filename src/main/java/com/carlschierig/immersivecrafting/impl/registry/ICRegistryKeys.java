@@ -7,8 +7,10 @@ import com.carlschierig.immersivecrafting.api.recipe.ICRecipeType;
 import com.carlschierig.immersivecrafting.impl.util.ICUtil;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import org.jetbrains.annotations.ApiStatus;
 
-public class ICRegistryKeys {
+@ApiStatus.Internal
+public final class ICRegistryKeys {
     public static final ResourceKey<Registry<ICConditionSerializer<?>>> CONDITION_SERIALIZER = createRegistryKey("condition_serializer");
     public static final ResourceKey<Registry<ICRecipeType<?>>> RECIPE_TYPE = createRegistryKey("recipe_type");
     public static final ResourceKey<Registry<ICRecipeSerializer<?>>> RECIPE_SERIALIZER = createRegistryKey("recipe_serializer");

@@ -42,7 +42,7 @@ on a quartz block with a stack of diamonds.
 
 ## Usage & Dependencies
 
-- Immersive Crafting depends on [Quilted Standard Libraries](https://modrinth.com/mod/qsl).
+- Immersive Crafting depends on [Quilt Standard Libraries](https://modrinth.com/mod/qsl).
 - The mod is currently Quilt-exclusive. I might add support for other loaders in the future,
   but I do not have the time to do so at the moment.
 

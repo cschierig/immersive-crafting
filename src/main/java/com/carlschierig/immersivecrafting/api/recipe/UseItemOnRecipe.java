@@ -7,7 +7,7 @@ import com.carlschierig.immersivecrafting.api.predicate.ICPredicate;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializers;
 import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
 import com.carlschierig.immersivecrafting.impl.recipe.ICRecipeSerializers;
-import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelper;
+import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelperImpl;
 import com.carlschierig.immersivecrafting.impl.util.ICGsonHelper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -88,7 +88,7 @@ public class UseItemOnRecipe extends ICRecipe {
     private static final ValidationContext context = new ValidationContext.Builder()
             .put(ContextTypes.PLAYER)
             .put(ContextTypes.LEVEL)
-            .put(ContextTypes.BLOCK).build();
+            .put(ContextTypes.BLOCK_STATE).build();
 
     @Override
     public ValidationContext getRequirements() {
@@ -116,13 +116,11 @@ public class UseItemOnRecipe extends ICRecipe {
         public UseItemOnRecipe fromJson(ResourceLocation id, JsonObject json) {
             String group = GsonHelper.getAsString(json, GROUP, "");
             Ingredient ingredient = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, INGREDIENT), false);
-            // todo: check non negative
             int amount = GsonHelper.getAsInt(json, AMOUNT, 1);
             if (amount < 1) {
                 throw new JsonParseException("amount must not be greater than or equal to 1.");
             }
 
-            // todo: prettier validation
             var predicateObject = GsonHelper.getAsJsonObject(json, PREDICATE, new JsonObject());
             var predicate = ICConditionSerializers.PREDICATE.fromJson(predicateObject);
             context.validate(predicate);
@@ -170,7 +168,7 @@ public class UseItemOnRecipe extends ICRecipe {
 
             var predicate = ICConditionSerializers.PREDICATE.fromNetwork(buf);
 
-            var results = ICByteBufHelper.readList(buf, FriendlyByteBuf::readItem);
+            var results = ICByteBufHelperImpl.readList(buf, FriendlyByteBuf::readItem);
             var spawnAtPlayer = buf.readBoolean();
 
             return new UseItemOnRecipe(id, group, ingredient, amount, predicate, results, spawnAtPlayer);
@@ -183,7 +181,7 @@ public class UseItemOnRecipe extends ICRecipe {
             buf.writeInt(recipe.amount);
 
             ICConditionSerializers.PREDICATE.toNetwork(buf, recipe.predicate);
-            ICByteBufHelper.writeList(buf, recipe.results, FriendlyByteBuf::writeItem);
+            ICByteBufHelperImpl.writeList(buf, recipe.results, FriendlyByteBuf::writeItem);
             buf.writeBoolean(recipe.spawnAtPlayer);
         }
     }
@@ -241,6 +239,12 @@ public class UseItemOnRecipe extends ICRecipe {
         }
 
         public UseItemOnRecipe build() {
+            if (ingredient == null) {
+                throw new IllegalStateException("ingredient must be set");
+            }
+            if (predicate == null) {
+                throw new IllegalStateException("predicate must be set");
+            }
             return new UseItemOnRecipe(id, group, ingredient, amount, predicate, results, spawnAtPlayer);
         }
     }

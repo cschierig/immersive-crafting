@@ -2,7 +2,7 @@ package com.carlschierig.immersivecrafting.api.predicate.condition;
 
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
-import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelper;
+import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelperImpl;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -54,13 +54,13 @@ public class InvertedCondition implements ICCondition {
 
         @Override
         public InvertedCondition fromNetwork(FriendlyByteBuf buf) {
-            var condition = ICByteBufHelper.readICCondition(buf);
+            var condition = ICByteBufHelperImpl.readICCondition(buf);
             return new InvertedCondition(condition);
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf buf, InvertedCondition instance) {
-            ICByteBufHelper.writeICCondition(buf, instance.original);
+            ICByteBufHelperImpl.writeICCondition(buf, instance.original);
         }
     }
 }

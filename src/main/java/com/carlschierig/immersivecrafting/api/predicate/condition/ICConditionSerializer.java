@@ -2,6 +2,7 @@ package com.carlschierig.immersivecrafting.api.predicate.condition;
 
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
+import org.jetbrains.annotations.Contract;
 
 /**
  * A serializer for serializing and deserializing {@link ICCondition}s.
@@ -16,6 +17,7 @@ public interface ICConditionSerializer<T extends ICCondition> {
      * @param json The json from which the condition is read.
      * @return a new {@link ICCondition} of type {@link T}.
      */
+    @Contract(pure = true)
     T fromJson(JsonObject json);
 
     /**
@@ -24,6 +26,7 @@ public interface ICConditionSerializer<T extends ICCondition> {
      * @param instance The condition which should be serialized.
      * @return a new {@link JsonObject} containing a json representation of the passed instance.
      */
+    @Contract(pure = true)
     JsonObject toJson(T instance);
 
     /**

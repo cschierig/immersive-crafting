@@ -8,6 +8,7 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -28,6 +29,11 @@ public abstract class ICRecipeProvider implements DataProvider {
     protected final FabricDataOutput output;
     private final PackOutput.PathProvider pathProvider;
 
+    /**
+     * Create a new ICRecipeProvider. Subclasses should pass on the {@link FabricDataOutput} they were handed.
+     *
+     * @param output the data output to use.
+     */
     public ICRecipeProvider(FabricDataOutput output) {
         this.output = output;
         pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "ic_recipes");
@@ -66,7 +72,7 @@ public abstract class ICRecipeProvider implements DataProvider {
     }
 
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return "Immersive Crafting Recipes";
     }
 

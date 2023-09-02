@@ -4,14 +4,16 @@ import com.carlschierig.immersivecrafting.api.predicate.condition.ICCondition;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializer;
 import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
 import net.minecraft.network.FriendlyByteBuf;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public final class ICByteBufHelper {
-    private ICByteBufHelper() {
+@ApiStatus.Internal
+public final class ICByteBufHelperImpl {
+    private ICByteBufHelperImpl() {
     }
 
     public static <T> List<T> readList(FriendlyByteBuf buf, Function<FriendlyByteBuf, T> deserializer) {

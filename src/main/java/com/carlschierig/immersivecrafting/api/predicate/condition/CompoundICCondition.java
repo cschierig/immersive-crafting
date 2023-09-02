@@ -1,7 +1,7 @@
 package com.carlschierig.immersivecrafting.api.predicate.condition;
 
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
-import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelper;
+import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelperImpl;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.GsonHelper;
@@ -64,13 +64,13 @@ public abstract class CompoundICCondition implements ICCondition {
 
         @Override
         public T fromNetwork(FriendlyByteBuf buf) {
-            var conditions = ICByteBufHelper.readList(buf, ICByteBufHelper::readICCondition);
+            var conditions = ICByteBufHelperImpl.readList(buf, ICByteBufHelperImpl::readICCondition);
             return create(conditions.toArray(ICCondition[]::new));
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf buf, T instance) {
-            ICByteBufHelper.writeList(buf, Arrays.asList(instance.conditions), ICByteBufHelper::writeICCondition);
+            ICByteBufHelperImpl.writeList(buf, Arrays.asList(instance.conditions), ICByteBufHelperImpl::writeICCondition);
         }
     }
 }

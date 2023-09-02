@@ -1,9 +1,10 @@
 package com.carlschierig.immersivecrafting.api.predicate;
 
 import com.carlschierig.immersivecrafting.api.predicate.condition.*;
-import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelper;
+import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelperImpl;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
+import org.jetbrains.annotations.Contract;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,29 +35,32 @@ public class ICPredicate extends AndCondition {
 
         @Override
         public ICPredicate fromNetwork(FriendlyByteBuf buf) {
-            var conditions = ICByteBufHelper.readList(buf, ICByteBufHelper::readICCondition);
+            var conditions = ICByteBufHelperImpl.readList(buf, ICByteBufHelperImpl::readICCondition);
             return new ICPredicate(conditions.toArray(ICCondition[]::new));
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf buf, ICPredicate instance) {
-            ICByteBufHelper.writeList(buf, Arrays.asList(instance.conditions), ICByteBufHelper::writeICCondition);
+            ICByteBufHelperImpl.writeList(buf, Arrays.asList(instance.conditions), ICByteBufHelperImpl::writeICCondition);
         }
     }
 
     public static class Builder {
         private final List<ICCondition> builderConditions = new ArrayList<>();
 
+        @Contract("_->this")
         public Builder with(ICCondition condition) {
             builderConditions.add(condition);
             return this;
         }
 
+        @Contract("_->this")
         public Builder and(ICCondition... conditions) {
             builderConditions.add(new AndCondition(conditions));
             return this;
         }
 
+        @Contract("_->this")
         public Builder or(ICCondition... conditions) {
             builderConditions.add(new OrCondition(conditions));
             return this;

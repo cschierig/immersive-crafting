@@ -1,8 +1,8 @@
 package com.carlschierig.immersivecrafting.mixin;
 
-import com.carlschierig.immersivecrafting.ImmersiveCrafting;
 import com.carlschierig.immersivecrafting.api.context.ContextTypes;
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
+import com.carlschierig.immersivecrafting.api.recipe.ICRecipeManager;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeTypes;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -25,11 +25,11 @@ public abstract class ItemMixin {
 
             var recipeContext = new RecipeContext.Builder()
                     .putHolder(ContextTypes.PLAYER, player)
-                    .putHolder(ContextTypes.BLOCK, level.getBlockState(context.getClickedPos()).getBlock())
+                    .putHolder(ContextTypes.BLOCK_STATE, level.getBlockState(context.getClickedPos()))
                     .putHolder(ContextTypes.LEVEL, level)
                     .build();
 
-            var optRecipe = ImmersiveCrafting.RECIPE_MANAGER.getRecipe(ICRecipeTypes.USE_ITEM, recipeContext);
+            var optRecipe = ICRecipeManager.getRecipe(ICRecipeTypes.USE_ITEM, recipeContext);
 
             if (optRecipe.isPresent()) {
                 var recipe = optRecipe.get();
