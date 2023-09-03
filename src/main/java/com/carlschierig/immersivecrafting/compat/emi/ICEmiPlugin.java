@@ -22,8 +22,8 @@ public class ICEmiPlugin implements EmiPlugin {
 
     @Override
     public void register(EmiRegistry registry) {
-        registerCategories(registry);
-        registerRecipeHandlers(registry);
+        // registerCategories(registry);
+        // registerRecipeHandlers(registry);
     }
 
     private void registerCategories(EmiRegistry registry) {
