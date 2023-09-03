@@ -8,6 +8,9 @@ classes/
 remappedSrc/
 run/
 
+# Datagen cache
+.cache/
+
 # Eclipse
 *.launch
 

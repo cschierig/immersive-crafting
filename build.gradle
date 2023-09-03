@@ -4,9 +4,12 @@ plugins {
     alias libs.plugins.quilt.loom
 }
 
-base.archivesName = project.archives_base_name
-version = "$project.version+${libs.versions.minecraft.get()}"
-group = project.maven_group
+repositories {
+    maven {
+        name = "TerraformersMC"
+        url = "https://maven.terraformersmc.com/"
+    }
+}
 
 dependencies {
     minecraft libs.minecraft
@@ -17,7 +20,16 @@ dependencies {
     modImplementation libs.quilt.loader
 
     modImplementation libs.quilted.fabric.api
+
+    // emi
+    modCompileOnly "dev.emi:emi-fabric:${libs.versions.emi.get()}:api"
+    modLocalRuntime libs.emi.runtime
 }
+
+base.archivesName = project.archives_base_name
+version = "$project.version+${libs.versions.minecraft.get()}"
+group = project.maven_group
+
 
 processResources {
     inputs.property 'version', version
@@ -48,17 +60,85 @@ jar {
     }
 }
 
+// api
+tasks.register('apiJar', Jar) {
+    archiveClassifier = "api"
+    dependsOn remapJar
+    from zipTree(remapJar.archivePath)
+    include 'quilt.mod.json'
+    include 'immersivecrafting.mixins.json'
+    include 'com/carlschierig/immersivecrafting/api/**'
+}
+
+build.dependsOn apiJar
+
+// Example mod
+sourceSets {
+    example {
+        compileClasspath += sourceSets.main.compileClasspath
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.runtimeClasspath
+
+        resources {
+            srcDirs += [
+                    'src/example/generated'
+            ]
+        }
+    }
+}
+
+loom {
+    runs {
+        example {
+            client()
+            configName = "Example Mod"
+            source(project.sourceSets.example)
+        }
+        exampleDatagen {
+            inherit example
+            name "Example Mod Data Generation"
+            vmArg "-Dfabric-api.datagen"
+            vmArg "-Dfabric-api.datagen.output-dir=${file("src/example/generated")}"
+            vmArg "-Dfabric-api.datagen=ic_examples"
+
+            runDir "build/datagen"
+        }
+    }
+}
+
+// publishing
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact(remapJar) {
+                builtBy remapJar
+                classifier ''
+            }
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+                classifier 'sources'
+            }
+            artifact(apiJar) {
+                builtBy apiJar
+                classifier 'api'
+            }
+        }
+    }
+}
+
 modrinth {
     token = System.getenv("MODRINTH_TOKEN")
     projectId = "immersive-crafting"
     versionType = "alpha"
     uploadFile = remapJar
     additionalFiles = [
-            remapSourcesJar
+            remapSourcesJar,
+            apiJar
     ]
     syncBodyFrom = rootProject.file("README.md").text
     dependencies {
-        required.project "qsl" // Creates a new required dependency on QSL
+        required.project "qsl"
+        optional.project "emi"
     }
 }
 tasks.modrinth.dependsOn(tasks.modrinthSyncBody)

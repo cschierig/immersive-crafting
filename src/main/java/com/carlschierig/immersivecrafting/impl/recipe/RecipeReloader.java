@@ -5,6 +5,7 @@ import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipe;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeType;
 import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
+import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
@@ -23,15 +24,19 @@ import java.util.Optional;
 
 @ApiStatus.Internal
 public final class RecipeReloader implements SimpleSynchronousResourceReloader {
-    private static Map<ICRecipeType<?>, Map<ResourceLocation, ICRecipe>> recipes = ImmutableMap.of();
+    private static ImmutableMap<ICRecipeType<?>, ImmutableMap<ResourceLocation, ICRecipe>> recipes = ImmutableMap.of();
 
     public static <T extends ICRecipe> Optional<T> getRecipe(ICRecipeType<T> type, RecipeContext context) {
         return ((Map<?, T>) recipes.get(type)).values().stream().filter(recipe -> recipe.matches(context)).findFirst();
     }
 
+    public static ImmutableCollection<ICRecipe> getRecipes(ICRecipeType<?> type) {
+        return recipes.get(type).values();
+    }
+
     @Override
     public void onResourceManagerReload(ResourceManager manager) {
-        var builder = ImmutableMap.<ICRecipeType<?>, Map<ResourceLocation, ICRecipe>>builder();
+        var builder = ImmutableMap.<ICRecipeType<?>, ImmutableMap<ResourceLocation, ICRecipe>>builder();
         var maps = new HashMap<ICRecipeType<?>, ImmutableMap.Builder<ResourceLocation, ICRecipe>>();
 
         for (var type : ICRegistries.RECIPE_TYPE) {

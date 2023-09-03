@@ -10,7 +10,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import org.jetbrains.annotations.Contract;
+import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockCondition implements ICCondition {
@@ -101,25 +101,31 @@ public class BlockCondition implements ICCondition {
         public Builder() {
         }
 
-        @Contract("_->this")
+        /**
+         * Uses the {@link ResourceLocation} of the given block as the resource location for the condition.
+         *
+         * @param block The block whose resource location should be used for the condition.
+         * @return this Builder.
+         */
+        public Builder idFromBlock(Block block) {
+            return id(BuiltInRegistries.BLOCK.getKey(block));
+        }
+
         public Builder id(ResourceLocation id) {
             this.id = id;
             return this;
         }
 
-        @Contract("_->this")
         public Builder hardness(float min, float max) {
             hardness = new RangePredicate(min, max);
             return this;
         }
 
-        @Contract("_->this")
         public Builder hardnessMinOnly(float min) {
             hardness = new RangePredicate(min, Float.POSITIVE_INFINITY);
             return this;
         }
 
-        @Contract("_->this")
         public Builder hardnessMaxOnly(float max) {
             hardness = new RangePredicate(Float.NEGATIVE_INFINITY, max);
             return this;

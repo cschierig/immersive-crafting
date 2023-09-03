@@ -2,26 +2,23 @@
   "schema_version": 1,
   "quilt_loader": {
     "group": "com.carlschierig",
-    "id": "immersive_crafting",
-    "version": "${version}",
+    "id": "ic_examples",
+    "version": "1.0.0",
     "metadata": {
-      "name": "Immersive Crafting",
-      "description": "Library mod adding data-driven in-world crafting.",
+      "name": "Immersive Crafting Example Mod",
+      "description": "Example content for Immersive Crafting.",
       "contributors": {
         "CozyPenguin": "Owner"
       },
       "contact": {
         "issues": "https://github.com/cschierig/immersive-crafting/issues",
         "sources": "https://github.com/cschierig/immersive-crafting"
-      },
-      "icon": "assets/immersive_crafting/icon.png"
+      }
     },
     "intermediate_mappings": "net.fabricmc:intermediary",
     "entrypoints": {
-      "init": "com.carlschierig.immersivecrafting.ImmersiveCrafting",
-      "emi": [
-        "com.carlschierig.immersivecrafting.compat.emi.ICEmiPlugin"
-      ]
+      "init": "com.carlschierig.icexample.ICExample",
+      "fabric-datagen": "com.carlschierig.icexample.datagen.ICExampleDatagen"
     },
     "depends": [
       {
@@ -35,8 +32,11 @@
       {
         "id": "minecraft",
         "versions": ">=1.20"
+      },
+      {
+        "id": "immersive_crafting",
+        "versions": "*"
       }
     ]
-  },
-  "mixin": "immersive-crafting.mixins.json"
+  }
 }

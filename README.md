@@ -19,18 +19,25 @@ on a quartz block with a stack of diamonds.
 ```json
 {
   "type": "immersive_crafting:use_item_on",
+  "amount": 5,
   "ingredient": {
     "item": "minecraft:diamond"
   },
-  "amount": 5,
   "predicate": {
-    "immersive_crafting:day_time": {
-      "start_time": 13000,
-      "end_time": 0
-    },
-    "immersive_crafting:block": {
-      "block": "minecraft:quartz_block"
-    }
+    "conditions": [
+      {
+        "type": "immersive_crafting:invert",
+        "condition": {
+          "type": "immersive_crafting:day_time",
+          "end_time": 12999,
+          "start_time": 0
+        }
+      },
+      {
+        "type": "immersive_crafting:block",
+        "id": "minecraft:quartz_block"
+      }
+    ]
   },
   "result": [
     {
