@@ -14,14 +14,17 @@ Up-to-date documentation can be found [here](https://github.com/cschierig/immers
 ## Example
 
 The following example crafts a nether star from five diamonds when the player right-clicks
-on a quartz block with a stack of diamonds.
+on a quartz block with a stack of diamonds at night.
 
 ```json
 {
   "type": "immersive_crafting:use_item_on",
-  "amount": 5,
   "ingredient": {
-    "item": "minecraft:diamond"
+    "type": "immersive_crafting:item",
+    "stack": {
+      "count": 5,
+      "item": "minecraft:diamond"
+    }
   },
   "predicate": {
     "conditions": [
@@ -41,7 +44,10 @@ on a quartz block with a stack of diamonds.
   },
   "result": [
     {
-      "item": "minecraft:nether_star"
+      "type": "immersive_crafting:item",
+      "stack": {
+        "item": "minecraft:nether_star"
+      }
     }
   ]
 }

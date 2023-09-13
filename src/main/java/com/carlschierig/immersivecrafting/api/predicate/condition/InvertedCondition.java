@@ -3,9 +3,12 @@ package com.carlschierig.immersivecrafting.api.predicate.condition;
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
 import com.carlschierig.immersivecrafting.api.serialization.ICGsonHelper;
+import com.carlschierig.immersivecrafting.impl.render.ICRenderHelper;
 import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelperImpl;
 import com.google.gson.JsonObject;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.GsonHelper;
 
 
@@ -19,6 +22,12 @@ public class InvertedCondition implements ICCondition {
     @Override
     public boolean test(RecipeContext context) {
         return !original.test(context);
+    }
+
+    @Override
+    public void render(GuiGraphics draw, int x, int y, float delta) {
+        original.render(draw, x, y, delta);
+        ICRenderHelper.renderItemAnnotation(draw, 0, 0, Component.literal("!"));
     }
 
     @Override

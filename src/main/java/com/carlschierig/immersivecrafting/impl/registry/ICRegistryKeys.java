@@ -17,6 +17,6 @@ public final class ICRegistryKeys {
     public static final ResourceKey<Registry<ContextType<?>>> CONTEXT_TYPE = createRegistryKey("context_type");
 
     private static <T> ResourceKey<Registry<T>> createRegistryKey(String path) {
-        return ResourceKey.createRegistryKey(ICUtil.createResourceLocation(path));
+        return ResourceKey.createRegistryKey(ICUtil.getId(path));
     }
 }

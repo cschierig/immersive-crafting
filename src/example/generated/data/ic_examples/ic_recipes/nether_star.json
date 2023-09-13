@@ -1,8 +1,11 @@
 {
   "type": "immersive_crafting:use_item_on",
-  "amount": 5,
   "ingredient": {
-    "item": "minecraft:diamond"
+    "type": "immersive_crafting:item",
+    "stack": {
+      "count": 5,
+      "item": "minecraft:diamond"
+    }
   },
   "predicate": {
     "conditions": [
@@ -22,7 +25,10 @@
   },
   "result": [
     {
-      "item": "minecraft:nether_star"
+      "type": "immersive_crafting:item",
+      "stack": {
+        "item": "minecraft:nether_star"
+      }
     }
   ]
 }

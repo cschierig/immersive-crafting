@@ -1,7 +1,10 @@
 {
   "type": "immersive_crafting:use_item_on",
   "ingredient": {
-    "item": "minecraft:porkchop"
+    "type": "immersive_crafting:item",
+    "stack": {
+      "item": "minecraft:porkchop"
+    }
   },
   "predicate": {
     "conditions": [
@@ -13,7 +16,10 @@
   },
   "result": [
     {
-      "item": "minecraft:cooked_porkchop"
+      "type": "immersive_crafting:item",
+      "stack": {
+        "item": "minecraft:cooked_porkchop"
+      }
     }
   ]
 }

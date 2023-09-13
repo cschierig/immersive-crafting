@@ -19,6 +19,7 @@ run/
 *.iml
 *.ipr
 *.iws
+.run/
 
 # Fleet
 .fleet/

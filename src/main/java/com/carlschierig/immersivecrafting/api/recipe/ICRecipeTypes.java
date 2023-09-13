@@ -12,7 +12,7 @@ public final class ICRecipeTypes {
         return Registry.register(
                 ICRegistries.RECIPE_TYPE, new ResourceLocation(ImmersiveCrafting.MODID, name), new ICRecipeType<T>() {
                     public String toString() {
-                        return name;
+                        return "<Recipe Type: " + name + ">";
                     }
                 });
     }

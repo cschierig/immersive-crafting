@@ -27,7 +27,8 @@ repositories {
 }
 
 dependencies {
-    modImplementation "maven.modrinth:immersive-crafting:version"
+    modCompileOnly "maven.modrinth:immersive-crafting:version:api"
+    modRuntimeOnly "maven.modrinth:immersive-crafting:version"
 }
 ```
 

@@ -1,23 +1,24 @@
 package com.carlschierig.immersivecrafting.api.recipe;
 
 import com.carlschierig.immersivecrafting.api.context.ContextTypes;
+import com.carlschierig.immersivecrafting.api.context.CraftingContext;
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
 import com.carlschierig.immersivecrafting.api.predicate.ICPredicate;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializers;
+import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICIngredient;
+import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICStack;
 import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
+import com.carlschierig.immersivecrafting.api.serialization.ICByteBufHelper;
+import com.carlschierig.immersivecrafting.api.serialization.ICGsonHelper;
 import com.carlschierig.immersivecrafting.impl.recipe.ICRecipeSerializers;
 import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelperImpl;
-import com.carlschierig.immersivecrafting.impl.util.ICGsonHelperImpl;
-import com.google.gson.JsonArray;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.ShapedRecipe;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,27 +26,21 @@ import java.util.List;
 public class UseItemOnRecipe extends ICRecipe {
     private final ResourceLocation id;
     private final String group;
-    private final Ingredient ingredient;
-    private final int amount;
-    private final ICPredicate predicate;
-    private final List<ItemStack> results;
+    private final @NotNull ICIngredient ingredient;
+    private final @NotNull ICPredicate predicate;
+    private final List<ICStack> results;
     private final boolean spawnAtPlayer;
 
     public UseItemOnRecipe(ResourceLocation id,
                            String group,
-                           Ingredient ingredient,
-                           int amount,
-                           ICPredicate predicate,
-                           List<ItemStack> results,
+                           @NotNull ICIngredient ingredient,
+                           @NotNull ICPredicate predicate,
+                           List<ICStack> results,
                            boolean spawnAtPlayer) {
-        if (amount < 1) {
-            throw new IllegalArgumentException("amount must not be greater than or equal to 1.");
-        }
 
         this.id = id;
         this.group = group;
         this.ingredient = ingredient;
-        this.amount = amount;
         this.predicate = predicate;
         this.results = results;
         this.spawnAtPlayer = spawnAtPlayer;
@@ -53,17 +48,12 @@ public class UseItemOnRecipe extends ICRecipe {
 
     @Override
     public boolean matches(RecipeContext context) {
-        var player = context.get(ContextTypes.PLAYER);
-        var inventory = player.getInventory();
-        var selected = inventory.getSelected();
-        return ingredient.test(selected)
-                && selected.getCount() >= amount
-                && predicate.test(context);
+        return ingredient.test(context) && predicate.test(context);
     }
 
     @Override
-    public List<ItemStack> assembleResults(RecipeContext context) {
-        List<ItemStack> resultList = new ArrayList<>(results.size());
+    public List<ICStack> getResults() {
+        List<ICStack> resultList = new ArrayList<>(results.size());
         for (var stack : results) {
             resultList.add(stack.copy());
         }
@@ -71,8 +61,25 @@ public class UseItemOnRecipe extends ICRecipe {
     }
 
     @Override
+    public void craft(RecipeContext recipeContext, CraftingContext craftingContext) {
+        for (var stack : results) {
+            stack.craft(recipeContext, craftingContext);
+        }
+    }
+
+    @Override
     public ResourceLocation getId() {
         return id;
+    }
+
+    @Override
+    public final ImmutableList<ICIngredient> getIngredients() {
+        return ImmutableList.of(ingredient);
+    }
+
+    @Override
+    public @NotNull ICPredicate getPredicate() {
+        return predicate;
     }
 
     @Override
@@ -88,15 +95,22 @@ public class UseItemOnRecipe extends ICRecipe {
     private static final ValidationContext context = new ValidationContext.Builder()
             .put(ContextTypes.PLAYER)
             .put(ContextTypes.LEVEL)
-            .put(ContextTypes.BLOCK_STATE).build();
+            .put(ContextTypes.BLOCK_STATE)
+            .put(ContextTypes.ITEM_STACK)
+            .put(ContextTypes.BLOCK_POSITION)
+            .put(ContextTypes.DIRECTION)
+            .build();
 
     @Override
     public ValidationContext getRequirements() {
         return context;
     }
 
-    public int getAmount() {
-        return amount;
+    private static final ValidationContext ingredientRequirements = ValidationContext.of(ContextTypes.ITEM_STACK);
+
+    @Override
+    public ValidationContext getIngredientRequirements() {
+        return ingredientRequirements;
     }
 
     public boolean spawnAtPlayer() {
@@ -106,7 +120,6 @@ public class UseItemOnRecipe extends ICRecipe {
     public static class Serializer implements ICRecipeSerializer<UseItemOnRecipe> {
         private static final String GROUP = "group";
         private static final String INGREDIENT = "ingredient";
-        private static final String AMOUNT = "amount";
         private static final String PREDICATE = "predicate";
         private static final String RESULT = "result";
         private static final String SPAWN_AT_PLAYER = "spawn_at_player";
@@ -115,23 +128,21 @@ public class UseItemOnRecipe extends ICRecipe {
         @Override
         public UseItemOnRecipe fromJson(ResourceLocation id, JsonObject json) {
             String group = GsonHelper.getAsString(json, GROUP, "");
-            Ingredient ingredient = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, INGREDIENT), false);
-            int amount = GsonHelper.getAsInt(json, AMOUNT, 1);
-            if (amount < 1) {
-                throw new JsonParseException("amount must not be greater than or equal to 1.");
-            }
+
+            var ingredient = ICGsonHelper.getAsIngredient(GsonHelper.getAsJsonObject(json, INGREDIENT));
+            ingredientRequirements.validate(ingredient);
 
             var predicateObject = GsonHelper.getAsJsonObject(json, PREDICATE, new JsonObject());
             var predicate = ICConditionSerializers.PREDICATE.fromJson(predicateObject);
             context.validate(predicate);
 
             var resultJson = GsonHelper.getAsJsonArray(json, RESULT);
-            List<ItemStack> results = new ArrayList<>();
+            List<ICStack> results = new ArrayList<>();
             for (var result : resultJson) {
-                results.add(ShapedRecipe.itemStackFromJson(result.getAsJsonObject()));
+                results.add(ICGsonHelper.getAsStack(result.getAsJsonObject()));
             }
             boolean spawnAtPlayer = GsonHelper.getAsBoolean(json, SPAWN_AT_PLAYER, false);
-            return new UseItemOnRecipe(id, group, ingredient, amount, predicate, results, spawnAtPlayer);
+            return new UseItemOnRecipe(id, group, ingredient, predicate, results, spawnAtPlayer);
         }
 
         @Override
@@ -140,16 +151,10 @@ public class UseItemOnRecipe extends ICRecipe {
             if (!instance.group.isEmpty()) {
                 json.addProperty("group", instance.group);
             }
-            json.add(INGREDIENT, instance.ingredient.toJson());
-            if (instance.amount > 1) {
-                json.addProperty(AMOUNT, instance.amount);
-            }
+            json.add(INGREDIENT, ICGsonHelper.conditionToJson(instance.ingredient));
             json.add(PREDICATE, ICConditionSerializers.PREDICATE.toJson(instance.predicate));
 
-            var resultArray = new JsonArray();
-            for (var resultStack : instance.results) {
-                resultArray.add(ICGsonHelperImpl.itemStackToJson(resultStack));
-            }
+            var resultArray = ICGsonHelper.conditionsToJson(instance.results);
             json.add(RESULT, resultArray);
 
             if (instance.spawnAtPlayer) {
@@ -163,25 +168,24 @@ public class UseItemOnRecipe extends ICRecipe {
         @Override
         public UseItemOnRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
             String group = buf.readUtf();
-            Ingredient ingredient = Ingredient.fromNetwork(buf);
-            int amount = buf.readInt();
 
+            var ingredient = (ICIngredient) ICByteBufHelper.readICCondition(buf);
             var predicate = ICConditionSerializers.PREDICATE.fromNetwork(buf);
 
-            var results = ICByteBufHelperImpl.readList(buf, FriendlyByteBuf::readItem);
+            var results = ICByteBufHelperImpl.readList(buf, buf1 -> (ICStack) ICByteBufHelper.readICCondition(buf1));
             var spawnAtPlayer = buf.readBoolean();
 
-            return new UseItemOnRecipe(id, group, ingredient, amount, predicate, results, spawnAtPlayer);
+            return new UseItemOnRecipe(id, group, ingredient, predicate, results, spawnAtPlayer);
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf buf, UseItemOnRecipe recipe) {
             buf.writeUtf(recipe.group);
-            recipe.ingredient.toNetwork(buf);
-            buf.writeInt(recipe.amount);
 
+            ICByteBufHelper.writeICCondition(buf, recipe.ingredient);
             ICConditionSerializers.PREDICATE.toNetwork(buf, recipe.predicate);
-            ICByteBufHelperImpl.writeList(buf, recipe.results, FriendlyByteBuf::writeItem);
+
+            ICByteBufHelperImpl.writeList(buf, recipe.results, ICByteBufHelper::writeICCondition);
             buf.writeBoolean(recipe.spawnAtPlayer);
         }
     }
@@ -189,10 +193,9 @@ public class UseItemOnRecipe extends ICRecipe {
     public static final class Builder {
         private final ResourceLocation id;
         private String group = "";
-        private Ingredient ingredient;
-        private int amount = 1;
+        private ICIngredient ingredient;
         private ICPredicate predicate;
-        private final List<ItemStack> results = new ArrayList<>();
+        private final List<ICStack> results = new ArrayList<>();
         private boolean spawnAtPlayer = false;
 
         public Builder(ResourceLocation id) {
@@ -204,16 +207,8 @@ public class UseItemOnRecipe extends ICRecipe {
             return this;
         }
 
-        public Builder ingredient(Ingredient ingredient) {
+        public Builder ingredient(ICIngredient ingredient) {
             this.ingredient = ingredient;
-            return this;
-        }
-
-        public Builder amount(int amount) {
-            if (amount < 1) {
-                throw new IllegalArgumentException("amount must not be greater than or equal to 1.");
-            }
-            this.amount = amount;
             return this;
         }
 
@@ -223,7 +218,7 @@ public class UseItemOnRecipe extends ICRecipe {
             return this;
         }
 
-        public Builder addResult(ItemStack result) {
+        public Builder addResult(ICStack result) {
             results.add(result);
             return this;
         }
@@ -245,7 +240,7 @@ public class UseItemOnRecipe extends ICRecipe {
             if (predicate == null) {
                 throw new IllegalStateException("predicate must be set");
             }
-            return new UseItemOnRecipe(id, group, ingredient, amount, predicate, results, spawnAtPlayer);
+            return new UseItemOnRecipe(id, group, ingredient, predicate, results, spawnAtPlayer);
         }
     }
 }

@@ -19,15 +19,15 @@ import org.quiltmc.qsl.resource.loader.api.reloader.SimpleSynchronousResourceRel
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @ApiStatus.Internal
 public final class RecipeReloader implements SimpleSynchronousResourceReloader {
     private static ImmutableMap<ICRecipeType<?>, ImmutableMap<ResourceLocation, ICRecipe>> recipes = ImmutableMap.of();
 
+    @SuppressWarnings("unchecked")
     public static <T extends ICRecipe> Optional<T> getRecipe(ICRecipeType<T> type, RecipeContext context) {
-        return ((Map<?, T>) recipes.get(type)).values().stream().filter(recipe -> recipe.matches(context)).findFirst();
+        return ((ImmutableMap<?, T>) recipes.get(type)).values().stream().filter(recipe -> recipe.matches(context)).findFirst();
     }
 
     public static ImmutableCollection<ICRecipe> getRecipes(ICRecipeType<?> type) {

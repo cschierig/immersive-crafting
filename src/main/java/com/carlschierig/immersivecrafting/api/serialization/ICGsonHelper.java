@@ -1,13 +1,18 @@
 package com.carlschierig.immersivecrafting.api.serialization;
 
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICCondition;
+import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICIngredient;
+import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICStack;
 import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
 import com.carlschierig.immersivecrafting.impl.util.ICGsonHelperImpl;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSyntaxException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+
+import java.util.Collection;
 
 /**
  * Provides helper methods for json (de)serialization of Immersive Crafting objects.
@@ -48,6 +53,36 @@ public class ICGsonHelper {
     public static ICCondition getAsCondition(JsonObject json) {
         var serializer = new ResourceLocation(GsonHelper.getAsString(json, "type"));
         return ICRegistries.CONDITION_SERIALIZER.get(serializer).fromJson(json);
+    }
+
+    public static ICIngredient getAsIngredient(JsonObject json) {
+        var result = getAsCondition(json);
+        if (result instanceof ICIngredient) {
+            return (ICIngredient) result;
+        }
+        throw new JsonSyntaxException("Json object must be an ingredient");
+    }
+
+    public static ICStack getAsStack(JsonObject json) {
+        var result = getAsCondition(json);
+        if (result instanceof ICStack) {
+            return (ICStack) result;
+        }
+        throw new JsonSyntaxException("Json object must be a stack");
+    }
+
+    /**
+     * Serializes the given {@link ICCondition} array.
+     *
+     * @param conditions The conditions array to serialize.
+     * @return a json array containing the conditions
+     */
+    public static JsonArray conditionsToJson(Collection<? extends ICCondition> conditions) {
+        var json = new JsonArray();
+        for (var condition : conditions) {
+            json.add(conditionToJson(condition));
+        }
+        return json;
     }
 
     /**

@@ -1,13 +1,25 @@
 plugins {
     id 'maven-publish'
-    id 'com.modrinth.minotaur' version '2.+'
+    alias libs.plugins.minotaur
     alias libs.plugins.quilt.loom
 }
 
 repositories {
+    // EMI
     maven {
         name = "TerraformersMC"
         url = "https://maven.terraformersmc.com/"
+    }
+    // REI
+    maven {
+        name = "SheDaniel"
+        url = "https://maven.shedaniel.me"
+    }
+    // JEI
+    maven {
+        // location of the maven that hosts JEI files since January 2023
+        name = "Jared's maven"
+        url = "https://maven.blamejared.com/"
     }
 }
 
@@ -21,15 +33,35 @@ dependencies {
 
     modImplementation libs.quilted.fabric.api
 
-    // emi
-    modCompileOnly "dev.emi:emi-fabric:${libs.versions.emi.get()}:api"
-    modLocalRuntime libs.emi.runtime
+    recipeViewer(dependencies)
 }
 
+def recipeViewer(DependencyHandler deps) {
+    // stolen from create fabric
+
+    // emi
+    deps.modCompileOnly "dev.emi:emi-fabric:${libs.versions.emi.get()}:api"
+
+    // rei
+    deps.modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${libs.versions.rei.get()}"
+    deps.modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${libs.versions.rei.get()}"
+    // jei
+    deps.modCompileOnly "mezz.jei:jei-${libs.versions.minecraft.get()}-common-api:${libs.versions.jei.get()}"
+    deps.modCompileOnly "mezz.jei:jei-${libs.versions.minecraft.get()}-fabric-api:${libs.versions.jei.get()}"
+
+    switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
+        case "emi": deps.modLocalRuntime libs.emi.runtime; break
+        case "rei": deps.modLocalRuntime libs.rei.runtime; break
+        case "jei": deps.modLocalRuntime "mezz.jei:jei-${libs.versions.minecraft.get()}-fabric:${libs.versions.jei.get()}"; break
+        case "disabled": break
+        default: println("Unknown recipe viewer specified: $recipe_viewer. Must be JEI, REI, EMI, or disabled.")
+    }
+}
+
+// Build
 base.archivesName = project.archives_base_name
 version = "$project.version+${libs.versions.minecraft.get()}"
 group = project.maven_group
-
 
 processResources {
     inputs.property 'version', version
@@ -80,9 +112,14 @@ sourceSets {
         runtimeClasspath += sourceSets.main.runtimeClasspath
 
         resources {
-            srcDirs += [
-                    'src/example/generated'
-            ]
+            srcDirs += ['src/example/generated']
+            exclude "src/generated/resources/.cache"
+        }
+    }
+    main {
+        resources {
+            srcDirs += ['src/main/generated']
+            exclude "src/main/resources/.cache"
         }
     }
 }
@@ -99,6 +136,15 @@ loom {
             name "Example Mod Data Generation"
             vmArg "-Dfabric-api.datagen"
             vmArg "-Dfabric-api.datagen.output-dir=${file("src/example/generated")}"
+            vmArg "-Dfabric-api.datagen=ic_examples"
+
+            runDir "build/exampleDatagen"
+        }
+        datagen {
+            inherit client
+            name "Data Generation"
+            vmArg "-Dfabric-api.datagen"
+            vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
             vmArg "-Dfabric-api.datagen=ic_examples"
 
             runDir "build/datagen"
@@ -126,19 +172,22 @@ publishing {
     }
 }
 
-modrinth {
-    token = System.getenv("MODRINTH_TOKEN")
-    projectId = "immersive-crafting"
-    versionType = "alpha"
-    uploadFile = remapJar
-    additionalFiles = [
-            remapSourcesJar,
-            apiJar
-    ]
-    syncBodyFrom = rootProject.file("README.md").text
-    dependencies {
-        required.project "qsl"
-        optional.project "emi"
+if (System.getenv("MODRINTH_TOKEN")) {
+    modrinth {
+        token = System.getenv("MODRINTH_TOKEN")
+        projectId = "immersive-crafting"
+        versionType = "alpha"
+        uploadFile = remapJar
+        additionalFiles = [
+                remapSourcesJar,
+                apiJar
+        ]
+        syncBodyFrom = rootProject.file("README.md").text
+        dependencies {
+            required.project "qsl"
+            optional.project "emi"
+            optional.project "rei"
+        }
     }
+    tasks.modrinth.dependsOn(tasks.modrinthSyncBody)
 }
-tasks.modrinth.dependsOn(tasks.modrinthSyncBody)

@@ -1,6 +1,8 @@
 package com.carlschierig.immersivecrafting.api.predicate.condition;
 
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditions;
 
 import java.util.function.Predicate;
@@ -21,6 +23,11 @@ public class AndCondition extends CompoundICCondition {
     @Override
     public boolean test(RecipeContext context) {
         return predicate.test(context);
+    }
+
+    @Override
+    public void render(GuiGraphics draw, int x, int y, float delta) {
+        draw.drawString(Minecraft.getInstance().font, "and", 0, 0, 0xffffffff);
     }
 
     public static class Serializer extends CompoundICCondition.Serializer<AndCondition> {

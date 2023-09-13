@@ -6,10 +6,14 @@ import com.carlschierig.immersivecrafting.api.context.ValidationContext;
 import com.carlschierig.immersivecrafting.impl.predicate.RangePredicate;
 import com.carlschierig.immersivecrafting.mixin.BlockStateAccessor;
 import com.google.gson.JsonObject;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,6 +42,17 @@ public class BlockCondition implements ICCondition {
         }
 
         return result;
+    }
+
+    @Override
+    public void render(GuiGraphics draw, int x, int y, float delta) {
+        var item = BuiltInRegistries.BLOCK.getOptional(id).map(Block::asItem).orElse(Items.AIR);
+        if (item != Items.AIR) {
+            draw.renderItem(new ItemStack(item), 0, 0);
+        } else {
+            // TODO: proper question mark texture
+            draw.drawString(Minecraft.getInstance().font, "?", 0, 0, 0xffffffff);
+        }
     }
 
     private static final ValidationContext context = ValidationContext.of(ContextTypes.BLOCK_STATE);

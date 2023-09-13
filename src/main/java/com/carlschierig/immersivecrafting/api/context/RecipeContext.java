@@ -11,6 +11,7 @@ import java.util.NoSuchElementException;
  * Use {@link RecipeContext.Builder} to create new contexts.
  */
 public final class RecipeContext {
+    public static final RecipeContext EMPTY = new RecipeContext(ImmutableMap.of());
     private final ImmutableMap<ContextType<?>, Object> holders;
 
     private RecipeContext(ImmutableMap<ContextType<?>, Object> holders) {

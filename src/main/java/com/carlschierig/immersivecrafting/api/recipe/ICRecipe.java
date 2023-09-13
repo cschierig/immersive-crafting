@@ -1,10 +1,14 @@
 package com.carlschierig.immersivecrafting.api.recipe;
 
 import com.carlschierig.immersivecrafting.api.context.ContextType;
+import com.carlschierig.immersivecrafting.api.context.CraftingContext;
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
+import com.carlschierig.immersivecrafting.api.predicate.ICPredicate;
+import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICIngredient;
+import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICStack;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 
 import java.util.List;
@@ -28,13 +32,28 @@ public abstract class ICRecipe {
     public abstract boolean matches(RecipeContext context);
 
     /**
-     * Craft the items this recipe produces.
-     * This method should return new {@link ItemStack}s on each call.
+     * Return the stacks this recipe produces.
      *
-     * @param context The context with information on how this recipe was triggered.
-     * @return a new {@link List} containing {@link ItemStack}s which were produced by the recipe.
+     * @return a {@link List} containing the recipe's results.
      */
-    public abstract List<ItemStack> assembleResults(RecipeContext context);
+    public abstract List<ICStack> getResults();
+
+    /**
+     * Craft the recipe using the given context.
+     *
+     * @param recipeContext   The Recipe Context used to find the recipe.
+     * @param craftingContext A context indicating how the stacks should be crafted.
+     */
+    public abstract void craft(RecipeContext recipeContext, CraftingContext craftingContext);
+
+    /**
+     * Returns a {@link List} containing the ingredients of the recipe.
+     *
+     * @return a {@link List} containing the ingredients of the recipe.
+     */
+    public abstract ImmutableList<ICIngredient> getIngredients();
+
+    public abstract ICPredicate getPredicate();
 
     /**
      * Returns the unique {@link ResourceLocation} of the recipe.
@@ -65,4 +84,12 @@ public abstract class ICRecipe {
      * @return {@link ValidationContext} which contains the {@link ContextType}s this recipe needs.
      */
     public abstract ValidationContext getRequirements();
+
+    /**
+     * Returns a {@link ValidationContext} which contains all the {@link ContextType}s that must be provided to this recipe
+     * when passing a {@link RecipeContext} as a parameter to any method.
+     *
+     * @return {@link ValidationContext} which contains the {@link ContextType}s this recipe needs.
+     */
+    public abstract ValidationContext getIngredientRequirements();
 }

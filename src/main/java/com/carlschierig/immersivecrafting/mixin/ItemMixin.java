@@ -1,14 +1,13 @@
 package com.carlschierig.immersivecrafting.mixin;
 
 import com.carlschierig.immersivecrafting.api.context.ContextTypes;
+import com.carlschierig.immersivecrafting.api.context.CraftingContext;
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeManager;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeTypes;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -27,23 +26,19 @@ public abstract class ItemMixin {
                     .putHolder(ContextTypes.PLAYER, player)
                     .putHolder(ContextTypes.BLOCK_STATE, level.getBlockState(context.getClickedPos()))
                     .putHolder(ContextTypes.LEVEL, level)
+                    .putHolder(ContextTypes.BLOCK_POSITION, context.getClickedPos())
+                    .putHolder(ContextTypes.DIRECTION, context.getClickedFace())
+                    .putHolder(ContextTypes.ITEM_STACK, player.getInventory().getSelected())
                     .build();
 
             var optRecipe = ICRecipeManager.getRecipe(ICRecipeTypes.USE_ITEM, recipeContext);
 
             if (optRecipe.isPresent()) {
                 var recipe = optRecipe.get();
-                var result = recipe.assembleResults(recipeContext);
+                recipe.craft(recipeContext, new CraftingContext(level, context.getClickedPos(), context.getClickedFace()));
 
-                for (var stack : result) {
-                    if (recipe.spawnAtPlayer()) {
-                        var entity = new ItemEntity(level, player.getX(), player.getY(), player.getZ(), stack);
-                    } else {
-                        Block.popResourceFromFace(level, context.getClickedPos(), context.getClickedFace(), stack);
-                    }
-                }
-
-                player.getInventory().getSelected().shrink(recipe.getAmount());
+                // TODO: random chance
+                player.getInventory().getSelected().shrink(recipe.getIngredients().get(0).getAmount());
 
                 cir.setReturnValue(InteractionResult.SUCCESS);
                 cir.cancel();

@@ -19,6 +19,7 @@
     "intermediate_mappings": "net.fabricmc:intermediary",
     "entrypoints": {
       "init": "com.carlschierig.immersivecrafting.ImmersiveCrafting",
+      "fabric-datagen": "com.carlschierig.immersivecrafting.datagen.ICDatagen",
       "emi": [
         "com.carlschierig.immersivecrafting.compat.emi.ICEmiPlugin"
       ]

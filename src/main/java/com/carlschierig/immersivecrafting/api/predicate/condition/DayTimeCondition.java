@@ -4,8 +4,11 @@ import com.carlschierig.immersivecrafting.api.context.ContextTypes;
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
 import com.google.gson.JsonObject;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 public class DayTimeCondition implements ICCondition {
     public static final ICCondition DAY = new DayTimeCondition(0, 12999);
@@ -32,6 +35,11 @@ public class DayTimeCondition implements ICCondition {
         } else {
             return startTime <= time && time <= 24000 || 0 <= time && time <= endTime;
         }
+    }
+
+    @Override
+    public void render(GuiGraphics draw, int x, int y, float delta) {
+        draw.renderItem(new ItemStack(Items.CLOCK), 0, 0);
     }
 
     @Override

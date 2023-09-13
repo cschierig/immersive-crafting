@@ -1,6 +1,8 @@
 package com.carlschierig.immersivecrafting.api.predicate.condition;
 
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditions;
 
 import java.util.function.Predicate;
@@ -11,6 +13,11 @@ public class OrCondition extends CompoundICCondition {
     public OrCondition(ICCondition... conditions) {
         super(conditions);
         predicate = LootItemConditions.orConditions(conditions);
+    }
+
+    @Override
+    public void render(GuiGraphics draw, int x, int y, float delta) {
+        draw.drawString(Minecraft.getInstance().font, "or", 0, 0, 0xffffffff);
     }
 
     @Override

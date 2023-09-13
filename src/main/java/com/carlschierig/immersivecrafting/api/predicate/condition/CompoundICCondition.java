@@ -1,6 +1,7 @@
 package com.carlschierig.immersivecrafting.api.predicate.condition;
 
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
+import com.carlschierig.immersivecrafting.api.predicate.PredicateVisitor;
 import com.carlschierig.immersivecrafting.api.serialization.ICGsonHelper;
 import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelperImpl;
 import com.google.gson.JsonObject;
@@ -29,6 +30,15 @@ public abstract class CompoundICCondition implements ICCondition {
     @Override
     public final ValidationContext getRequirements() {
         return ValidationContext.merge(Arrays.stream(conditions).map(ICCondition::getRequirements).collect(Collectors.toList()));
+    }
+
+    public ICCondition[] getChildren() {
+        return conditions;
+    }
+
+    @Override
+    public final void accept(PredicateVisitor visitor) {
+        visitor.visitCompound(this);
     }
 
     /**
