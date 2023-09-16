@@ -12,6 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
@@ -29,7 +30,7 @@ public class ICXRecipeProvider extends ICRecipeProvider {
     }
 
     @Override
-    public void buildRecipes(Consumer<ICRecipe> exporter) {
+    public void buildRecipes(@NotNull Consumer<ICRecipe> exporter) {
         // offer recipes to the exporter
 
         // Turn pork-chop into cooked pork-chop when using it on a magma block.

@@ -4,6 +4,9 @@ import com.carlschierig.immersivecrafting.ImmersiveCrafting;
 import com.carlschierig.immersivecrafting.api.predicate.ICPredicate;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICCondition;
 import com.google.common.collect.ImmutableSet;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,7 +34,7 @@ public final class ValidationContext {
      * @param type The type whose existence should be checked.
      * @return {@code true} if the type is contained in the context, {@code false} otherwise.
      */
-    public boolean contains(ContextType<?> type) {
+    public boolean contains(@Nullable ContextType<?> type) {
         return validTypes.contains(type);
     }
 
@@ -42,7 +45,7 @@ public final class ValidationContext {
      * @return {@code true} if instance the method is called on is a superset of the given context, {@code false}
      * otherwise.
      */
-    public boolean supersetOf(ValidationContext context) {
+    public boolean supersetOf(@NotNull ValidationContext context) {
         return validTypes.containsAll(context.validTypes);
     }
 
@@ -53,7 +56,9 @@ public final class ValidationContext {
      * @param context The context whose mismatches should be found.
      * @return a {@link Set} containing all the missing context types.
      */
-    public Set<ContextType<?>> getMismatch(ValidationContext context) {
+    @NotNull
+    @Contract(pure = true)
+    public Set<ContextType<?>> getMismatch(@NotNull ValidationContext context) {
         return context.validTypes.stream().filter(type -> !validTypes.contains(type)).collect(Collectors.toSet());
     }
 
@@ -64,7 +69,7 @@ public final class ValidationContext {
      * @param condition The condition which should be validated against the context.
      * @throws IllegalStateException if the condition wasn't successfully validated.
      */
-    public void validate(ICCondition condition) {
+    public void validate(@NotNull ICCondition condition) {
         var requirements = condition.getRequirements();
         if (!supersetOf(requirements)) {
             var mismatchs = getMismatch(requirements);
@@ -81,11 +86,18 @@ public final class ValidationContext {
      * @param type The context type the condition will contain.
      * @return a new {@link ValidationContext} containing the given context type.
      */
-    public static ValidationContext of(ContextType<?> type) {
+    public static ValidationContext of(@NotNull ContextType<?> type) {
         return new ValidationContext(ImmutableSet.of(type));
     }
 
-    public static ValidationContext merge(Iterable<ValidationContext> contexts) {
+    /**
+     * Merges multiple Validation contexts and returns a new one which contains all the context types present
+     * in at least one of them. This is equivalent to a union operation on sets.
+     *
+     * @param contexts The contexts which should be merged.
+     * @return A new {@link ValidationContext} which merges all the given contexts.
+     */
+    public static ValidationContext merge(@NotNull Iterable<ValidationContext> contexts) {
         ImmutableSet.Builder<ContextType<?>> builder = new ImmutableSet.Builder<>();
 
         for (var context : contexts) {
@@ -107,7 +119,7 @@ public final class ValidationContext {
          * @param type The type which should be added.
          * @return the builder.
          */
-        public Builder put(ContextType<?> type) {
+        public Builder put(@NotNull ContextType<?> type) {
             validTypes.add(type);
             return this;
         }

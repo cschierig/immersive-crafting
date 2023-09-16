@@ -16,6 +16,6 @@ public class ICRecipeCategory extends EmiRecipeCategory {
 
     @Override
     public Component getName() {
-        return Component.translatable(ICTranslationHelper.translate(type));
+        return Component.translatable(ICTranslationHelper.translateRecipeType(type));
     }
 }

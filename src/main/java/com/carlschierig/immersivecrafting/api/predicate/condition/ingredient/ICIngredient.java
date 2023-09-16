@@ -1,9 +1,12 @@
 package com.carlschierig.immersivecrafting.api.predicate.condition.ingredient;
 
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICCondition;
+import com.carlschierig.immersivecrafting.api.render.ICRenderFlags;
 import com.carlschierig.immersivecrafting.api.render.ICRenderable;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -23,6 +26,16 @@ public interface ICIngredient extends ICRenderable, ICCondition {
         render(draw, x, y, delta, -1);
     }
 
+    /**
+     * Render this instance using the given {@link GuiGraphics}.
+     *
+     * @param draw  The {@link GuiGraphics} used for rendering.
+     * @param x     the x coordinate of the mouse.
+     * @param y     the y coordinate of the mouse.
+     * @param delta The time delta used for animation.
+     * @param flags The bits of this integer indicate what parts should be rendered.
+     *              Use {@link ICRenderFlags#test(int)} to compare the given value against flags.
+     */
     void render(GuiGraphics draw, int x, int y, float delta, int flags);
 
     /**
@@ -33,11 +46,43 @@ public interface ICIngredient extends ICRenderable, ICCondition {
      */
     float getChance();
 
+    /**
+     * Copies this ingredient. Must return a new instance on each call.
+     *
+     * @return A copy of this ingredient.
+     */
     ICIngredient copy();
 
+    /**
+     * Returns the individual parts of this ingredient.
+     * <p>
+     * If this ingredient is a consumer,
+     * the returned stacks have an <b>or relation</b>,
+     * meaning that any of the returned stacks is valid for consumption to fulfill this ingredient.
+     * <p>
+     * If this ingredient is a producer, the returned stack have an <b>and relation</b>,
+     * meaning that this ingredient will produce all the returned stacks.
+     *
+     * @return a list of stacks which are used by the ingredient.
+     */
     List<ICStack> getParts();
 
+    /**
+     * Returns the name of this ingredient.
+     *
+     * @return the name of this ingredient.
+     */
+    @NotNull
     Component getName();
 
+    /**
+     * Returns whether this ingredient is empty.
+     *
+     * @return {@code true} if this ingredient is empty, {@code false} otherwise.
+     */
     boolean isEmpty();
+
+    @Override
+    @NotNull
+    List<ClientTooltipComponent> getTooltip();
 }

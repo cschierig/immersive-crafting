@@ -5,10 +5,10 @@ import dev.emi.emi.api.widget.Widget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 
-public class ConditionButtonWidget extends Widget {
+public class ButtonWidget extends Widget {
     private final Button button;
 
-    public ConditionButtonWidget(Button button) {
+    public ButtonWidget(Button button) {
         this.button = button;
     }
 

@@ -4,18 +4,25 @@ import com.carlschierig.immersivecrafting.api.context.ContextTypes;
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
 import com.carlschierig.immersivecrafting.impl.predicate.RangePredicate;
+import com.carlschierig.immersivecrafting.impl.render.KeyVaueTooltipComponent;
 import com.carlschierig.immersivecrafting.mixin.BlockStateAccessor;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BlockCondition implements ICCondition {
     @Nullable
@@ -53,6 +60,19 @@ public class BlockCondition implements ICCondition {
             // TODO: proper question mark texture
             draw.drawString(Minecraft.getInstance().font, "?", 0, 0, 0xffffffff);
         }
+    }
+
+    @Override
+    public @NotNull List<ClientTooltipComponent> getTooltip() {
+        List<ClientTooltipComponent> list = new ArrayList<>();
+        if (id != null) {
+            list.add(new KeyVaueTooltipComponent(Component.literal("id"), Component.literal(id.toString())));
+        }
+        if (hardness != null) {
+            list.add(new KeyVaueTooltipComponent(Component.literal("hardness"), Component.literal(hardness.toString())));
+        }
+
+        return list;
     }
 
     private static final ValidationContext context = ValidationContext.of(ContextTypes.BLOCK_STATE);

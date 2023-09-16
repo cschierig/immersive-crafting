@@ -1,10 +1,14 @@
 package com.carlschierig.immersivecrafting.api.predicate;
 
+import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.predicate.condition.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a predicate which takes a {@link RecipeContext} to test if a recipe is valid.
+ */
 public class ICPredicate extends AndCondition {
     public ICPredicate(ICCondition[] conditions) {
         super(conditions);

@@ -21,8 +21,6 @@ import java.util.function.Consumer;
  * Provides a base for generating immersive crafting recipes.
  * Based on {@link net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider}.
  *
- * @author Carl Schierig
- * @version 1.0
  * @see net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider
  */
 public abstract class ICRecipeProvider implements DataProvider {
@@ -34,7 +32,7 @@ public abstract class ICRecipeProvider implements DataProvider {
      *
      * @param output the data output to use.
      */
-    public ICRecipeProvider(FabricDataOutput output) {
+    public ICRecipeProvider(@NotNull FabricDataOutput output) {
         this.output = output;
         pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "ic_recipes");
     }
@@ -42,9 +40,9 @@ public abstract class ICRecipeProvider implements DataProvider {
     /**
      * Implement this method and offer recipes to the exporters using their builders
      *
-     * @param exporter
+     * @param exporter Offer the recipes to this supplier to save them.
      */
-    public abstract void buildRecipes(Consumer<ICRecipe> exporter);
+    public abstract void buildRecipes(@NotNull Consumer<ICRecipe> exporter);
 
     @Override
     public CompletableFuture<?> run(CachedOutput writer) {
@@ -72,14 +70,16 @@ public abstract class ICRecipeProvider implements DataProvider {
     }
 
     @Override
-    public @NotNull String getName() {
+    @NotNull
+    public String getName() {
         return "Immersive Crafting Recipes";
     }
 
     /**
      * Override this method to change the recipe identifier. The default implementation normalizes the namespace to the mod ID.
      */
-    protected ResourceLocation getRecipeIdentifier(ResourceLocation identifier) {
+    @NotNull
+    protected ResourceLocation getRecipeIdentifier(@NotNull ResourceLocation identifier) {
         return new ResourceLocation(output.getModId(), identifier.getPath());
     }
 }

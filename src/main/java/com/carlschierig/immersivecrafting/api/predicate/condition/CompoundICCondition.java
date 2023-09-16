@@ -7,6 +7,8 @@ import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelperImpl;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.GsonHelper;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -57,7 +59,8 @@ public abstract class CompoundICCondition implements ICCondition {
          * @param conditions The conditions which should be passed to the constructor.
          * @return a new compound condition of type {@link T}.
          */
-        protected abstract T create(ICCondition[] conditions);
+        @Contract("_->new")
+        protected abstract T create(@NotNull ICCondition[] conditions);
 
         @Override
         public T fromJson(JsonObject json) {

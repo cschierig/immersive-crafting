@@ -30,6 +30,11 @@ public class RangePredicate implements Predicate<Float> {
         return serializer;
     }
 
+    @Override
+    public String toString() {
+        return "[" + min + ", " + max + "]";
+    }
+
     public static class Serializer implements PredicateSerializer<RangePredicate> {
         private static final String MIN = "min";
         private static final String MAX = "max";

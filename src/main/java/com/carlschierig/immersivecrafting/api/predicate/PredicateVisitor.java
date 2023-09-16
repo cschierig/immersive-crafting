@@ -2,6 +2,7 @@ package com.carlschierig.immersivecrafting.api.predicate;
 
 import com.carlschierig.immersivecrafting.api.predicate.condition.CompoundICCondition;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICCondition;
+import com.carlschierig.immersivecrafting.api.predicate.condition.SingleChildICCondition;
 
 public interface PredicateVisitor {
     default void visit(ICPredicate predicate) {
@@ -11,4 +12,6 @@ public interface PredicateVisitor {
     void visitCompound(CompoundICCondition condition);
 
     void visitCondition(ICCondition condition);
+
+    void visitSingleChildCondition(SingleChildICCondition condition);
 }

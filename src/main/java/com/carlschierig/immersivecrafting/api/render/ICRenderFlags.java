@@ -13,7 +13,29 @@ public enum ICRenderFlags {
         this.value = value;
     }
 
+    /**
+     * Checks if the given integer contains this flag.
+     *
+     * @param flagHolder An integer representing a set of flags.
+     * @return {@code true} if the integer contains the flag, {@code false} otherwise.
+     */
     public boolean test(int flagHolder) {
         return (flagHolder & value) != 0;
+    }
+
+    /**
+     * Creates an integer containing all the passed flags.
+     * The flags can then be checked with {@link #test(int)}
+     *
+     * @param flags The flags which should be stored in the return value.
+     * @return an integer containing all the passed flags
+     * @see #test(int flagHolder)
+     */
+    public static int of(ICRenderFlags... flags) {
+        int value = 0;
+        for (var flag : flags) {
+            value |= flag.value;
+        }
+        return value;
     }
 }

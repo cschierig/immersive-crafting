@@ -7,7 +7,9 @@
     "BlockStateAccessor",
     "ItemMixin"
   ],
-  "client": [],
+  "client": [
+    "GuiGraphicsAccessor"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

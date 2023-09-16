@@ -34,7 +34,7 @@ public class ICEmiPlugin implements EmiPlugin {
 
     private void registerRecipes(EmiRegistry registry, ResourceLocation id, ICRecipeType<?> value) {
         for (var recipe : ICRecipeManager.getRecipes(value)) {
-            var emiRecipe = new BasicRecipe(CATEGORIES.get(id), recipe);
+            var emiRecipe = new ICEmiRecipe(CATEGORIES.get(id), recipe);
             registry.addRecipe(emiRecipe);
         }
     }

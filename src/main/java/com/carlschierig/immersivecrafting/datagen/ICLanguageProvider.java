@@ -11,10 +11,21 @@ public class ICLanguageProvider extends FabricLanguageProvider {
     }
 
     @Override
-    public void generateTranslations(TranslationBuilder translationBuilder) {
-        translationBuilder.add(ICTranslationHelper.translate(ICRecipeTypes.USE_ITEM), "Use Item on");
-        translationBuilder.add("immersive_crafting.recipeView.conditions", "Conditions");
+    public void generateTranslations(TranslationBuilder builder) {
+        translateUIElements(builder);
+        translateRecipeTypes(builder);
+        translateConditions(builder);
     }
 
+    private void translateUIElements(TranslationBuilder builder) {
+        builder.add("immersive_crafting.recipeView.conditions", "Conditions");
+    }
 
+    private void translateRecipeTypes(TranslationBuilder builder) {
+        builder.add(ICTranslationHelper.translateRecipeType(ICRecipeTypes.USE_ITEM), "Use Item on");
+    }
+
+    private void translateConditions(TranslationBuilder builder) {
+        builder.add(ICTranslationHelper.translateCondition("andCondition"), "And");
+    }
 }

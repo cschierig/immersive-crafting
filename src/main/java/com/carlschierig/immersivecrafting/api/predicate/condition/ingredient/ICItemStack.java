@@ -7,6 +7,7 @@ import com.carlschierig.immersivecrafting.api.context.ValidationContext;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializer;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializers;
 import com.carlschierig.immersivecrafting.api.render.ICRenderFlags;
+import com.carlschierig.immersivecrafting.impl.render.FakeScreen;
 import com.carlschierig.immersivecrafting.impl.render.ICRenderHelper;
 import com.carlschierig.immersivecrafting.impl.util.ICGsonHelperImpl;
 import com.google.gson.JsonObject;
@@ -14,6 +15,7 @@ import com.google.gson.JsonSyntaxException;
 import com.mojang.blaze3d.platform.Lighting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -23,6 +25,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -82,7 +85,7 @@ public class ICItemStack extends ICStack {
     }
 
     @Override
-    public Component getName() {
+    public @NotNull Component getName() {
         return stack.getDisplayName();
     }
 
@@ -123,6 +126,11 @@ public class ICItemStack extends ICStack {
     @Override
     public Object getKey() {
         return stack.getItem();
+    }
+
+    @Override
+    public @NotNull List<ClientTooltipComponent> getTooltip() {
+        return FakeScreen.INSTANCE.getTooltipFromItem(stack);
     }
 
     public static class Serializer implements ICConditionSerializer<ICItemStack> {

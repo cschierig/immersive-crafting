@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class BasicRecipe implements EmiRecipe {
+public class ICEmiRecipe implements EmiRecipe {
     private final EmiRecipeCategory category;
     private final ICRecipe recipe;
 
@@ -31,7 +31,7 @@ public class BasicRecipe implements EmiRecipe {
     private final int outputWidth = EmiTexture.SLOT.width * 3;
     private int conditionHeight;
 
-    public BasicRecipe(EmiRecipeCategory category, ICRecipe recipe) {
+    public ICEmiRecipe(EmiRecipeCategory category, ICRecipe recipe) {
         this.category = category;
         this.recipe = recipe;
         computeDimensions();
@@ -104,7 +104,7 @@ public class BasicRecipe implements EmiRecipe {
             var result = outputs.get(i);
             var xCord = left + (i % 3) * EmiTexture.SLOT.width;
             var yCord = (i / 3) * EmiTexture.SLOT.width;
-            var slot = new SlotWidget(new Stack(result), xCord, yCord);
+            var slot = new SlotWidget(new ICEmiStack(result), xCord, yCord);
             widgets.add(slot);
         }
     }
@@ -119,12 +119,10 @@ public class BasicRecipe implements EmiRecipe {
         var client = Minecraft.getInstance();
 
         var y = inOutHeight + PADDING;
-        widgets.addText(Component.translatable("immersive_crafting.recipeView.conditions").append(":"), 0, y, 0, false);
         var buttonWidth = client.font.width(Component.translatable("immersive_crafting.recipeView.conditions")) + PADDING * 4;
         var buttonHeight = client.font.lineHeight + PADDING * 4;
 
         var buttonX = (width - buttonWidth) / 2;
-        var buttonY = y + client.font.lineHeight + PADDING;
 
         var onPress = new Button.OnPress() {
             @Override
@@ -134,9 +132,9 @@ public class BasicRecipe implements EmiRecipe {
             }
         };
         var button = Button.builder(Component.translatable("immersive_crafting.recipeView.conditions"), onPress)
-                .bounds(buttonX, buttonY, buttonWidth, buttonHeight)
+                .bounds(buttonX, y, buttonWidth, buttonHeight)
                 .build();
-        var widget = new ConditionButtonWidget(button);
+        var widget = new ButtonWidget(button);
         widgets.add(widget);
     }
 
@@ -162,8 +160,6 @@ public class BasicRecipe implements EmiRecipe {
 
         // Conditions
         conditionHeight += PADDING; // upper padding
-        conditionHeight += Minecraft.getInstance().font.lineHeight;
-        conditionHeight += PADDING; // lower padding
         conditionHeight += Minecraft.getInstance().font.lineHeight + PADDING * 4; // button height
         conditionHeight += PADDING; // bottom padding
 

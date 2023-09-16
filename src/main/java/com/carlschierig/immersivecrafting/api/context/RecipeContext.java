@@ -1,6 +1,7 @@
 package com.carlschierig.immersivecrafting.api.context;
 
 import com.google.common.collect.ImmutableMap;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.NoSuchElementException;
 
@@ -11,6 +12,9 @@ import java.util.NoSuchElementException;
  * Use {@link RecipeContext.Builder} to create new contexts.
  */
 public final class RecipeContext {
+    /**
+     * An empty Recipe context without containing no context types.
+     */
     public static final RecipeContext EMPTY = new RecipeContext(ImmutableMap.of());
     private final ImmutableMap<ContextType<?>, Object> holders;
 
@@ -27,7 +31,8 @@ public final class RecipeContext {
      * @throws NoSuchElementException if no object of that type is present.
      */
     @SuppressWarnings("unchecked")
-    public <T> T get(ContextType<T> type) {
+    @NotNull
+    public <T> T get(@NotNull ContextType<T> type) {
         var holder = holders.get(type);
         if (holder != null) {
             // can only break if the insertion logic is messed with
@@ -50,7 +55,7 @@ public final class RecipeContext {
          * @param <T>    The type of the object which is added.
          * @return the builder.
          */
-        public <T> Builder putHolder(ContextType<T> type, T object) {
+        public <T> Builder putHolder(@NotNull ContextType<T> type, @NotNull T object) {
             holders.put(type, object);
             return this;
         }

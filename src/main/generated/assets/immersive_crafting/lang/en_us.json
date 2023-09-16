@@ -1,4 +1,5 @@
 {
+  "immersive_crafting.condition.andCondition": "And",
   "immersive_crafting.recipeType.immersive_crafting.use_item": "Use Item on",
   "immersive_crafting.recipeView.conditions": "Conditions"
 }

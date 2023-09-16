@@ -58,6 +58,6 @@ public class ICEmiIngredient implements EmiIngredient {
 
     @Override
     public List<ClientTooltipComponent> getTooltip() {
-        return List.of();
+        return ingredient.getTooltip();
     }
 }
