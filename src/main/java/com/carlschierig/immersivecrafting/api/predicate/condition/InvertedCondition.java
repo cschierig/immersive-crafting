@@ -4,6 +4,8 @@ import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.impl.render.ICRenderHelper;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.NotNull;
+import org.quiltmc.loader.api.minecraft.ClientOnly;
 
 
 public class InvertedCondition extends SingleChildICCondition {
@@ -16,8 +18,9 @@ public class InvertedCondition extends SingleChildICCondition {
         return !child.test(context);
     }
 
+    @ClientOnly
     @Override
-    public void render(GuiGraphics draw, int x, int y, float delta) {
+    public void render(@NotNull GuiGraphics draw, int x, int y, float delta) {
         super.render(draw, x, y, delta);
         ICRenderHelper.renderItemAnnotation(draw, 0, 0, Component.literal("!"));
     }

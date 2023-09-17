@@ -4,6 +4,8 @@ import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditions;
+import org.jetbrains.annotations.NotNull;
+import org.quiltmc.loader.api.minecraft.ClientOnly;
 
 import java.util.function.Predicate;
 
@@ -15,8 +17,9 @@ public class OrCondition extends CompoundICCondition {
         predicate = LootItemConditions.orConditions(conditions);
     }
 
+    @ClientOnly
     @Override
-    public void render(GuiGraphics draw, int x, int y, float delta) {
+    public void render(@NotNull GuiGraphics draw, int x, int y, float delta) {
         draw.drawString(Minecraft.getInstance().font, "or", 0, 0, 0xffffffff);
     }
 

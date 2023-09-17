@@ -7,10 +7,10 @@ import com.carlschierig.immersivecrafting.api.predicate.condition.CompoundICCond
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICCondition;
 import com.carlschierig.immersivecrafting.api.predicate.condition.SingleChildICCondition;
 import com.carlschierig.immersivecrafting.api.render.ICRenderable;
-import com.carlschierig.immersivecrafting.mixin.GuiGraphicsAccessor;
+import com.carlschierig.immersivecrafting.impl.render.ICRenderHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -204,7 +204,7 @@ public class PredicateTree implements ICRenderable {
     }
 
     @Override
-    public void render(GuiGraphics draw, int x, int y, float delta) {
+    public void render(@NotNull GuiGraphics draw, int x, int y, float delta) {
         draw.pose().pushPose();
         draw.pose().translate(xShift, 0, 0);
         renderSubtree(root, draw, x, y, delta);
@@ -251,7 +251,7 @@ public class PredicateTree implements ICRenderable {
         var nodeX = node.x + xShift;
         if (x >= nodeX && x <= nodeX + baseUnit && y >= node.y && y <= node.y + baseUnit) {
             var tooltip = node.condition.getTooltip();
-            ((GuiGraphicsAccessor) draw).invokeRenderTooltip(Minecraft.getInstance().font, tooltip, x, y, DefaultTooltipPositioner.INSTANCE);
+            ICRenderHelper.renderTooltip(Minecraft.getInstance().screen, draw, x, y, tooltip);
         }
     }
 

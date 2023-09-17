@@ -9,6 +9,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import org.jetbrains.annotations.NotNull;
+import org.quiltmc.loader.api.minecraft.ClientOnly;
 
 public class DayTimeCondition implements ICCondition {
     public static final ICCondition DAY = new DayTimeCondition(0, 12999);
@@ -37,8 +39,9 @@ public class DayTimeCondition implements ICCondition {
         }
     }
 
+    @ClientOnly
     @Override
-    public void render(GuiGraphics draw, int x, int y, float delta) {
+    public void render(@NotNull GuiGraphics draw, int x, int y, float delta) {
         draw.renderItem(new ItemStack(Items.CLOCK), 0, 0);
     }
 

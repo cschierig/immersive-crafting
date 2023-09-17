@@ -26,9 +26,13 @@ import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
+import org.quiltmc.loader.api.minecraft.ClientOnly;
 
 import java.util.List;
 
+/**
+ * ICStack wrapper containing an item stack.
+ */
 public class ICItemStack extends ICStack {
     private final ItemStack stack;
     private final float chance;
@@ -48,9 +52,18 @@ public class ICItemStack extends ICStack {
 
     @Override
     public void craft(RecipeContext recipeContext, CraftingContext craftingContext) {
-        Block.popResourceFromFace(craftingContext.level(), craftingContext.pos(), craftingContext.direction(), stack);
+        var chance = craftingContext.random().nextFloat();
+        if (this.chance >= chance) {
+            Block.popResourceFromFace(craftingContext.level(), craftingContext.pos(), craftingContext.direction(), stack);
+        }
     }
 
+    @Override
+    public Object getKey() {
+        return stack.getItem();
+    }
+
+    @ClientOnly
     @Override
     public void render(GuiGraphics draw, int x, int y, float delta, int flags) {
         draw.renderItem(stack, x, y);
@@ -77,11 +90,6 @@ public class ICItemStack extends ICStack {
     @Override
     public float getChance() {
         return chance;
-    }
-
-    @Override
-    public List<ICStack> getParts() {
-        return List.of(this);
     }
 
     @Override
@@ -124,12 +132,7 @@ public class ICItemStack extends ICStack {
     }
 
     @Override
-    public Object getKey() {
-        return stack.getItem();
-    }
-
-    @Override
-    public @NotNull List<ClientTooltipComponent> getTooltip() {
+    public @NotNull @ClientOnly List<ClientTooltipComponent> getTooltip() {
         return FakeScreen.INSTANCE.getTooltipFromItem(stack);
     }
 

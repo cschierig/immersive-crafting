@@ -35,7 +35,7 @@ public abstract class ItemMixin {
 
             if (optRecipe.isPresent()) {
                 var recipe = optRecipe.get();
-                recipe.craft(recipeContext, new CraftingContext(level, context.getClickedPos(), context.getClickedFace()));
+                recipe.craft(recipeContext, new CraftingContext(level, context.getClickedPos(), context.getClickedFace(), level.getRandom()));
 
                 // TODO: random chance
                 player.getInventory().getSelected().shrink(recipe.getIngredients().get(0).getAmount());

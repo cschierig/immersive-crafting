@@ -3,6 +3,7 @@ package com.carlschierig.immersivecrafting.api.predicate.condition;
 import com.carlschierig.immersivecrafting.api.context.ContextTypes;
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
+import com.carlschierig.immersivecrafting.api.data.ICTranslationHelper;
 import com.carlschierig.immersivecrafting.impl.predicate.RangePredicate;
 import com.carlschierig.immersivecrafting.impl.render.KeyVaueTooltipComponent;
 import com.carlschierig.immersivecrafting.mixin.BlockStateAccessor;
@@ -20,11 +21,13 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.quiltmc.loader.api.minecraft.ClientOnly;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BlockCondition implements ICCondition {
+    public static String LANGUAGE_KEY = "block";
     @Nullable
     private final ResourceLocation id;
     @Nullable
@@ -51,8 +54,9 @@ public class BlockCondition implements ICCondition {
         return result;
     }
 
+    @ClientOnly
     @Override
-    public void render(GuiGraphics draw, int x, int y, float delta) {
+    public void render(@NotNull GuiGraphics draw, int x, int y, float delta) {
         var item = BuiltInRegistries.BLOCK.getOptional(id).map(Block::asItem).orElse(Items.AIR);
         if (item != Items.AIR) {
             draw.renderItem(new ItemStack(item), 0, 0);
@@ -63,13 +67,22 @@ public class BlockCondition implements ICCondition {
     }
 
     @Override
+    public @Nullable Component getName() {
+        return Component.translatable(ICTranslationHelper.translateCondition(LANGUAGE_KEY));
+    }
+
+    @Override
     public @NotNull List<ClientTooltipComponent> getTooltip() {
-        List<ClientTooltipComponent> list = new ArrayList<>();
+        List<ClientTooltipComponent> list = new ArrayList<>(ICCondition.super.getTooltip());
         if (id != null) {
-            list.add(new KeyVaueTooltipComponent(Component.literal("id"), Component.literal(id.toString())));
+            list.add(new KeyVaueTooltipComponent(
+                    Component.translatable(ICTranslationHelper.translateConditionDescription(LANGUAGE_KEY, "id")),
+                    Component.literal(id.toString())));
         }
         if (hardness != null) {
-            list.add(new KeyVaueTooltipComponent(Component.literal("hardness"), Component.literal(hardness.toString())));
+            list.add(new KeyVaueTooltipComponent(
+                    Component.translatable(ICTranslationHelper.translateConditionDescription(LANGUAGE_KEY, "hardness")),
+                    Component.literal(hardness.toString())));
         }
 
         return list;

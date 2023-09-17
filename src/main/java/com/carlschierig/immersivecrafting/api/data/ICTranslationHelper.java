@@ -4,7 +4,7 @@ import com.carlschierig.immersivecrafting.api.recipe.ICRecipeType;
 import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
 
 /**
- * Provides helper methods to standardize translation keys
+ * Provides helper methods to standardize translation keys.
  */
 public final class ICTranslationHelper {
     private ICTranslationHelper() {
@@ -16,5 +16,13 @@ public final class ICTranslationHelper {
 
     public static String translateCondition(String conditionName) {
         return "immersive_crafting.condition." + conditionName;
+    }
+
+    public static String translateConditionDescription(String conditionName) {
+        return "immersive_crafting.conditionDescription." + conditionName;
+    }
+
+    public static String translateConditionDescription(String conditionName, String postfix) {
+        return "immersive_crafting.conditionDescription." + conditionName + "." + postfix;
     }
 }

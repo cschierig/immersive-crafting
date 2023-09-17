@@ -8,6 +8,8 @@ import com.google.gson.JsonObject;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.GsonHelper;
+import org.jetbrains.annotations.NotNull;
+import org.quiltmc.loader.api.minecraft.ClientOnly;
 
 public abstract class SingleChildICCondition implements ICCondition {
     protected final ICCondition child;
@@ -16,8 +18,9 @@ public abstract class SingleChildICCondition implements ICCondition {
         this.child = child;
     }
 
+    @ClientOnly
     @Override
-    public void render(GuiGraphics draw, int x, int y, float delta) {
+    public void render(@NotNull GuiGraphics draw, int x, int y, float delta) {
         child.render(draw, x, y, delta);
     }
 

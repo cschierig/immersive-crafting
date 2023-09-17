@@ -1,5 +1,9 @@
 {
-  "immersive_crafting.condition.andCondition": "And",
+  "immersive_crafting.condition.and": "And",
+  "immersive_crafting.condition.block": "Block",
+  "immersive_crafting.conditionDescription.and": "All sub conditions must be fulfilled.",
+  "immersive_crafting.conditionDescription.block.hardness": "Hardness",
+  "immersive_crafting.conditionDescription.block.id": "ID",
   "immersive_crafting.recipeType.immersive_crafting.use_item": "Use Item on",
   "immersive_crafting.recipeView.conditions": "Conditions"
 }

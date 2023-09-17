@@ -6,12 +6,14 @@ import com.carlschierig.immersivecrafting.api.predicate.PredicateVisitor;
 import com.carlschierig.immersivecrafting.api.predicate.Visitable;
 import com.carlschierig.immersivecrafting.api.render.ICRenderable;
 import com.carlschierig.immersivecrafting.impl.predicate.ICConditionData;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.quiltmc.loader.api.minecraft.ClientOnly;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +28,17 @@ import java.util.function.Predicate;
 public interface ICCondition extends Predicate<RecipeContext>, Visitable, ICRenderable {
     ICConditionSerializer<?> getSerializer();
 
+    /**
+     * Returns a validation context specifying which context types need to be passed to the test method.
+     *
+     * @return a validation context specifying which context types need to be passed to the test method.
+     */
     ValidationContext getRequirements();
 
     /**
      * Returns the name of the condition.
      *
-     * @return
+     * @return the name of the condition.
      */
     @Nullable
     default Component getName() {
@@ -44,6 +51,7 @@ public interface ICCondition extends Predicate<RecipeContext>, Visitable, ICRend
      *
      * @return a list of tooltip components which can be rendered as a tooltip.
      */
+    @ClientOnly
     @NotNull
     @Contract("->new")
     default List<ClientTooltipComponent> getTooltip() {
@@ -55,6 +63,21 @@ public interface ICCondition extends Predicate<RecipeContext>, Visitable, ICRend
         }
 
         return list;
+    }
+
+    /**
+     * Render this instance using the given {@link GuiGraphics}.
+     * <p>
+     * Condition icons should not be larger than a typical minecraft texture (16x16).
+     *
+     * @param draw  The {@link GuiGraphics} used for rendering.
+     * @param x     the x coordinate of the mouse.
+     * @param y     the y coordinate of the mouse.
+     * @param delta The time delta used for animation.
+     */
+    @ClientOnly
+    @Override
+    default void render(@NotNull GuiGraphics draw, int x, int y, float delta) {
     }
 
     @Override

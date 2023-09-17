@@ -60,5 +60,15 @@ public class ICXRecipeProvider extends ICRecipeProvider {
                 .addResult(new ICItemStack(Items.NETHER_STAR))
                 .build();
         exporter.accept(diamondToNetherStar);
+
+        // Break flint to find an amethyst with a 50% chance when hitting it against a hard block
+        var flintToAmethyst = new UseItemOnRecipe.Builder(new ResourceLocation("ic_examples", "amethyst"))
+                .ingredient(new ICItemStack(Items.FLINT))
+                .predicate(new ICPredicate.Builder()
+                        .with(new BlockCondition.Builder().hardnessMinOnly(1.5f).build())
+                        .build())
+                .addResult(new ICItemStack(new ItemStack(Items.AMETHYST_SHARD), 0.5f))
+                .build();
+        exporter.accept(flintToAmethyst);
     }
 }

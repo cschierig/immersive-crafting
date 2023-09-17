@@ -1,7 +1,11 @@
 package com.carlschierig.immersivecrafting.api.render;
 
 import net.minecraft.client.gui.GuiGraphics;
+import org.jetbrains.annotations.NotNull;
 
+/**
+ * Represents an element which can be rendered on a gui.
+ */
 @FunctionalInterface
 public interface ICRenderable {
     /**
@@ -12,5 +16,5 @@ public interface ICRenderable {
      * @param y     the y coordinate of the mouse.
      * @param delta The time delta used for animation.
      */
-    void render(GuiGraphics draw, int x, int y, float delta);
+    void render(@NotNull GuiGraphics draw, int x, int y, float delta);
 }

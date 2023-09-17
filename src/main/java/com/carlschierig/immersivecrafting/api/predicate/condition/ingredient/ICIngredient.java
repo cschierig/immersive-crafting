@@ -4,12 +4,18 @@ import com.carlschierig.immersivecrafting.api.predicate.condition.ICCondition;
 import com.carlschierig.immersivecrafting.api.render.ICRenderFlags;
 import com.carlschierig.immersivecrafting.api.render.ICRenderable;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
+import org.quiltmc.loader.api.minecraft.ClientOnly;
 
 import java.util.List;
 
+/**
+ * An ingredient is something that can be consumed or produced by a recipe.
+ * Recipes require {@link ICStack}s to be the output as they contain a craft method.
+ *
+ * @see ICStack
+ */
 public interface ICIngredient extends ICRenderable, ICCondition {
 
     /**
@@ -21,13 +27,15 @@ public interface ICIngredient extends ICRenderable, ICCondition {
      */
     int getAmount();
 
+    @ClientOnly
     @Override
-    default void render(GuiGraphics draw, int x, int y, float delta) {
+    default void render(@NotNull GuiGraphics draw, int x, int y, float delta) {
         render(draw, x, y, delta, -1);
     }
 
     /**
      * Render this instance using the given {@link GuiGraphics}.
+     * Ingredient icons should not be larger than a typical minecraft texture (16x16).
      *
      * @param draw  The {@link GuiGraphics} used for rendering.
      * @param x     the x coordinate of the mouse.
@@ -36,7 +44,10 @@ public interface ICIngredient extends ICRenderable, ICCondition {
      * @param flags The bits of this integer indicate what parts should be rendered.
      *              Use {@link ICRenderFlags#test(int)} to compare the given value against flags.
      */
-    void render(GuiGraphics draw, int x, int y, float delta, int flags);
+    @ClientOnly
+    default void render(GuiGraphics draw, int x, int y, float delta, int flags) {
+
+    }
 
     /**
      * Returns the chance that the ingredient is consumed/produced.
@@ -81,8 +92,4 @@ public interface ICIngredient extends ICRenderable, ICCondition {
      * @return {@code true} if this ingredient is empty, {@code false} otherwise.
      */
     boolean isEmpty();
-
-    @Override
-    @NotNull
-    List<ClientTooltipComponent> getTooltip();
 }
