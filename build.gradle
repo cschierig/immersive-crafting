@@ -131,6 +131,11 @@ loom {
             configName = "Example Mod"
             source(project.sourceSets.example)
         }
+        exampleServer {
+            server()
+            configName = "Example Mod"
+            source(project.sourceSets.example)
+        }
         exampleDatagen {
             inherit example
             name "Example Mod Data Generation"

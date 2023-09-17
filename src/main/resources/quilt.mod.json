@@ -19,6 +19,7 @@
     "intermediate_mappings": "net.fabricmc:intermediary",
     "entrypoints": {
       "init": "com.carlschierig.immersivecrafting.ImmersiveCrafting",
+      "client_init": "com.carlschierig.immersivecrafting.ImmersiveCraftingClient",
       "fabric-datagen": "com.carlschierig.immersivecrafting.datagen.ICDatagen",
       "emi": [
         "com.carlschierig.immersivecrafting.compat.emi.ICEmiPlugin"
@@ -36,6 +37,12 @@
       {
         "id": "minecraft",
         "versions": ">=1.20"
+      },
+      {
+        "id": "emi",
+        "environment": "client",
+        "versions": ">=1.0.19",
+        "optional": true
       }
     ]
   },

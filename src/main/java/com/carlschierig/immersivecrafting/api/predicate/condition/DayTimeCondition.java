@@ -30,7 +30,7 @@ public class DayTimeCondition implements ICCondition {
     @Override
     public boolean test(RecipeContext recipeContext) {
         var level = recipeContext.get(ContextTypes.LEVEL);
-        var time = level.getDayTime();
+        var time = level.getDayTime() % 24000;
 
         if (startTime <= endTime) {
             return startTime <= time && time <= endTime;

@@ -4,6 +4,7 @@ import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.impl.recipe.RecipeReloader;
 import com.google.common.collect.ImmutableCollection;
 
+import java.util.List;
 import java.util.Optional;
 
 public final class ICRecipeManager {
@@ -27,5 +28,9 @@ public final class ICRecipeManager {
      */
     public static ImmutableCollection<ICRecipe> getRecipes(ICRecipeType<?> type) {
         return RecipeReloader.getRecipes(type);
+    }
+
+    public static List<ICRecipe> getRecipes() {
+        return RecipeReloader.getRecipes();
     }
 }

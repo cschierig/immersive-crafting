@@ -1,6 +1,9 @@
 package com.carlschierig.immersivecrafting.api.serialization;
 
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICCondition;
+import com.carlschierig.immersivecrafting.api.recipe.ICRecipe;
+import com.carlschierig.immersivecrafting.api.recipe.ICRecipeSerializer;
+import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
 import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelperImpl;
 import net.minecraft.network.FriendlyByteBuf;
 
@@ -29,5 +32,18 @@ public class ICByteBufHelper {
      */
     public static void writeICCondition(FriendlyByteBuf buf, ICCondition condition) {
         ICByteBufHelperImpl.writeICCondition(buf, condition);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends ICRecipe> void writeICRecipe(FriendlyByteBuf buf, T recipe) {
+        buf.writeResourceLocation(ICRegistries.RECIPE_SERIALIZER.getKey(recipe.getSerializer()));
+        buf.writeResourceLocation(recipe.getId());
+        ((ICRecipeSerializer<T>) recipe.getSerializer()).toNetwork(buf, recipe);
+    }
+
+    public static ICRecipe readICRecipe(FriendlyByteBuf buf) {
+        var serializer = buf.readResourceLocation();
+        var id = buf.readResourceLocation();
+        return ICRegistries.RECIPE_SERIALIZER.get(serializer).fromNetwork(id, buf);
     }
 }

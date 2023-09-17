@@ -54,7 +54,7 @@ public class ICItemStack extends ICStack {
     public void craft(RecipeContext recipeContext, CraftingContext craftingContext) {
         var chance = craftingContext.random().nextFloat();
         if (this.chance >= chance) {
-            Block.popResourceFromFace(craftingContext.level(), craftingContext.pos(), craftingContext.direction(), stack);
+            Block.popResourceFromFace(craftingContext.level(), craftingContext.pos(), craftingContext.direction(), stack.copy());
         }
     }
 
