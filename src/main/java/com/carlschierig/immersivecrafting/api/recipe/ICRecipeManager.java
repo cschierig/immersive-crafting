@@ -30,6 +30,11 @@ public final class ICRecipeManager {
         return RecipeReloader.getRecipes(type);
     }
 
+    /**
+     * Returns a list containing all registered recipes.
+     *
+     * @return a list containing all registered recipes.
+     */
     public static List<ICRecipe> getRecipes() {
         return RecipeReloader.getRecipes();
     }

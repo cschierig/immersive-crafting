@@ -1,13 +1,14 @@
 package com.carlschierig.immersivecrafting.api.predicate.condition;
 
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
-import com.carlschierig.immersivecrafting.api.data.ICTranslationHelper;
+import com.carlschierig.immersivecrafting.impl.util.ICTranslationHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditions;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.quiltmc.loader.api.minecraft.ClientOnly;
@@ -66,6 +67,7 @@ public class AndCondition extends CompoundICCondition {
     }
 
     public static class Serializer extends CompoundICCondition.Serializer<AndCondition> {
+        @Contract("_->new")
         @Override
         protected AndCondition create(ICCondition[] conditions) {
             return new AndCondition(conditions);

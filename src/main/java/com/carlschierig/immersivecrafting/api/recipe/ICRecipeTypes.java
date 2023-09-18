@@ -5,6 +5,9 @@ import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 
+/**
+ * Recipe types provided by immersive crafting.
+ */
 public final class ICRecipeTypes {
     public static ICRecipeType<UseItemOnRecipe> USE_ITEM = register("use_item");
 

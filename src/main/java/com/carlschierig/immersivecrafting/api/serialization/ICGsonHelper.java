@@ -55,6 +55,12 @@ public class ICGsonHelper {
         return ICRegistries.CONDITION_SERIALIZER.get(serializer).fromJson(json);
     }
 
+    /**
+     * Deserializes the json object as an ingredient.
+     *
+     * @param json A serialized {@link ICIngredient}.
+     * @return An {@link ICIngredient} based on the given json object.
+     */
     public static ICIngredient getAsIngredient(JsonObject json) {
         var result = getAsCondition(json);
         if (result instanceof ICIngredient) {
@@ -63,6 +69,12 @@ public class ICGsonHelper {
         throw new JsonSyntaxException("Json object must be an ingredient");
     }
 
+    /**
+     * Deserializes the json object as a stack.
+     *
+     * @param json A serialized {@link ICStack}.
+     * @return An {@link ICStack} based on the given json object.
+     */
     public static ICStack getAsStack(JsonObject json) {
         var result = getAsCondition(json);
         if (result instanceof ICStack) {

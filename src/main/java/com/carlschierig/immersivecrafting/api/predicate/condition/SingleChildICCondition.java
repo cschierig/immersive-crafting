@@ -11,6 +11,9 @@ import net.minecraft.util.GsonHelper;
 import org.jetbrains.annotations.NotNull;
 import org.quiltmc.loader.api.minecraft.ClientOnly;
 
+/**
+ * This condition should be used for conditions which have a single child.
+ */
 public abstract class SingleChildICCondition implements ICCondition {
     protected final ICCondition child;
 

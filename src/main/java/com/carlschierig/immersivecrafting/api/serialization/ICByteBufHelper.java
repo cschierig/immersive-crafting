@@ -34,6 +34,12 @@ public class ICByteBufHelper {
         ICByteBufHelperImpl.writeICCondition(buf, condition);
     }
 
+    /**
+     * Writes the given {@link ICRecipe} to the byte buf.
+     *
+     * @param buf    The byte buf to which the recipe should be written.
+     * @param recipe The recipe which should be written to the byte buf.
+     */
     @SuppressWarnings("unchecked")
     public static <T extends ICRecipe> void writeICRecipe(FriendlyByteBuf buf, T recipe) {
         buf.writeResourceLocation(ICRegistries.RECIPE_SERIALIZER.getKey(recipe.getSerializer()));
@@ -41,6 +47,12 @@ public class ICByteBufHelper {
         ((ICRecipeSerializer<T>) recipe.getSerializer()).toNetwork(buf, recipe);
     }
 
+    /**
+     * Reads an {@link ICRecipe} from the byte buf.
+     *
+     * @param buf The byte buf from which the recipe should be read.
+     * @return the read recipe.
+     */
     public static ICRecipe readICRecipe(FriendlyByteBuf buf) {
         var serializer = buf.readResourceLocation();
         var id = buf.readResourceLocation();

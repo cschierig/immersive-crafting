@@ -20,7 +20,7 @@
     "entrypoints": {
       "init": "com.carlschierig.immersivecrafting.ImmersiveCrafting",
       "client_init": "com.carlschierig.immersivecrafting.ImmersiveCraftingClient",
-      "fabric-datagen": "com.carlschierig.immersivecrafting.datagen.ICDatagen",
+      "fabric-datagen": "com.carlschierig.immersivecrafting.impl.datagen.ICDatagen",
       "emi": [
         "com.carlschierig.immersivecrafting.compat.emi.ICEmiPlugin"
       ]

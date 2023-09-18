@@ -192,6 +192,7 @@ if (System.getenv("MODRINTH_TOKEN")) {
             required.project "qsl"
             optional.project "emi"
             optional.project "rei"
+            optional.project "jei"
         }
     }
     tasks.modrinth.dependsOn(tasks.modrinthSyncBody)

@@ -23,23 +23,23 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A recipe which is triggered when a player uses an item on a block.
+ */
 public class UseItemOnRecipe extends ICRecipe {
     private final ResourceLocation id;
-    private final String group;
     private final @NotNull ICIngredient ingredient;
     private final @NotNull ICPredicate predicate;
     private final List<ICStack> results;
     private final boolean spawnAtPlayer;
 
     public UseItemOnRecipe(ResourceLocation id,
-                           String group,
                            @NotNull ICIngredient ingredient,
                            @NotNull ICPredicate predicate,
                            List<ICStack> results,
                            boolean spawnAtPlayer) {
 
         this.id = id;
-        this.group = group;
         this.ingredient = ingredient;
         this.predicate = predicate;
         this.results = results;
@@ -113,10 +113,6 @@ public class UseItemOnRecipe extends ICRecipe {
         return ingredientRequirements;
     }
 
-    public boolean spawnAtPlayer() {
-        return spawnAtPlayer;
-    }
-
     public static class Serializer implements ICRecipeSerializer<UseItemOnRecipe> {
         private static final String GROUP = "group";
         private static final String INGREDIENT = "ingredient";
@@ -127,8 +123,6 @@ public class UseItemOnRecipe extends ICRecipe {
 
         @Override
         public UseItemOnRecipe fromJson(ResourceLocation id, JsonObject json) {
-            String group = GsonHelper.getAsString(json, GROUP, "");
-
             var ingredient = ICGsonHelper.getAsIngredient(GsonHelper.getAsJsonObject(json, INGREDIENT));
             ingredientRequirements.validate(ingredient);
 
@@ -142,15 +136,12 @@ public class UseItemOnRecipe extends ICRecipe {
                 results.add(ICGsonHelper.getAsStack(result.getAsJsonObject()));
             }
             boolean spawnAtPlayer = GsonHelper.getAsBoolean(json, SPAWN_AT_PLAYER, false);
-            return new UseItemOnRecipe(id, group, ingredient, predicate, results, spawnAtPlayer);
+            return new UseItemOnRecipe(id, ingredient, predicate, results, spawnAtPlayer);
         }
 
         @Override
         public JsonObject toJson(UseItemOnRecipe instance) {
             JsonObject json = new JsonObject();
-            if (!instance.group.isEmpty()) {
-                json.addProperty("group", instance.group);
-            }
             json.add(INGREDIENT, ICGsonHelper.conditionToJson(instance.ingredient));
             json.add(PREDICATE, ICConditionSerializers.PREDICATE.toJson(instance.predicate));
 
@@ -167,21 +158,17 @@ public class UseItemOnRecipe extends ICRecipe {
 
         @Override
         public UseItemOnRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
-            String group = buf.readUtf();
-
             var ingredient = (ICIngredient) ICByteBufHelper.readICCondition(buf);
             var predicate = ICConditionSerializers.PREDICATE.fromNetwork(buf);
 
             var results = ICByteBufHelperImpl.readList(buf, buf1 -> (ICStack) ICByteBufHelper.readICCondition(buf1));
             var spawnAtPlayer = buf.readBoolean();
 
-            return new UseItemOnRecipe(id, group, ingredient, predicate, results, spawnAtPlayer);
+            return new UseItemOnRecipe(id, ingredient, predicate, results, spawnAtPlayer);
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf buf, UseItemOnRecipe recipe) {
-            buf.writeUtf(recipe.group);
-
             ICByteBufHelper.writeICCondition(buf, recipe.ingredient);
             ICConditionSerializers.PREDICATE.toNetwork(buf, recipe.predicate);
 
@@ -190,9 +177,11 @@ public class UseItemOnRecipe extends ICRecipe {
         }
     }
 
+    /**
+     * A builder for creating Use Item On Recipes.
+     */
     public static final class Builder {
         private final ResourceLocation id;
-        private String group = "";
         private ICIngredient ingredient;
         private ICPredicate predicate;
         private final List<ICStack> results = new ArrayList<>();
@@ -202,22 +191,35 @@ public class UseItemOnRecipe extends ICRecipe {
             this.id = id;
         }
 
-        public Builder group(String group) {
-            this.group = group;
-            return this;
-        }
-
+        /**
+         * Sets the ingredient used by the recipe.
+         *
+         * @param ingredient the ingredient used by the recipe.
+         * @return this Builder.
+         */
         public Builder ingredient(ICIngredient ingredient) {
             this.ingredient = ingredient;
             return this;
         }
 
+        /**
+         * Sets the predicate used by the recipe.
+         *
+         * @param predicate the predicate used by the recipe.
+         * @return this Builder.
+         */
         public Builder predicate(ICPredicate predicate) {
             context.validate(predicate);
             this.predicate = predicate;
             return this;
         }
 
+        /**
+         * Adds a result stack to the recipe.
+         *
+         * @param result the result added to the recipe.
+         * @return this Builder.
+         */
         public Builder addResult(ICStack result) {
             results.add(result);
             return this;
@@ -240,7 +242,7 @@ public class UseItemOnRecipe extends ICRecipe {
             if (predicate == null) {
                 throw new IllegalStateException("predicate must be set");
             }
-            return new UseItemOnRecipe(id, group, ingredient, predicate, results, spawnAtPlayer);
+            return new UseItemOnRecipe(id, ingredient, predicate, results, spawnAtPlayer);
         }
     }
 }

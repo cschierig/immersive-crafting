@@ -1,8 +1,8 @@
 package com.carlschierig.immersivecrafting.compat.emi;
 
-import com.carlschierig.immersivecrafting.api.data.ICTranslationHelper;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeType;
 import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
+import com.carlschierig.immersivecrafting.impl.util.ICTranslationHelper;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import net.minecraft.network.chat.Component;
 

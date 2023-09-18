@@ -26,7 +26,7 @@ public interface ICConditionSerializer<T extends ICCondition> {
      * @param instance The condition which should be serialized.
      * @return a new {@link JsonObject} containing a json representation of the passed instance.
      */
-    @Contract(pure = true)
+    @Contract(value = "_->new", pure = true)
     JsonObject toJson(T instance);
 
     /**
@@ -40,7 +40,7 @@ public interface ICConditionSerializer<T extends ICCondition> {
     /**
      * Serializes the condition to json.
      *
-     * @param buf      The byte buffer to which the instance data should be appanded.
+     * @param buf      The byte buffer to which the instance data should be appended.
      * @param instance The condition which should be serialized.
      */
     void toNetwork(FriendlyByteBuf buf, T instance);

@@ -1,4 +1,4 @@
-package com.carlschierig.immersivecrafting.api.data;
+package com.carlschierig.immersivecrafting.impl.util;
 
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeType;
 import com.carlschierig.immersivecrafting.api.registry.ICRegistries;

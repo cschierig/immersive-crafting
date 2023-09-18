@@ -65,10 +65,20 @@ public class ICXRecipeProvider extends ICRecipeProvider {
         var flintToAmethyst = new UseItemOnRecipe.Builder(new ResourceLocation("ic_examples", "amethyst"))
                 .ingredient(new ICItemStack(Items.FLINT))
                 .predicate(new ICPredicate.Builder()
-                        .with(new BlockCondition.Builder().hardnessMinOnly(1.5f).build())
+                        .with(new BlockCondition.Builder().hardnessMinOnly(2.5f).build())
                         .build())
                 .addResult(new ICItemStack(new ItemStack(Items.AMETHYST_SHARD), 0.5f))
                 .build();
         exporter.accept(flintToAmethyst);
+
+        // cut sticks from logs with flint
+        var flintToStick = new UseItemOnRecipe.Builder(new ResourceLocation("ic_examples", "stick"))
+                .ingredient(new ICItemStack(Items.FLINT))
+                .predicate(new ICPredicate.Builder()
+                        .with(new BlockCondition.Builder().tag(new ResourceLocation("logs")).build())
+                        .build())
+                .addResult(new ICItemStack(Items.STICK))
+                .build();
+        exporter.accept(flintToStick);
     }
 }

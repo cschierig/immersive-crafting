@@ -10,18 +10,15 @@
     "conditions": [
       {
         "type": "immersive_crafting:block",
-        "hardness": {
-          "min": 2.5
-        }
+        "tag": "minecraft:logs"
       }
     ]
   },
   "result": [
     {
       "type": "immersive_crafting:item",
-      "chance": 0.5,
       "stack": {
-        "item": "minecraft:amethyst_shard"
+        "item": "minecraft:stick"
       }
     }
   ]

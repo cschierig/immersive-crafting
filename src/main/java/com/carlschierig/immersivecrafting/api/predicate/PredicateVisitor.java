@@ -4,6 +4,9 @@ import com.carlschierig.immersivecrafting.api.predicate.condition.CompoundICCond
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICCondition;
 import com.carlschierig.immersivecrafting.api.predicate.condition.SingleChildICCondition;
 
+/**
+ * A visitor for visiting predicate trees.
+ */
 public interface PredicateVisitor {
     default void visit(ICPredicate predicate) {
         visitCompound(predicate);

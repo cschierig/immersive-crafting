@@ -10,6 +10,9 @@ import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 
+/**
+ * Registries used to register data types provided by immersive crafting.
+ */
 public final class ICRegistries {
     public static final Registry<ICConditionSerializer<?>> CONDITION_SERIALIZER = createRegistry(ICRegistryKeys.CONDITION_SERIALIZER);
     public static final Registry<ICRecipeType<?>> RECIPE_TYPE = createRegistry(ICRegistryKeys.RECIPE_TYPE);

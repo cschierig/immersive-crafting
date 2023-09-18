@@ -233,7 +233,7 @@ public class PredicateTree implements ICRenderable {
             draw.fill(leftX, yMid, rightX, yMid + 1, 0xffffffff);
 
             // Draw vertical line to mid
-            draw.fill(node.x + baseUnit / 2, yTop, node.x + +baseUnit / 2 + 1, yMid, 0xffffffff);
+            draw.fill(node.x + baseUnit / 2, yTop, node.x + baseUnit / 2 + 1, yMid, 0xffffffff);
 
             // draw lines to children
             for (int i = 0; i < node.children.size(); i++) {
@@ -291,7 +291,7 @@ public class PredicateTree implements ICRenderable {
         }
 
         private boolean hasChild() {
-            return children.size() > 1;
+            return !children.isEmpty();
         }
 
         private Node getLeftmostChild() {

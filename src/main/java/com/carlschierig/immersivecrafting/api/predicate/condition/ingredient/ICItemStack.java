@@ -139,11 +139,13 @@ public class ICItemStack extends ICStack {
     public static class Serializer implements ICConditionSerializer<ICItemStack> {
         private static final String STACK = "stack";
         private static final String CHANCE = "chance";
+        private static final String NBT = "nbt";
 
         @Override
         public ICItemStack fromJson(JsonObject json) {
             var stack = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, STACK));
             var chance = GsonHelper.getAsFloat(json, CHANCE, 1);
+
             if (chance < 0 || chance > 1) {
                 throw new JsonSyntaxException("Chance must be between 0 and 1.");
             }
