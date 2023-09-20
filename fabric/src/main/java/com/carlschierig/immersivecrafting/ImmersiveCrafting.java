@@ -21,9 +21,7 @@ public class ImmersiveCrafting implements ModInitializer {
     public void onInitialize() {
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new RecipeReloaderFabric());
 
-        ICRecipeTypes.init();
-        ICRecipeSerializers.init();
-        ICConditionSerializers.init();
+        ImmersiveCraftingCommon.init();
 
         S2CPackets.INSTANCE = new S2CPacketsFabric();
         S2CPlayChannelEvents.REGISTER.register(ICMessages::registerPlayer);

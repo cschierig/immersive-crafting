@@ -19,9 +19,7 @@ public class ImmersiveCraftingForge {
     public ImmersiveCraftingForge() {
         MinecraftForge.EVENT_BUS.register(this);
 
-        ICRecipeTypes.init();
-        ICRecipeSerializers.init();
-        ICConditionSerializers.init();
+        ImmersiveCraftingCommon.init();
         ICMessages.registerPackets();
 
         S2CPackets.INSTANCE = new S2CPacketsForge();
