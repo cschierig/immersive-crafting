@@ -55,9 +55,8 @@ on a quartz block with a stack of diamonds at night.
 
 ## Usage & Dependencies
 
-- Immersive Crafting depends on [Quilt Standard Libraries](https://modrinth.com/mod/qsl).
-- The mod is currently Quilt-exclusive. I might add support for other loaders in the future,
-  but I do not have the time to do so at the moment.
+- Immersive Crafting for Fabric depends on [Fabric API](https://modrinth.com/mod/fabric-api).
+- It is recommended to use EMI to view the recipes. REI and JEI support will be added in the future.
 
 <!-- modrinth_exclude.start -->
 

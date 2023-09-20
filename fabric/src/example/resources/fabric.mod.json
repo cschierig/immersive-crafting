@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "ic_examples",
+  "name": "Immersive Crafting Example Mod",
+  "description": "Example content for Immersive Crafting.",
+  "contact": {
+    "issues": "https://github.com/cschierig/immersive-crafting/issues",
+    "sources": "https://github.com/cschierig/immersive-crafting"
+  },
+  "authors": [
+    "CozyPenguin"
+  ],
+  "version": "1.0.0",
+  "license": "MIT",
+  "entrypoints": {
+    "main": [
+      "com.carlschierig.icexample.ICExample"
+    ],
+    "fabric-datagen": [
+      "com.carlschierig.icexample.datagen.ICExampleDatagen"
+    ],
+    "emi": [
+      "com.carlschierig.immersivecrafting.compat.emi.ICEmiPlugin"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.14.22",
+    "fabric-api": "*",
+    "minecraft": "1.20.1",
+    "java": ">=17",
+    "immersive_crafting": "*"
+  },
+  "suggests": {
+    "emi": ">=1.0.19"
+  }
+}
