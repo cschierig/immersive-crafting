@@ -67,13 +67,19 @@ subprojects {
     }
 
     repositories {
-        // EMI
-        maven("https://maven.terraformersmc.com/")
-        // REI
-        maven("https://maven.shedaniel.me")
-        // JEI
-        maven("https://maven.blamejared.com/")
-        maven("https://repo.spongepowered.org/repository/maven-public/")
+        maven("https://maven.terraformersmc.com/") {
+            name = "EMI"
+        }
+        maven("https://maven.shedaniel.me") {
+            name = "REI"
+        }
+        maven("https://maven.blamejared.com/") {
+            name = "JEI"
+        }
+        maven("https://repo.spongepowered.org/repository/maven-public/") {
+            name = "Sponge / Mixin"
+        }
+        mavenCentral()
     }
 
     configure<BasePluginExtension> {

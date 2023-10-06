@@ -13,6 +13,9 @@ val version: String by project
 dependencies {
     compileOnly(libs.mixin)
     compileOnly(libs.emi.common) { api(this) }
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.0.3")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.0.3")
 }
 
 minecraft {
@@ -31,6 +34,10 @@ sourceSets {
             exclude("src/main/resources/.cache")
         }
     }
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
 
 fun api(dep: ExternalModuleDependency) {

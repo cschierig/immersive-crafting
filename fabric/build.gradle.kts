@@ -113,7 +113,7 @@ loom {
             inherit(getByName("client"))
             name("Data Generation")
             vmArg("-Dfabric-api.datagen")
-            vmArg("-Dfabric-api.datagen.output-dir=${file("src/main/generated")}")
+            vmArg("-Dfabric-api.datagen.output-dir=${common.file("src/main/generated")}")
             vmArg("-Dfabric-api.datagen=ic_examples")
 
             runDir("build/datagen")
