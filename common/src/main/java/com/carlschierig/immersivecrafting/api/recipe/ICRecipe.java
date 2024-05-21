@@ -7,8 +7,13 @@ import com.carlschierig.immersivecrafting.api.context.ValidationContext;
 import com.carlschierig.immersivecrafting.api.predicate.ICPredicate;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICIngredient;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICStack;
+import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
+import com.carlschierig.immersivecrafting.impl.registry.ICRegistryKeys;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.resources.ResourceLocation;
+import com.mojang.serialization.Codec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.crafting.Recipe;
 
 import java.util.List;
@@ -22,6 +27,13 @@ import java.util.List;
  * unchanged.
  */
 public abstract class ICRecipe {
+    public static final Codec<ICRecipe> CODEC = ICRegistries.RECIPE_SERIALIZER
+            .byNameCodec()
+            .dispatch(ICRecipe::getSerializer, ICRecipeSerializer::codec);
+    public static final StreamCodec<RegistryFriendlyByteBuf, ICRecipe> STREAM_CODEC = ByteBufCodecs
+            .registry(ICRegistryKeys.RECIPE_SERIALIZER)
+            .dispatch(ICRecipe::getSerializer, ICRecipeSerializer::streamCodec);
+
     /**
      * Returns whether this recipe matches the given {@link RecipeContext}.
      * This is used by the {@link ICRecipeManager} to determine which recipe to use when crafting.
@@ -54,13 +66,6 @@ public abstract class ICRecipe {
     public abstract ImmutableList<ICIngredient> getIngredients();
 
     public abstract ICPredicate getPredicate();
-
-    /**
-     * Returns the unique {@link ResourceLocation} of the recipe.
-     *
-     * @return the unique {@link ResourceLocation} of the recipe.
-     */
-    public abstract ResourceLocation getId();
 
     /**
      * Returns the serializer used to (de)serialize recipes of this type.

@@ -8,16 +8,14 @@ import com.carlschierig.immersivecrafting.api.predicate.ICPredicate;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializers;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICIngredient;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICStack;
-import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
-import com.carlschierig.immersivecrafting.api.serialization.ICByteBufHelper;
-import com.carlschierig.immersivecrafting.api.serialization.ICGsonHelper;
 import com.carlschierig.immersivecrafting.impl.recipe.ICRecipeSerializers;
-import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelperImpl;
 import com.google.common.collect.ImmutableList;
-import com.google.gson.JsonObject;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -27,19 +25,15 @@ import java.util.List;
  * A recipe which is triggered when a player uses an item on a block.
  */
 public class UseItemOnRecipe extends ICRecipe {
-    private final ResourceLocation id;
-    private final @NotNull ICIngredient ingredient;
+    public final @NotNull ICIngredient ingredient;
     private final @NotNull ICPredicate predicate;
     private final List<ICStack> results;
     private final boolean spawnAtPlayer;
 
-    public UseItemOnRecipe(ResourceLocation id,
-                           @NotNull ICIngredient ingredient,
+    public UseItemOnRecipe(@NotNull ICIngredient ingredient,
                            @NotNull ICPredicate predicate,
                            List<ICStack> results,
                            boolean spawnAtPlayer) {
-
-        this.id = id;
         this.ingredient = ingredient;
         this.predicate = predicate;
         this.results = results;
@@ -65,11 +59,6 @@ public class UseItemOnRecipe extends ICRecipe {
         for (var stack : results) {
             stack.craft(recipeContext, craftingContext);
         }
-    }
-
-    @Override
-    public ResourceLocation getId() {
-        return id;
     }
 
     @Override
@@ -114,66 +103,35 @@ public class UseItemOnRecipe extends ICRecipe {
     }
 
     public static class Serializer implements ICRecipeSerializer<UseItemOnRecipe> {
-        private static final String GROUP = "group";
-        private static final String INGREDIENT = "ingredient";
-        private static final String PREDICATE = "predicate";
-        private static final String RESULT = "result";
-        private static final String SPAWN_AT_PLAYER = "spawn_at_player";
+        public static final MapCodec<UseItemOnRecipe> CODEC = RecordCodecBuilder.mapCodec(
+                instance -> instance.group(
+                        ICIngredient.CODEC.fieldOf("ingredient").forGetter(recipe -> recipe.ingredient),
+                        ICConditionSerializers.PREDICATE.codec().fieldOf("predicate").forGetter(UseItemOnRecipe::getPredicate),
+                        Codec.list(ICStack.CODEC).fieldOf("result").forGetter(UseItemOnRecipe::getResults),
+                        Codec.BOOL.optionalFieldOf("spawn_at_player", false).forGetter(recipe -> recipe.spawnAtPlayer)
+                ).apply(instance, UseItemOnRecipe::new)
+        );
 
+        public static final StreamCodec<RegistryFriendlyByteBuf, UseItemOnRecipe> STREAM_CODEC = StreamCodec.composite(
+                ICIngredient.STREAM_CODEC,
+                recipe -> recipe.ingredient,
+                ICConditionSerializers.PREDICATE.streamCodec(),
+                UseItemOnRecipe::getPredicate,
+                ICStack.STREAM_CODEC.apply(ByteBufCodecs.list()),
+                UseItemOnRecipe::getResults,
+                ByteBufCodecs.BOOL,
+                recipe -> recipe.spawnAtPlayer,
+                UseItemOnRecipe::new
+        );
 
         @Override
-        public UseItemOnRecipe fromJson(ResourceLocation id, JsonObject json) {
-            var ingredient = ICGsonHelper.getAsIngredient(GsonHelper.getAsJsonObject(json, INGREDIENT));
-            ingredientRequirements.validate(ingredient);
-
-            var predicateObject = GsonHelper.getAsJsonObject(json, PREDICATE, new JsonObject());
-            var predicate = ICConditionSerializers.PREDICATE.fromJson(predicateObject);
-            context.validate(predicate);
-
-            var resultJson = GsonHelper.getAsJsonArray(json, RESULT);
-            List<ICStack> results = new ArrayList<>();
-            for (var result : resultJson) {
-                results.add(ICGsonHelper.getAsStack(result.getAsJsonObject()));
-            }
-            boolean spawnAtPlayer = GsonHelper.getAsBoolean(json, SPAWN_AT_PLAYER, false);
-            return new UseItemOnRecipe(id, ingredient, predicate, results, spawnAtPlayer);
+        public MapCodec<UseItemOnRecipe> codec() {
+            return CODEC;
         }
 
         @Override
-        public JsonObject toJson(UseItemOnRecipe instance) {
-            JsonObject json = new JsonObject();
-            json.add(INGREDIENT, ICGsonHelper.conditionToJson(instance.ingredient));
-            json.add(PREDICATE, ICConditionSerializers.PREDICATE.toJson(instance.predicate));
-
-            var resultArray = ICGsonHelper.conditionsToJson(instance.results);
-            json.add(RESULT, resultArray);
-
-            if (instance.spawnAtPlayer) {
-                json.addProperty(SPAWN_AT_PLAYER, true);
-            }
-
-            json.addProperty("type", ICRegistries.RECIPE_SERIALIZER.getKey(instance.getSerializer()).toString());
-            return json;
-        }
-
-        @Override
-        public UseItemOnRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
-            var ingredient = (ICIngredient) ICByteBufHelper.readICCondition(buf);
-            var predicate = ICConditionSerializers.PREDICATE.fromNetwork(buf);
-
-            var results = ICByteBufHelperImpl.readList(buf, buf1 -> (ICStack) ICByteBufHelper.readICCondition(buf1));
-            var spawnAtPlayer = buf.readBoolean();
-
-            return new UseItemOnRecipe(id, ingredient, predicate, results, spawnAtPlayer);
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, UseItemOnRecipe recipe) {
-            ICByteBufHelper.writeICCondition(buf, recipe.ingredient);
-            ICConditionSerializers.PREDICATE.toNetwork(buf, recipe.predicate);
-
-            ICByteBufHelperImpl.writeList(buf, recipe.results, ICByteBufHelper::writeICCondition);
-            buf.writeBoolean(recipe.spawnAtPlayer);
+        public StreamCodec<RegistryFriendlyByteBuf, UseItemOnRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 
@@ -181,15 +139,10 @@ public class UseItemOnRecipe extends ICRecipe {
      * A builder for creating Use Item On Recipes.
      */
     public static final class Builder {
-        private final ResourceLocation id;
         private ICIngredient ingredient;
         private ICPredicate predicate;
         private final List<ICStack> results = new ArrayList<>();
         private boolean spawnAtPlayer = false;
-
-        public Builder(ResourceLocation id) {
-            this.id = id;
-        }
 
         /**
          * Sets the ingredient used by the recipe.
@@ -242,7 +195,7 @@ public class UseItemOnRecipe extends ICRecipe {
             if (predicate == null) {
                 throw new IllegalStateException("predicate must be set");
             }
-            return new UseItemOnRecipe(id, ingredient, predicate, results, spawnAtPlayer);
+            return new UseItemOnRecipe(ingredient, predicate, results, spawnAtPlayer);
         }
     }
 }

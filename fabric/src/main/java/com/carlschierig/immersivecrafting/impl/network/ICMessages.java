@@ -1,8 +1,8 @@
 package com.carlschierig.immersivecrafting.impl.network;
 
-import com.carlschierig.immersivecrafting.impl.util.ICUtil;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -10,14 +10,17 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import java.util.List;
 
 public class ICMessages {
-    public static final ResourceLocation UPDATE = ICUtil.getId("update_recipes");
-
     public static void registerClientReceivers() {
-        ClientPlayNetworking.registerGlobalReceiver(UPDATE, ClientPacketReciever::receiveRecipes);
+        ClientPlayNetworking.registerGlobalReceiver(UpdateRecipesPayload.TYPE, ClientPacketReciever::receiveRecipes);
+    }
+
+    public static void registerPayloadsS2C() {
+        PayloadTypeRegistry.playS2C().register(UpdateRecipesPayload.TYPE, UpdateRecipesPayload.STREAM_CODEC);
     }
 
     public static void registerPlayer(ServerGamePacketListenerImpl handler, PacketSender sender, MinecraftServer server, List<ResourceLocation> channels) {
-        if (channels.contains(UPDATE)) {
+        // TODO: check if this still works
+        if (channels.contains(UpdateRecipesPayload.TYPE.id())) {
             S2CPacketsFabric.PLAYERS.add(handler.player);
         }
     }

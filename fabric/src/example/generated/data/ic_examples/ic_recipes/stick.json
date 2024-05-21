@@ -3,14 +3,17 @@
   "ingredient": {
     "type": "immersive_crafting:item",
     "stack": {
-      "item": "minecraft:flint"
+      "count": 1,
+      "id": "minecraft:flint"
     }
   },
   "predicate": {
     "conditions": [
       {
         "type": "immersive_crafting:block",
-        "tag": "minecraft:logs"
+        "block": {
+          "tag": "minecraft:logs"
+        }
       }
     ]
   },
@@ -18,7 +21,8 @@
     {
       "type": "immersive_crafting:item",
       "stack": {
-        "item": "minecraft:stick"
+        "count": 1,
+        "id": "minecraft:stick"
       }
     }
   ]

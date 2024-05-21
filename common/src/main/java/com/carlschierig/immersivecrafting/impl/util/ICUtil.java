@@ -3,6 +3,7 @@ package com.carlschierig.immersivecrafting.impl.util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -23,6 +24,10 @@ public final class ICUtil {
 
     public static ResourceLocation getId(String value) {
         return new ResourceLocation(MODID, value);
+    }
+
+    public static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> getType(String value) {
+        return CustomPacketPayload.createType(MODID + ":" + value);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

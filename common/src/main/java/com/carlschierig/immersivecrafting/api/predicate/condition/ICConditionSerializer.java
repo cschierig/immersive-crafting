@@ -1,8 +1,8 @@
 package com.carlschierig.immersivecrafting.api.predicate.condition;
 
-import com.google.gson.JsonObject;
-import net.minecraft.network.FriendlyByteBuf;
-import org.jetbrains.annotations.Contract;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 
 /**
  * A serializer for serializing and deserializing {@link ICCondition}s.
@@ -12,36 +12,16 @@ import org.jetbrains.annotations.Contract;
  */
 public interface ICConditionSerializer<T extends ICCondition> {
     /**
-     * Returns a new {@link ICCondition} of type {@link T} based on the given {@link JsonObject}.
+     * The codec used for json (de)serialization of {@link ICCondition}s of type {@link T}.
      *
-     * @param json The json from which the condition is read.
-     * @return a new {@link ICCondition} of type {@link T}.
+     * @return the codec used for json (de)serialization.
      */
-    @Contract(pure = true)
-    T fromJson(JsonObject json);
+    MapCodec<T> codec();
 
     /**
-     * Serializes the condition to json.
+     * The codec used for (de)serialization of {@link ICCondition}s of type {@link T} into a byte stream.
      *
-     * @param instance The condition which should be serialized.
-     * @return a new {@link JsonObject} containing a json representation of the passed instance.
+     * @return the codec used for byte stream (de)serialization.
      */
-    @Contract(value = "_->new", pure = true)
-    JsonObject toJson(T instance);
-
-    /**
-     * Reads a condition of type {@link T} from the given {@link FriendlyByteBuf} and returns it.
-     *
-     * @param buf The {@link FriendlyByteBuf} from which the condition should be read.
-     * @return a new condition of type {@link T}.
-     */
-    T fromNetwork(FriendlyByteBuf buf);
-
-    /**
-     * Serializes the condition to json.
-     *
-     * @param buf      The byte buffer to which the instance data should be appended.
-     * @param instance The condition which should be serialized.
-     */
-    void toNetwork(FriendlyByteBuf buf, T instance);
+    StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec();
 }

@@ -3,10 +3,13 @@ package com.carlschierig.immersivecrafting.api.predicate.condition;
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.impl.render.ICRenderHelper;
 import com.carlschierig.immersivecrafting.impl.util.ICTranslationHelper;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,9 +59,17 @@ public class InvertedCondition extends SingleChildICCondition {
     }
 
     public static final class Serializer extends SingleChildICCondition.Serializer<InvertedCondition> {
+        public static final MapCodec<InvertedCondition> CODEC = createCodec(InvertedCondition::new);
+        public static final StreamCodec<RegistryFriendlyByteBuf, InvertedCondition> STREAM_CODEC = createStreamCodec(InvertedCondition::new);
+
         @Override
-        protected InvertedCondition create(ICCondition conditions) {
-            return new InvertedCondition(conditions);
+        public MapCodec<InvertedCondition> codec() {
+            return CODEC;
+        }
+
+        @Override
+        public StreamCodec<? super RegistryFriendlyByteBuf, InvertedCondition> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

@@ -2,9 +2,8 @@ package com.carlschierig.immersivecrafting.api.recipe;
 
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.impl.recipe.ICRecipeManagerImpl;
-import com.google.common.collect.ImmutableCollection;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 
 public final class ICRecipeManager {
@@ -16,7 +15,7 @@ public final class ICRecipeManager {
      * @param <T>     The type of the recipe which is returned.
      * @return The first recipe which matches the predicate, if any.
      */
-    public static <T extends ICRecipe> Optional<T> getRecipe(ICRecipeType<T> type, RecipeContext context) {
+    public static <T extends ICRecipe> Optional<ICRecipeHolder<T>> getRecipe(ICRecipeType<T> type, RecipeContext context) {
         return ICRecipeManagerImpl.INSTANCE.getRecipe(type, context);
     }
 
@@ -26,7 +25,7 @@ public final class ICRecipeManager {
      * @param type The Recipe Type whose recipes should be returned.
      * @return All recipes of the given {@link RecipeContext}.
      */
-    public static ImmutableCollection<ICRecipe> getRecipes(ICRecipeType<?> type) {
+    public static <T extends ICRecipe> Collection<ICRecipeHolder<T>> getRecipes(ICRecipeType<T> type) {
         return ICRecipeManagerImpl.INSTANCE.getRecipes(type);
     }
 
@@ -35,7 +34,7 @@ public final class ICRecipeManager {
      *
      * @return a list containing all registered recipes.
      */
-    public static List<ICRecipe> getRecipes() {
+    public static Collection<ICRecipeHolder<?>> getRecipes() {
         return ICRecipeManagerImpl.INSTANCE.getRecipes();
     }
 }

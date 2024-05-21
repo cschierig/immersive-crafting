@@ -2,13 +2,15 @@ package com.carlschierig.immersivecrafting.api.predicate.condition;
 
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.impl.util.ICTranslationHelper;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditions;
-import org.jetbrains.annotations.Contract;
+import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,7 +24,7 @@ public class OrCondition extends CompoundICCondition {
 
     public OrCondition(ICCondition... conditions) {
         super(conditions);
-        predicate = LootItemConditions.orConditions(conditions);
+        predicate = Util.anyOf(List.of(conditions));
     }
 
     @Override
@@ -57,10 +59,17 @@ public class OrCondition extends CompoundICCondition {
     }
 
     public static class Serializer extends CompoundICCondition.Serializer<OrCondition> {
-        @Contract("_->new")
+        public static final MapCodec<OrCondition> CODEC = createCodec(OrCondition::new);
+        public static final StreamCodec<RegistryFriendlyByteBuf, OrCondition> STREAM_CODEC = createStreamCodec(OrCondition::new);
+
         @Override
-        protected OrCondition create(ICCondition[] conditions) {
-            return new OrCondition(conditions);
+        public MapCodec<OrCondition> codec() {
+            return CODEC;
+        }
+
+        @Override
+        public StreamCodec<? super RegistryFriendlyByteBuf, OrCondition> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

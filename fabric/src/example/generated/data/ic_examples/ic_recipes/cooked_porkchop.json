@@ -3,14 +3,17 @@
   "ingredient": {
     "type": "immersive_crafting:item",
     "stack": {
-      "item": "minecraft:porkchop"
+      "count": 1,
+      "id": "minecraft:porkchop"
     }
   },
   "predicate": {
     "conditions": [
       {
         "type": "immersive_crafting:block",
-        "id": "minecraft:magma_block"
+        "block": {
+          "id": "minecraft:magma_block"
+        }
       }
     ]
   },
@@ -18,7 +21,8 @@
     {
       "type": "immersive_crafting:item",
       "stack": {
-        "item": "minecraft:cooked_porkchop"
+        "count": 1,
+        "id": "minecraft:cooked_porkchop"
       }
     }
   ]

@@ -26,5 +26,13 @@
   },
   "mixins": [
     "immersive-crafting.mixins.json"
-  ]
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.22",
+    "minecraft": "1.20.6",
+    "java": ">=21"
+  },
+  "suggests": {
+    "emi": ">=1.0.19"
+  }
 }

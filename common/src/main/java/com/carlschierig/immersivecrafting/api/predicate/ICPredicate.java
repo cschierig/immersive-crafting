@@ -2,6 +2,9 @@ package com.carlschierig.immersivecrafting.api.predicate;
 
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.predicate.condition.*;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.Contract;
 
 import java.util.ArrayList;
@@ -21,11 +24,17 @@ public class ICPredicate extends AndCondition {
     }
 
     public static class Serializer extends CompoundICCondition.Serializer<ICPredicate> {
+        public static final MapCodec<ICPredicate> CODEC = createCodec(ICPredicate::new);
+        public static final StreamCodec<RegistryFriendlyByteBuf, ICPredicate> STREAM_CODEC = createStreamCodec(ICPredicate::new);
 
         @Override
-        @Contract("_->new")
-        protected ICPredicate create(ICCondition[] conditions) {
-            return new ICPredicate(conditions);
+        public MapCodec<ICPredicate> codec() {
+            return CODEC;
+        }
+
+        @Override
+        public StreamCodec<RegistryFriendlyByteBuf, ICPredicate> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 

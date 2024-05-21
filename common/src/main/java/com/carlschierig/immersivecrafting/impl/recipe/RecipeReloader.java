@@ -2,58 +2,59 @@ package com.carlschierig.immersivecrafting.impl.recipe;
 
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipe;
+import com.carlschierig.immersivecrafting.api.recipe.ICRecipeHolder;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeType;
-import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
 import com.carlschierig.immersivecrafting.impl.network.S2CPackets;
 import com.carlschierig.immersivecrafting.impl.util.ICUtil;
-import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import net.minecraft.resources.ResourceLocation;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.minecraft.util.GsonHelper;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @ApiStatus.Internal
 public class RecipeReloader extends ICRecipeManagerImpl implements ResourceManagerReloadListener {
-    private ImmutableMap<ICRecipeType<?>, ImmutableMap<ResourceLocation, ICRecipe>> recipes = ImmutableMap.of();
+    private Multimap<ICRecipeType<?>, ICRecipeHolder<?>> recipes = ImmutableMultimap.of();
 
     public RecipeReloader() {
         ICRecipeManagerImpl.INSTANCE = this;
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends ICRecipe> Optional<T> getRecipe(ICRecipeType<T> type, RecipeContext context) {
-        return ((ImmutableMap<?, T>) recipes.get(type)).values().stream().filter(recipe -> recipe.matches(context)).findFirst();
+    public <T extends ICRecipe> Optional<ICRecipeHolder<T>> getRecipe(ICRecipeType<T> type, RecipeContext context) {
+        return recipes.get(type).stream().filter(recipe -> recipe.recipe().matches(context)).map(val -> (ICRecipeHolder<T>) val).findFirst();
     }
 
-    public ImmutableCollection<ICRecipe> getRecipes(ICRecipeType<?> type) {
-        return recipes.get(type).values();
+    @SuppressWarnings("unchecked")
+    public <T extends ICRecipe> Collection<ICRecipeHolder<T>> getRecipes(ICRecipeType<T> type) {
+        return recipes.get(type).stream().map(val -> (ICRecipeHolder<T>) val).collect(Collectors.toList());
     }
 
     @Override
     public void onResourceManagerReload(ResourceManager manager) {
-        List<ICRecipe> recipes = new ArrayList<>();
+        List<ICRecipeHolder<?>> recipes = new ArrayList<>();
         for (var entry : manager.listResources("ic_recipes", path -> path.getPath().endsWith(".json")).entrySet()) {
             var id = entry.getKey();
             var resource = entry.getValue();
 
             try (var reader = new InputStreamReader(resource.open())) {
-                var json = JsonParser.parseReader(reader).getAsJsonObject();
-                var recipe = ICRegistries.RECIPE_SERIALIZER.get(
-                        new ResourceLocation(GsonHelper.getAsString(json, "type"))
-                ).fromJson(id, json);
-                recipes.add(recipe);
+                var json = JsonParser.parseReader(reader);
+
+                var recipe = ICRecipe.CODEC.parse(JsonOps.INSTANCE, json);
+
+                recipes.add(new ICRecipeHolder<>(id, recipe.getOrThrow(JsonParseException::new)));
             } catch (IOException exception) {
                 ICUtil.LOG.error("Could not load recipes from '{}'", id);
             } catch (JsonSyntaxException exception) {
@@ -65,25 +66,17 @@ public class RecipeReloader extends ICRecipeManagerImpl implements ResourceManag
         S2CPackets.INSTANCE.sendRecipes();
     }
 
-    public void setRecipes(Iterable<ICRecipe> recipes) {
-        var builder = ImmutableMap.<ICRecipeType<?>, ImmutableMap<ResourceLocation, ICRecipe>>builder();
-        var maps = new HashMap<ICRecipeType<?>, ImmutableMap.Builder<ResourceLocation, ICRecipe>>();
+    public void setRecipes(Iterable<ICRecipeHolder<?>> recipes) {
+        var builder = ImmutableMultimap.<ICRecipeType<?>, ICRecipeHolder<?>>builder();
 
-        for (var type : ICRegistries.RECIPE_TYPE) {
-            maps.put(type, new ImmutableMap.Builder<>());
-        }
-        for (var recipe : recipes) {
-            var id = recipe.getId();
-            maps.get(recipe.getType()).put(id, recipe);
-        }
-
-        for (var map : maps.entrySet()) {
-            builder.put(map.getKey(), map.getValue().build());
+        for (var holder : recipes) {
+            var type = holder.recipe().getType();
+            builder.put(type, holder);
         }
         this.recipes = builder.build();
     }
 
-    public List<ICRecipe> getRecipes() {
-        return recipes.values().stream().flatMap(map -> map.values().stream()).collect(Collectors.toList());
+    public Collection<ICRecipeHolder<?>> getRecipes() {
+        return recipes.values();
     }
 }

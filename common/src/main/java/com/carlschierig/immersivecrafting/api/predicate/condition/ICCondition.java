@@ -4,11 +4,17 @@ import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
 import com.carlschierig.immersivecrafting.api.predicate.PredicateVisitor;
 import com.carlschierig.immersivecrafting.api.predicate.Visitable;
+import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
 import com.carlschierig.immersivecrafting.api.render.ICRenderable;
 import com.carlschierig.immersivecrafting.impl.predicate.ICConditionData;
+import com.carlschierig.immersivecrafting.impl.registry.ICRegistryKeys;
+import com.mojang.serialization.Codec;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +31,16 @@ import java.util.function.Predicate;
  * These have a default implementation, but it is recommended to implement them so that
  */
 public interface ICCondition extends Predicate<RecipeContext>, Visitable, ICRenderable {
-    ICConditionSerializer<?> getSerializer();
+    Codec<ICCondition> CODEC = ICRegistries.CONDITION_SERIALIZER
+            .byNameCodec()
+            .dispatch(ICCondition::getSerializer, ICConditionSerializer::codec);
+
+    StreamCodec<RegistryFriendlyByteBuf, ICCondition> STREAM_CODEC = ByteBufCodecs
+            .registry(ICRegistryKeys.CONDITION_SERIALIZER)
+            .dispatch(ICCondition::getSerializer, ICConditionSerializer::streamCodec);
+
+
+    ICConditionSerializer<? extends ICCondition> getSerializer();
 
     /**
      * Returns a validation context specifying which context types need to be passed to the test method.

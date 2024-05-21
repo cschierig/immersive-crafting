@@ -1,11 +1,8 @@
 package com.carlschierig.immersivecrafting;
 
-import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializers;
-import com.carlschierig.immersivecrafting.api.recipe.ICRecipeTypes;
 import com.carlschierig.immersivecrafting.impl.network.ICMessages;
 import com.carlschierig.immersivecrafting.impl.network.S2CPackets;
 import com.carlschierig.immersivecrafting.impl.network.S2CPacketsFabric;
-import com.carlschierig.immersivecrafting.impl.recipe.ICRecipeSerializers;
 import com.carlschierig.immersivecrafting.impl.recipe.RecipeReloaderFabric;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.S2CPlayChannelEvents;
@@ -23,8 +20,10 @@ public class ImmersiveCrafting implements ModInitializer {
 
         ImmersiveCraftingCommon.init();
 
+        ICMessages.registerPayloadsS2C();
         S2CPackets.INSTANCE = new S2CPacketsFabric();
         S2CPlayChannelEvents.REGISTER.register(ICMessages::registerPlayer);
+
         ServerPlayConnectionEvents.DISCONNECT.register(ICMessages::unregisterPlayer);
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> S2CPackets.INSTANCE.trySendRecipes(handler.player));
     }

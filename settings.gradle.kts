@@ -1,16 +1,14 @@
 pluginManagement {
     repositories {
-        maven("https://maven.fabricmc.net/")
-        maven("https://maven.minecraftforge.net/") {
-            name = "Forge"
-        }
-        maven("https://repo.spongepowered.org/repository/maven-public/") {
-            name = "Sponge / Mixin"
-        }
-
         gradlePluginPortal()
+        maven("https://maven.fabricmc.net/") {
+            name = "Fabric"
+        }
+        maven("https://maven.neoforged.net/releases") {
+            name = "Neoforge"
+        }
     }
 }
 
 rootProject.name = "immersive-crafting"
-include("common", "fabric", "forge")
+include("common", "fabric", "neoforge")

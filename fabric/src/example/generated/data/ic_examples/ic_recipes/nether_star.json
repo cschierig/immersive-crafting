@@ -4,7 +4,7 @@
     "type": "immersive_crafting:item",
     "stack": {
       "count": 5,
-      "item": "minecraft:diamond"
+      "id": "minecraft:diamond"
     }
   },
   "predicate": {
@@ -19,7 +19,9 @@
       },
       {
         "type": "immersive_crafting:block",
-        "id": "minecraft:quartz_block"
+        "block": {
+          "id": "minecraft:quartz_block"
+        }
       }
     ]
   },
@@ -27,7 +29,8 @@
     {
       "type": "immersive_crafting:item",
       "stack": {
-        "item": "minecraft:nether_star"
+        "count": 1,
+        "id": "minecraft:nether_star"
       }
     }
   ]

@@ -5,14 +5,17 @@ import com.carlschierig.immersivecrafting.api.recipe.ICRecipeTypes;
 import com.carlschierig.immersivecrafting.impl.util.ICTranslationHelper;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
+import net.minecraft.core.HolderLookup;
+
+import java.util.concurrent.CompletableFuture;
 
 public class ICLanguageProvider extends FabricLanguageProvider {
-    protected ICLanguageProvider(FabricDataOutput dataOutput) {
-        super(dataOutput);
+    protected ICLanguageProvider(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registries) {
+        super(dataOutput, registries);
     }
 
     @Override
-    public void generateTranslations(TranslationBuilder builder) {
+    public void generateTranslations(HolderLookup.Provider registries, TranslationBuilder builder) {
         translateUIElements(builder);
         translateRecipeTypes(builder);
         translateConditions(builder);

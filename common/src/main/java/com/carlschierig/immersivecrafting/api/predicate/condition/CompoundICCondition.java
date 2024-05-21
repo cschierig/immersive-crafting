@@ -2,15 +2,15 @@ package com.carlschierig.immersivecrafting.api.predicate.condition;
 
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
 import com.carlschierig.immersivecrafting.api.predicate.PredicateVisitor;
-import com.carlschierig.immersivecrafting.api.serialization.ICGsonHelper;
-import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelperImpl;
-import com.google.gson.JsonObject;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.util.GsonHelper;
-import org.jetbrains.annotations.Contract;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -45,46 +45,35 @@ public abstract class CompoundICCondition implements ICCondition {
 
     /**
      * A template {@link ICConditionSerializer} for {@link CompoundICCondition}s.
-     * Subclasses must override {@link Serializer#create(ICCondition[])} to determine how a new instance should
-     * be created.
+     * Provides factory methods for creating codecs and stream codecs.
      *
      * @param <T> The type of condition for which the serializer is used.
      */
     public static abstract class Serializer<T extends CompoundICCondition> implements ICConditionSerializer<T> {
-        private static final String CONDITIONS = "conditions";
+        /**
+         * Create a codec for a compound ic condition using the given factory.
+         *
+         * @param factory Function to create a new compound condition of type {@link T} using the given {@link ICCondition[]}.
+         * @return a new codec for (de)serializing conditions of type {@link T}.
+         */
+        protected static <T extends CompoundICCondition> MapCodec<T> createCodec(Function<@NotNull ICCondition[], T> factory) {
+            return Codec.list(ICCondition.CODEC).fieldOf("conditions").xmap(
+                    list -> factory.apply(list.toArray(ICCondition[]::new)),
+                    condition -> Arrays.asList(condition.conditions)
+            );
+        }
 
         /**
-         * Create a new compound condition of type {@link T} using the given {@link ICCondition[]}.
+         * Create a stream codec for a compound ic condition using the given factory.
          *
-         * @param conditions The conditions which should be passed to the constructor.
-         * @return a new compound condition of type {@link T}.
+         * @param factory Function to create a new compound condition of type {@link T} using the given {@link ICCondition[]}.
+         * @return a new stream codec for (de)serializing conditions of type {@link T}.
          */
-        @Contract("_->new")
-        protected abstract T create(@NotNull ICCondition[] conditions);
-
-        @Override
-        public T fromJson(JsonObject json) {
-            var conditions = ICGsonHelper.getAsConditions(GsonHelper.getAsJsonArray(json, CONDITIONS));
-            return create(conditions);
-        }
-
-        @Override
-        public JsonObject toJson(T instance) {
-            var conditions = ICGsonHelper.conditionsToJson(instance.conditions);
-            var json = new JsonObject();
-            json.add(CONDITIONS, conditions);
-            return json;
-        }
-
-        @Override
-        public T fromNetwork(FriendlyByteBuf buf) {
-            var conditions = ICByteBufHelperImpl.readList(buf, ICByteBufHelperImpl::readICCondition);
-            return create(conditions.toArray(ICCondition[]::new));
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, T instance) {
-            ICByteBufHelperImpl.writeList(buf, Arrays.asList(instance.conditions), ICByteBufHelperImpl::writeICCondition);
+        protected static <T extends CompoundICCondition> StreamCodec<RegistryFriendlyByteBuf, T> createStreamCodec(Function<@NotNull ICCondition[], T> factory) {
+            return ICCondition.STREAM_CODEC.apply(ByteBufCodecs.list()).map(
+                    list -> factory.apply(list.toArray(ICCondition[]::new)),
+                    condition -> Arrays.asList(condition.conditions)
+            );
         }
     }
 }

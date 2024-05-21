@@ -2,10 +2,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 plugins {
+    java
     alias(libs.plugins.fabric.loom) apply false
-    alias(libs.plugins.forge.gradle) apply false
-    alias(libs.plugins.sponge.gradle) apply false
-    alias(libs.plugins.mixin) apply false
 }
 
 val modArchiveName: String by project
@@ -27,6 +25,7 @@ subprojects {
         withSourcesJar()
         withJavadocJar()
     }
+    java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
     tasks.withType<Jar>().configureEach {
         from("LICENSE") {
@@ -36,7 +35,8 @@ subprojects {
 
     tasks.named<Jar>("jar") {
         manifest {
-            attributes(mapOf(
+            attributes(
+                mapOf(
                     "Specification-Title" to modName,
                     "Specification-Vendor" to author,
                     "Specification-Version" to archiveVersion,
@@ -47,17 +47,18 @@ subprojects {
                     "Timestamp" to System.currentTimeMillis(),
                     "Built-On-Java" to "${System.getProperty("java.vm.version")} (${System.getProperty("java.vm.vendor")})",
                     "Built-On-Minecraft" to libs.versions.minecraft.get()
-            ))
+                )
+            )
         }
     }
 
     tasks.withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
-        options.release.set(17)
+        options.release.set(21)
     }
 
     tasks.withType<ProcessResources> {
-        filesMatching(listOf("pack.mcmeta", "fabric.mod.json", "mods.toml", "*.mixins.json")) {
+        filesMatching(listOf("pack.mcmeta", "fabric.mod.json", "neoforge.mods.toml", "*.mixins.json")) {
             expand(project.properties)
         }
     }
@@ -76,8 +77,14 @@ subprojects {
         maven("https://maven.blamejared.com/") {
             name = "JEI"
         }
-        maven("https://repo.spongepowered.org/repository/maven-public/") {
-            name = "Sponge / Mixin"
+        maven("https://maven.parchmentmc.org") {
+            name = "ParchmentMC"
+        }
+        maven("https://maven.fabricmc.net/") {
+            name = "Fabric"
+        }
+        maven("https://maven.neoforged.net/releases") {
+            name = "Forge"
         }
         mavenCentral()
     }
@@ -91,6 +98,6 @@ subprojects {
 
 tasks.register("release") {
     dependsOn(project("fabric").tasks.named("modrinth").get())
-    dependsOn(project("forge").tasks.named("modrinth").get())
+    dependsOn(project("neoforge").tasks.named("modrinth").get())
     dependsOn(project("fabric").tasks.named("modrinthSyncBody").get())
 }

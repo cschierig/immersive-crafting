@@ -1,14 +1,11 @@
 package com.carlschierig.immersivecrafting.impl.predicate;
 
-import com.google.gson.JsonObject;
-import net.minecraft.network.FriendlyByteBuf;
+import com.mojang.serialization.Codec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 
 public interface PredicateSerializer<T> {
-    T fromJson(JsonObject json);
+    Codec<T> codec();
 
-    JsonObject toJson(T instance);
-
-    T fromNetwork(FriendlyByteBuf buf);
-
-    void toNetwork(FriendlyByteBuf buf, T instance);
+    StreamCodec<RegistryFriendlyByteBuf, T> streamCodec();
 }

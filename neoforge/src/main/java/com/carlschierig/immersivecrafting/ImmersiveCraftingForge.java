@@ -1,26 +1,21 @@
 package com.carlschierig.immersivecrafting;
 
-import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializers;
-import com.carlschierig.immersivecrafting.api.recipe.ICRecipeTypes;
-import com.carlschierig.immersivecrafting.impl.network.ICMessages;
 import com.carlschierig.immersivecrafting.impl.network.S2CPackets;
 import com.carlschierig.immersivecrafting.impl.network.S2CPacketsForge;
-import com.carlschierig.immersivecrafting.impl.recipe.ICRecipeSerializers;
 import com.carlschierig.immersivecrafting.impl.recipe.RecipeReloader;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 
 @Mod("immersive_crafting")
 public class ImmersiveCraftingForge {
     public ImmersiveCraftingForge() {
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
 
         ImmersiveCraftingCommon.init();
-        ICMessages.registerPackets();
 
         S2CPackets.INSTANCE = new S2CPacketsForge();
     }
@@ -36,4 +31,5 @@ public class ImmersiveCraftingForge {
             S2CPackets.INSTANCE.trySendRecipes(player);
         }
     }
+
 }

@@ -4,9 +4,13 @@ build/
 out/
 classes/
 
-# Quilt Loom
+# Fabric Loom
 remappedSrc/
 run/
+.cache/
+
+# Neoforge
+runs/
 
 # Eclipse
 *.launch

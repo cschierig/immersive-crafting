@@ -27,10 +27,10 @@ repositories {
 }
 
 dependencies {
-    modCompileOnly "maven.modrinth:immersive-crafting:version:api"
+    modCompileOnlyApi "maven.modrinth:immersive-crafting:version:api"
     modRuntimeOnly "maven.modrinth:immersive-crafting:version"
 }
 ```
 
 to your project's `build.gradle` and replace `version` with the version
-you want to use, e.g. `0.1.0+1.20.1`.
+you want to use, e.g. `0.4.0+1.20.6`.

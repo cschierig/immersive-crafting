@@ -27,7 +27,7 @@ public class TreeScreen extends Screen {
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        this.renderDirtBackground(graphics);
+        //this.renderDirtBackground(graphics);
         graphics.drawCenteredString(Minecraft.getInstance().font, "Work in Progress", width / 2, height / 4 - 50, 0xffffffff);
         graphics.pose().pushPose();
         graphics.pose().translate(xShift, yShift, 0);

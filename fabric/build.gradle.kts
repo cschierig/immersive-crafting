@@ -13,57 +13,26 @@ val modId: String by project
 val recipeViewer: String by project
 val common = project(":common")
 
+val exampleModCompileOnlyApi by configurations.creating;
+exampleModCompileOnlyApi.extendsFrom(configurations.modCompileOnlyApi.get())
 
-dependencies {
-    minecraft(libs.minecraft)
-    mappings(loom.officialMojangMappings())
-
-    modImplementation(libs.fabric.loader)
-    modImplementation(libs.fabric.api)
-
-    implementation(project(":common"))
-
-    recipeViewer(dependencies)
-}
 
 sourceSets {
     create("example") {
-        compileClasspath += sourceSets.main.get().compileClasspath
-        compileClasspath += sourceSets.main.get().output
+        compileClasspath = sourceSets.main.get().compileClasspath
+        compileClasspath += exampleModCompileOnlyApi
         runtimeClasspath += sourceSets.main.get().runtimeClasspath
 
         resources {
             srcDir(file("src/example/generated"))
-            exclude("src/generated/resources/.cache")
+            exclude("src/example/generated/resources/.cache")
         }
     }
     getByName("main") {
         resources {
             srcDir(file("src/main/generated"))
-            exclude("src/main/resources/.cache")
+            exclude("src/main/generated/resources/.cache")
         }
-    }
-}
-
-fun recipeViewer(deps: DependencyHandler) {
-    // stolen from create fabric
-
-    // emi
-    deps.modCompileOnly(libs.emi.fabric) { api(this) }
-
-    // rei
-    deps.modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${libs.versions.rei.get()}")
-    deps.modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${libs.versions.rei.get()}")
-    // jei
-    deps.modCompileOnly("mezz.jei:jei-${libs.versions.minecraft.get()}-common-api:${libs.versions.jei.get()}")
-    deps.modCompileOnly("mezz.jei:jei-${libs.versions.minecraft.get()}-fabric-api:${libs.versions.jei.get()}")
-
-    when (recipeViewer.lowercase(Locale.ROOT)) {
-        "emi" -> deps.modLocalRuntime(libs.emi.fabric)
-        "rei" -> deps.modLocalRuntime(libs.rei)
-        "jei" -> deps.modLocalRuntime("mezz.jei:jei-${libs.versions.minecraft.get()}-fabric:${libs.versions.jei.get()}")
-        "disabled" -> Unit
-        else -> println("Unknown recipe viewer specified: $recipeViewer. Must be JEI, REI, EMI, or disabled.")
     }
 }
 
@@ -105,7 +74,7 @@ loom {
             name("Example Mod Data Generation")
             vmArg("-Dfabric-api.datagen")
             vmArg("-Dfabric-api.datagen.output-dir=${file("src/example/generated")}")
-            vmArg("-Dfabric-api.datagen=ic_examples")
+            vmArg("-Dfabric-api.datagen.modid=ic_examples")
 
             runDir("build/exampleDatagen")
         }
@@ -114,7 +83,7 @@ loom {
             name("Data Generation")
             vmArg("-Dfabric-api.datagen")
             vmArg("-Dfabric-api.datagen.output-dir=${common.file("src/main/generated")}")
-            vmArg("-Dfabric-api.datagen=ic_examples")
+            vmArg("-Dfabric-api.datagen.modid=immersive_crafting")
 
             runDir("build/datagen")
         }
@@ -150,6 +119,45 @@ tasks.named("build") {
     dependsOn(tasks.named("apiJar"))
 }
 
+dependencies {
+    minecraft(libs.minecraft)
+    mappings(loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${libs.versions.minecraft.get()}:${libs.versions.parchment.get()}@zip")
+    })
+
+    modImplementation(libs.fabric.loader)
+    modImplementation(libs.fabric.api)
+
+    implementation(project(":common"))
+
+    recipeViewer(dependencies)
+
+    exampleModCompileOnlyApi(tasks.getByName("apiJar").outputs.files)
+}
+
+fun recipeViewer(deps: DependencyHandler) {
+    // stolen from create fabric
+
+    // emi
+    deps.modCompileOnly(libs.emi.fabric) { api(this) }
+
+    // rei
+    deps.modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${libs.versions.rei.get()}")
+    deps.modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${libs.versions.rei.get()}")
+    // jei
+    // deps.modCompileOnly("mezz.jei:jei-${libs.versions.minecraft.get()}-common-api:${libs.versions.jei.get()}")
+    // deps.modCompileOnly("mezz.jei:jei-${libs.versions.minecraft.get()}-fabric-api:${libs.versions.jei.get()}")
+
+    when (recipeViewer.lowercase(Locale.ROOT)) {
+        "emi" -> deps.modLocalRuntime(libs.emi.fabric)
+        "rei" -> deps.modLocalRuntime(libs.rei)
+        // "jei" -> deps.modLocalRuntime("mezz.jei:jei-${libs.versions.minecraft.get()}-fabric:${libs.versions.jei.get()}")
+        "disabled" -> Unit
+        else -> println("Unknown recipe viewer specified: $recipeViewer. Must be JEI, REI, EMI, or disabled.")
+    }
+}
+
 if (System.getenv("MODRINTH_TOKEN") != null) {
     modrinth {
         token.set(System.getenv("MODRINTH_TOKEN"))
@@ -159,8 +167,8 @@ if (System.getenv("MODRINTH_TOKEN") != null) {
         versionType.set("alpha")
         uploadFile.set(tasks.named("remapJar"))
         additionalFiles.set(listOf(
-                "remapSourcesJar",
-                "apiJar"
+            "remapSourcesJar",
+            "apiJar"
         ).map { tasks.named(it) })
         syncBodyFrom.set(rootProject.file("README.md").readText())
         dependencies {
@@ -172,8 +180,8 @@ if (System.getenv("MODRINTH_TOKEN") != null) {
         detectLoaders.set(false)
         changelog.set(file("../CHANGELOG.md").readText())
     }
+    tasks.named("modrinth") { dependsOn("runDatagen") }
 }
-
 
 fun api(dep: ExternalModuleDependency) {
     dep.artifact {

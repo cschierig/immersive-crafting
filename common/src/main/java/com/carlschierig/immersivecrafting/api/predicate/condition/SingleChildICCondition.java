@@ -2,13 +2,13 @@ package com.carlschierig.immersivecrafting.api.predicate.condition;
 
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
 import com.carlschierig.immersivecrafting.api.predicate.PredicateVisitor;
-import com.carlschierig.immersivecrafting.api.serialization.ICGsonHelper;
-import com.carlschierig.immersivecrafting.impl.util.ICByteBufHelperImpl;
-import com.google.gson.JsonObject;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.util.GsonHelper;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Function;
 
 /**
  * This condition should be used for conditions which have a single child.
@@ -40,35 +40,30 @@ public abstract class SingleChildICCondition implements ICCondition {
     }
 
     public static abstract class Serializer<T extends SingleChildICCondition> implements ICConditionSerializer<T> {
-        private static final String CONDITION = "condition";
-
-        protected abstract T create(ICCondition conditions);
-
-        @Override
-        public T fromJson(JsonObject json) {
-            var condition = GsonHelper.getAsJsonObject(json, CONDITION);
-            return create(ICGsonHelper.getAsCondition(condition));
+        /**
+         * Create a codec for a single child condition using the given factory.
+         *
+         * @param factory Function to create a new single child condition of type {@link T} using the given {@link ICCondition[]}.
+         * @return a new codec for (de)serializing conditions of type {@link T}.
+         */
+        protected static <T extends SingleChildICCondition> MapCodec<T> createCodec(Function<@NotNull ICCondition, T> factory) {
+            return ICCondition.CODEC.fieldOf("condition").xmap(
+                    factory,
+                    con -> con.child
+            );
         }
 
-        @Override
-        public JsonObject toJson(T instance) {
-            var json = new JsonObject();
-
-            var condition = ICGsonHelper.conditionToJson(instance.child);
-            json.add(CONDITION, condition);
-
-            return json;
-        }
-
-        @Override
-        public T fromNetwork(FriendlyByteBuf buf) {
-            var condition = ICByteBufHelperImpl.readICCondition(buf);
-            return create(condition);
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, T instance) {
-            ICByteBufHelperImpl.writeICCondition(buf, instance.child);
+        /**
+         * Create a stream codec for a single child condition using the given factory.
+         *
+         * @param factory Function to create a new single child condition of type {@link T} using the given {@link ICCondition[]}.
+         * @return a new stream codec for (de)serializing conditions of type {@link T}.
+         */
+        protected static <T extends SingleChildICCondition> StreamCodec<RegistryFriendlyByteBuf, T> createStreamCodec(Function<@NotNull ICCondition, T> factory) {
+            return ICCondition.STREAM_CODEC.map(
+                    factory,
+                    condition -> condition.child
+            );
         }
     }
 }

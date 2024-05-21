@@ -1,6 +1,7 @@
 package com.carlschierig.immersivecrafting.compat.emi;
 
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipe;
+import com.carlschierig.immersivecrafting.api.recipe.ICRecipeHolder;
 import com.carlschierig.immersivecrafting.impl.render.conditions.PredicateTree;
 import com.carlschierig.immersivecrafting.impl.render.conditions.TreeScreen;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -21,6 +22,7 @@ import java.util.List;
 public class ICEmiRecipe implements EmiRecipe {
     private final EmiRecipeCategory category;
     private final ICRecipe recipe;
+    private final ResourceLocation identifier;
 
     private static final int PADDING = 2;
     private int width;
@@ -31,9 +33,10 @@ public class ICEmiRecipe implements EmiRecipe {
     private final int outputWidth = EmiTexture.SLOT.width * 3;
     private int conditionHeight;
 
-    public ICEmiRecipe(EmiRecipeCategory category, ICRecipe recipe) {
+    public ICEmiRecipe(EmiRecipeCategory category, ICRecipeHolder<?> recipe) {
         this.category = category;
-        this.recipe = recipe;
+        this.recipe = recipe.recipe();
+        this.identifier = recipe.id();
         computeDimensions();
     }
 
@@ -45,7 +48,7 @@ public class ICEmiRecipe implements EmiRecipe {
 
     @Override
     public @Nullable ResourceLocation getId() {
-        return recipe.getId();
+        return identifier;
     }
 
     @Override

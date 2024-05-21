@@ -1,9 +1,10 @@
 package com.carlschierig.immersivecrafting.impl.predicate;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.util.GsonHelper;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 import java.util.function.Predicate;
 
@@ -36,45 +37,29 @@ public class RangePredicate implements Predicate<Float> {
     }
 
     public static class Serializer implements PredicateSerializer<RangePredicate> {
-        private static final String MIN = "min";
-        private static final String MAX = "max";
+        public static final Codec<RangePredicate> CODEC = RecordCodecBuilder.create(
+                instance -> instance.group(
+                        Codec.FLOAT.optionalFieldOf("min", Float.NEGATIVE_INFINITY).forGetter(predicate -> predicate.min),
+                        Codec.FLOAT.optionalFieldOf("max", Float.POSITIVE_INFINITY).forGetter(predicate -> predicate.max)
+                ).apply(instance, RangePredicate::new)
+        );
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, RangePredicate> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.FLOAT,
+                pred -> pred.min,
+                ByteBufCodecs.FLOAT,
+                pred -> pred.max,
+                RangePredicate::new
+        );
 
         @Override
-        public RangePredicate fromJson(JsonObject json) {
-            if (!json.has(MIN) && !json.has(MAX)) {
-                throw new JsonParseException("Range must include minimum or maximum value.");
-            }
-            var min = GsonHelper.getAsFloat(json, MIN, Float.NEGATIVE_INFINITY);
-            var max = GsonHelper.getAsFloat(json, MAX, Float.POSITIVE_INFINITY);
-            if (min > max) {
-                throw new JsonParseException("Minimum may not be larger than maximum.");
-            }
-            return new RangePredicate(min, max);
+        public Codec<RangePredicate> codec() {
+            return CODEC;
         }
 
         @Override
-        public JsonObject toJson(RangePredicate instance) {
-            var json = new JsonObject();
-            if (!Float.isInfinite(instance.min)) {
-                json.addProperty(MIN, instance.min);
-            }
-            if (!Float.isInfinite(instance.max)) {
-                json.addProperty(MAX, instance.max);
-            }
-            return json;
-        }
-
-        @Override
-        public RangePredicate fromNetwork(FriendlyByteBuf buf) {
-            var min = buf.readFloat();
-            var max = buf.readFloat();
-            return new RangePredicate(min, max);
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, RangePredicate instance) {
-            buf.writeFloat(instance.min);
-            buf.writeFloat(instance.max);
+        public StreamCodec<RegistryFriendlyByteBuf, RangePredicate> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

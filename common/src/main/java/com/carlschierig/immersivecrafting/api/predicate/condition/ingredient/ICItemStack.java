@@ -9,20 +9,20 @@ import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSer
 import com.carlschierig.immersivecrafting.api.render.ICRenderFlags;
 import com.carlschierig.immersivecrafting.impl.render.FakeScreen;
 import com.carlschierig.immersivecrafting.impl.render.ICRenderHelper;
-import com.carlschierig.immersivecrafting.impl.util.ICGsonHelperImpl;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
 import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
@@ -53,6 +53,7 @@ public class ICItemStack extends ICStack {
     public void craft(RecipeContext recipeContext, CraftingContext craftingContext) {
         var chance = craftingContext.random().nextFloat();
         if (this.chance >= chance) {
+            // TODO: direction might be null
             Block.popResourceFromFace(craftingContext.level(), craftingContext.pos(), craftingContext.direction(), stack.copy());
         }
     }
@@ -135,43 +136,29 @@ public class ICItemStack extends ICStack {
     }
 
     public static class Serializer implements ICConditionSerializer<ICItemStack> {
-        private static final String STACK = "stack";
-        private static final String CHANCE = "chance";
-        private static final String NBT = "nbt";
+        public static final MapCodec<ICItemStack> CODEC = RecordCodecBuilder.mapCodec(
+                instance -> instance.group(
+                        ItemStack.CODEC.fieldOf("stack").forGetter(stack -> stack.stack),
+                        Codec.floatRange(0, 1).optionalFieldOf("chance", 1f).forGetter(stack -> stack.chance)
+                ).apply(instance, ICItemStack::new)
+        );
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, ICItemStack> STREAM_CODEC = StreamCodec.composite(
+                ItemStack.STREAM_CODEC,
+                stack -> stack.stack,
+                ByteBufCodecs.FLOAT,
+                stack -> stack.chance,
+                ICItemStack::new
+        );
 
         @Override
-        public ICItemStack fromJson(JsonObject json) {
-            var stack = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, STACK));
-            var chance = GsonHelper.getAsFloat(json, CHANCE, 1);
-
-            if (chance < 0 || chance > 1) {
-                throw new JsonSyntaxException("Chance must be between 0 and 1.");
-            }
-            return new ICItemStack(stack, chance);
+        public MapCodec<ICItemStack> codec() {
+            return CODEC;
         }
 
         @Override
-        public JsonObject toJson(ICItemStack instance) {
-            var json = new JsonObject();
-
-            json.add(STACK, ICGsonHelperImpl.itemStackToJson(instance.stack));
-            if (instance.chance != 1) {
-                json.addProperty(CHANCE, instance.chance);
-            }
-            return json;
-        }
-
-        @Override
-        public ICItemStack fromNetwork(FriendlyByteBuf buf) {
-            var item = buf.readItem();
-            var chance = buf.readFloat();
-            return new ICItemStack(item, chance);
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, ICItemStack instance) {
-            buf.writeItem(instance.stack);
-            buf.writeFloat(instance.chance);
+        public StreamCodec<? super RegistryFriendlyByteBuf, ICItemStack> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

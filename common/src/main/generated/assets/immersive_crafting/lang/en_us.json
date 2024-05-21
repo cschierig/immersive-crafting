@@ -27,6 +27,6 @@
   "immersive_crafting.conditionDescription.dayTime.timeRange": "It must be between",
   "immersive_crafting.conditionDescription.inverted": "The following must not be true:",
   "immersive_crafting.conditionDescription.or": "Any sub condition must be fulfilled.",
-  "immersive_crafting.recipeType.immersivecrafting.use_item": "Use Item on",
+  "immersive_crafting.recipeType.immersive_crafting.use_item": "Use Item on",
   "immersive_crafting.recipeView.conditions": "Conditions"
 }

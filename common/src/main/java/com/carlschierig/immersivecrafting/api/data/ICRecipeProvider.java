@@ -1,8 +1,7 @@
 package com.carlschierig.immersivecrafting.api.data;
 
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipe;
-import com.carlschierig.immersivecrafting.api.recipe.ICRecipeSerializer;
-import com.google.gson.JsonObject;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -14,7 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 /**
  * Provides a base for generating immersive crafting recipes.
@@ -22,14 +21,16 @@ import java.util.function.Consumer;
  */
 public abstract class ICRecipeProvider implements DataProvider {
     private final PackOutput.PathProvider pathProvider;
+    private final CompletableFuture<HolderLookup.Provider> registries;
 
     /**
      * Create a new ICRecipeProvider. Subclasses should pass on the {@link PackOutput} they were handed.
      *
      * @param output the data output to use.
      */
-    public ICRecipeProvider(@NotNull PackOutput output) {
+    public ICRecipeProvider(@NotNull PackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
         pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "ic_recipes");
+        this.registries = registriesFuture;
     }
 
     /**
@@ -37,30 +38,27 @@ public abstract class ICRecipeProvider implements DataProvider {
      *
      * @param exporter Offer the recipes to this supplier to save them.
      */
-    public abstract void buildRecipes(@NotNull Consumer<ICRecipe> exporter);
+    public abstract void buildRecipes(@NotNull BiConsumer<ResourceLocation, ICRecipe> exporter);
 
     @Override
     public CompletableFuture<?> run(CachedOutput writer) {
+        return this.registries.thenCompose(reg -> run(writer, reg));
+    }
+
+    protected CompletableFuture<?> run(CachedOutput writer, HolderLookup.Provider registries) {
+
         Set<ResourceLocation> generatedRecipes = new HashSet<>();
         List<CompletableFuture<?>> list = new ArrayList<>();
-        buildRecipes(recipe -> {
-            ResourceLocation identifier = recipe.getId();
+        buildRecipes((identifier, recipe) -> {
 
             if (!generatedRecipes.add(identifier)) {
                 throw new IllegalStateException("Duplicate recipe " + identifier);
             }
 
-            var recipeJson = serializeRecipe(recipe);
-            list.add(DataProvider.saveStable(writer, recipeJson, pathProvider.json(identifier)));
+            list.add(DataProvider.saveStable(writer, registries, ICRecipe.CODEC, recipe, pathProvider.json(identifier)));
         });
 
         return CompletableFuture.allOf(list.toArray(CompletableFuture<?>[]::new));
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T extends ICRecipe> JsonObject serializeRecipe(T recipe) {
-        var serializer = (ICRecipeSerializer<T>) recipe.getSerializer();
-        return serializer.toJson(recipe);
     }
 
     @Override

@@ -3,8 +3,12 @@ package com.carlschierig.immersivecrafting.api.predicate.condition.ingredient;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICCondition;
 import com.carlschierig.immersivecrafting.api.render.ICRenderFlags;
 import com.carlschierig.immersivecrafting.api.render.ICRenderable;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -16,6 +20,24 @@ import java.util.List;
  * @see ICStack
  */
 public interface ICIngredient extends ICRenderable, ICCondition {
+    /**
+     * A variant of {@link ICCondition#CODEC} which ensures the value is an {@link ICIngredient}.
+     */
+    Codec<ICIngredient> CODEC = ICCondition.CODEC.comapFlatMap(
+            condition -> {
+                if (condition instanceof ICIngredient ingredient) {
+                    return DataResult.success(ingredient);
+                } else {
+                    return DataResult.error(() -> "Value must be an ingredient.");
+                }
+            },
+            ingredient -> ingredient
+    );
+
+    StreamCodec<RegistryFriendlyByteBuf, ICIngredient> STREAM_CODEC = ICCondition.STREAM_CODEC.map(
+            condition -> (ICIngredient) condition,
+            ingredient -> ingredient
+    );
 
     /**
      * Returns the amount which is needed by the ingredient.
