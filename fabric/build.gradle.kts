@@ -143,8 +143,8 @@ fun recipeViewer(deps: DependencyHandler) {
     deps.modCompileOnly(libs.emi.fabric) { api(this) }
 
     // rei
-    deps.modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${libs.versions.rei.get()}")
-    deps.modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${libs.versions.rei.get()}")
+    deps.modCompileOnly(libs.rei.fabric.api)
+    deps.modCompileOnly(libs.rei.fabric.plugin)
     // jei
     // deps.modCompileOnly("mezz.jei:jei-${libs.versions.minecraft.get()}-common-api:${libs.versions.jei.get()}")
     // deps.modCompileOnly("mezz.jei:jei-${libs.versions.minecraft.get()}-fabric-api:${libs.versions.jei.get()}")

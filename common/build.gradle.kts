@@ -5,14 +5,24 @@ plugins {
     alias(libs.plugins.fabric.loom)
 }
 
-val modName: String by project
 val modId: String by project
-val author: String by project
-val version: String by project
 
-// tasks.forEach {
-//     it.group = null
-// }
+loom {
+    val awFile = file("src/main/resources/${modId}.accesswidener")
+    if (awFile.exists()) {
+        accessWidenerPath.set(awFile)
+    }
+
+    mixin {
+        defaultRefmapName.set("${modId}.refmap.json")
+    }
+
+    addRemapConfiguration("testModImplementation") {
+        targetConfigurationName.set("test")
+        onCompileClasspath = true
+        onRuntimeClasspath = true
+    }
+}
 
 dependencies {
     minecraft(libs.minecraft)
@@ -22,22 +32,11 @@ dependencies {
     })
 
     compileOnly(libs.mixin)
-    compileOnly(libs.emi.common) { api(this) }
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.0.3")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.0.3")
-}
+    compileOnly("dev.emi:emi-xplat-mojmap:${libs.versions.emi.get()}:api")
 
-loom {
-
-    val awFile = file("src/main/resources/${modId}.accesswidener")
-    if (awFile.exists()) {
-        accessWidenerPath.set(awFile)
-    }
-
-    mixin {
-        defaultRefmapName.set("${modId}.refmap.json")
-    }
+    configurations.getByName("testModImplementation")(libs.fabric.loader)
+    testImplementation(libs.fabric.loader.junit)
 }
 
 sourceSets {
