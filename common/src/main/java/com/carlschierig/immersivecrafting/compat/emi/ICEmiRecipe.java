@@ -36,6 +36,7 @@ public class ICEmiRecipe implements EmiRecipe {
     public ICEmiRecipe(EmiRecipeCategory category, ICRecipeHolder<?> recipe) {
         this.category = category;
         this.recipe = recipe.recipe();
+        // TODO: id needs to be unique
         this.identifier = recipe.id();
         computeDimensions();
     }

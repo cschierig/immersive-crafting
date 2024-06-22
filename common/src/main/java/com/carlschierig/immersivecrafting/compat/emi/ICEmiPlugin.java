@@ -4,6 +4,7 @@ import com.carlschierig.immersivecrafting.api.recipe.ICRecipeManager;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeType;
 import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
 import dev.emi.emi.api.EmiEntrypoint;
+import dev.emi.emi.api.EmiInitRegistry;
 import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -15,6 +16,11 @@ import java.util.Map;
 @EmiEntrypoint
 public class ICEmiPlugin implements EmiPlugin {
     public static final Map<ResourceLocation, EmiRecipeCategory> CATEGORIES = new HashMap<>();
+
+    @Override
+    public void initialize(EmiInitRegistry registry) {
+        EmiPlugin.super.initialize(registry);
+    }
 
     @Override
     public void register(EmiRegistry registry) {

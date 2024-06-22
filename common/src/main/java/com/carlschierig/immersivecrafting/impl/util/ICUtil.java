@@ -23,11 +23,11 @@ public final class ICUtil {
     }
 
     public static ResourceLocation getId(String value) {
-        return new ResourceLocation(MODID, value);
+        return ResourceLocation.tryBuild(MODID, value);
     }
 
     public static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> getType(String value) {
-        return CustomPacketPayload.createType(MODID + ":" + value);
+        return new CustomPacketPayload.Type<>(getId(value));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

@@ -9,6 +9,10 @@ public abstract class S2CPackets {
     public static final Set<ServerPlayer> PLAYERS = new HashSet<>();
     public static S2CPackets INSTANCE;
 
+    public S2CPackets() {
+        INSTANCE = this;
+    }
+
     public abstract void sendRecipes();
 
     public abstract void trySendRecipes(ServerPlayer player);

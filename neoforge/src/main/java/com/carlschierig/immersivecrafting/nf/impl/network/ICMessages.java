@@ -1,5 +1,6 @@
-package com.carlschierig.immersivecrafting.impl.network;
+package com.carlschierig.immersivecrafting.nf.impl.network;
 
+import com.carlschierig.immersivecrafting.impl.network.UpdateRecipesPayload;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;

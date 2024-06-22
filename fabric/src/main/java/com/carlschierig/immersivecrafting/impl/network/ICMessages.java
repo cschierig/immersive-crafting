@@ -11,7 +11,7 @@ import java.util.List;
 
 public class ICMessages {
     public static void registerClientReceivers() {
-        ClientPlayNetworking.registerGlobalReceiver(UpdateRecipesPayload.TYPE, ClientPacketReciever::receiveRecipes);
+        ClientPlayNetworking.registerGlobalReceiver(UpdateRecipesPayload.TYPE, ClientPacketReceiver::receiveRecipes);
     }
 
     public static void registerPayloadsS2C() {

@@ -1,6 +1,8 @@
-package com.carlschierig.immersivecrafting.impl.network;
+package com.carlschierig.immersivecrafting.nf.impl.network;
 
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeManager;
+import com.carlschierig.immersivecrafting.impl.network.S2CPackets;
+import com.carlschierig.immersivecrafting.impl.network.UpdateRecipesPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;

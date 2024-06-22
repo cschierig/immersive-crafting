@@ -4,6 +4,7 @@ import com.carlschierig.immersivecrafting.impl.network.ICMessages;
 import com.carlschierig.immersivecrafting.impl.network.S2CPackets;
 import com.carlschierig.immersivecrafting.impl.network.S2CPacketsFabric;
 import com.carlschierig.immersivecrafting.impl.recipe.RecipeReloaderFabric;
+import com.carlschierig.immersivecrafting.impl.registry.ICRegistriesImplFabric;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.S2CPlayChannelEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -16,12 +17,14 @@ public class ImmersiveCrafting implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        new ICRegistriesImplFabric();
+
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new RecipeReloaderFabric());
 
         ImmersiveCraftingCommon.init();
 
         ICMessages.registerPayloadsS2C();
-        S2CPackets.INSTANCE = new S2CPacketsFabric();
+        new S2CPacketsFabric();
         S2CPlayChannelEvents.REGISTER.register(ICMessages::registerPlayer);
 
         ServerPlayConnectionEvents.DISCONNECT.register(ICMessages::unregisterPlayer);

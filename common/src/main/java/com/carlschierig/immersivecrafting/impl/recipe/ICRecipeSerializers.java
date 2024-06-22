@@ -14,7 +14,7 @@ public final class ICRecipeSerializers {
     public static final ICRecipeSerializer<UseItemOnRecipe> USE_ITEM_RECIPE = register("use_item_on", new UseItemOnRecipe.Serializer());
 
     private static <S extends ICRecipeSerializer<T>, T extends ICRecipe> S register(String id, S serializer) {
-        return Registry.register(ICRegistries.RECIPE_SERIALIZER, new ResourceLocation(ICUtil.MODID, id), serializer);
+        return Registry.register(ICRegistries.RECIPE_SERIALIZER, ResourceLocation.tryBuild(ICUtil.MODID, id), serializer);
     }
 
     public static void init() {

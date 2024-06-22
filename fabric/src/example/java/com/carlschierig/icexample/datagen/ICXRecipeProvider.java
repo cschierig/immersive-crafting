@@ -49,7 +49,7 @@ public class ICXRecipeProvider extends ICRecipeProvider {
                 .addResult(new ICItemStack(Items.COOKED_PORKCHOP))
                 .build();
         // we still need to offer the recipe to the consumer.
-        exporter.accept(new ResourceLocation("ic_examples", "cooked_porkchop"), porkChopRecipe);
+        exporter.accept(ResourceLocation.tryBuild("ic_examples", "cooked_porkchop"), porkChopRecipe);
 
         // Another example: Turn 5 diamonds into a nether star when using them on a quartz block at night.
         var diamondToNetherStar = new UseItemOnRecipe.Builder()
@@ -61,7 +61,7 @@ public class ICXRecipeProvider extends ICRecipeProvider {
                         .build())
                 .addResult(new ICItemStack(Items.NETHER_STAR))
                 .build();
-        exporter.accept(new ResourceLocation("ic_examples", "nether_star"), diamondToNetherStar);
+        exporter.accept(ResourceLocation.tryBuild("ic_examples", "nether_star"), diamondToNetherStar);
 
         // Break flint to find an amethyst with a 50% chance when hitting it against a hard block
         var flintToAmethyst = new UseItemOnRecipe.Builder()
@@ -71,16 +71,16 @@ public class ICXRecipeProvider extends ICRecipeProvider {
                         .build())
                 .addResult(new ICItemStack(new ItemStack(Items.AMETHYST_SHARD), 0.5f))
                 .build();
-        exporter.accept(new ResourceLocation("ic_examples", "amethyst"), flintToAmethyst);
+        exporter.accept(ResourceLocation.tryBuild("ic_examples", "amethyst"), flintToAmethyst);
 
         // cut sticks from logs with flint
         var flintToStick = new UseItemOnRecipe.Builder()
                 .ingredient(new ICItemStack(Items.FLINT))
                 .predicate(new ICPredicate.Builder()
-                        .with(new BlockCondition.Builder().tag(new ResourceLocation("logs")).build())
+                        .with(new BlockCondition.Builder().tag(ResourceLocation.withDefaultNamespace("logs")).build())
                         .build())
                 .addResult(new ICItemStack(Items.STICK))
                 .build();
-        exporter.accept(new ResourceLocation("ic_examples", "stick"), flintToStick);
+        exporter.accept(ResourceLocation.tryBuild("ic_examples", "stick"), flintToStick);
     }
 }

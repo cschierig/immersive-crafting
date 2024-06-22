@@ -1,28 +1,62 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import net.fabricmc.loom.task.RemapJarTask
 import org.gradle.kotlin.dsl.support.uppercaseFirstChar
 import java.util.*
 
 plugins {
-    java
-    idea
-    `maven-publish`
-    alias(libs.plugins.neoforge.gradle)
+    alias(libs.plugins.shadow)
     alias(libs.plugins.minotaur)
 }
 
 val modId: String by project
+val withSourcesJar = property("withSourcesJar").toString().toBoolean()
+val withApiJar = property("withApiJar").toString().toBoolean()
+val modrinthId: String by project
+val modrinthType: String by project
 val recipeViewer: String by project
-val common = project(":common")
+
+val commonProject = project(":common")
+
+architectury {
+    platformSetupLoomIde()
+    neoForge()
+}
+
+val common by configurations.creating
+val shadowBundle by configurations.creating
+configurations {
+    "common" {
+        isCanBeResolved = true
+        isCanBeConsumed = false
+    }
+
+    compileClasspath.get().extendsFrom(common)
+    runtimeClasspath.get().extendsFrom(common)
+    getByName("developmentNeoForge").extendsFrom(common)
+
+    "shadowBundle" {
+        isCanBeResolved = true
+        isCanBeConsumed = false
+    }
+}
+
+repositories {
+    maven("https://maven.neoforged.net/releases") {
+        name = "NeoForged"
+    }
+}
 
 dependencies {
-    implementation("net.neoforged:neoforge:${libs.versions.neoforge.mdk.get()}")
+    neoForge(libs.neoforge.mdk)
 
-    compileOnly(project(":common"))
+    common(project(":common", "namedElements")) { isTransitive = false }
+    shadowBundle(project(":common", "transformProductionNeoForge"))
 
     recipeViewer(dependencies)
 }
 
 fun recipeViewer(deps: DependencyHandler) {
-    // stolen from create fabric
+// stolen from create fabric
 
     // emi
     deps.compileOnly("dev.emi:emi-neoforge:${libs.versions.emi.get()}:api")
@@ -34,44 +68,41 @@ fun recipeViewer(deps: DependencyHandler) {
     }
 }
 
-sourceSets.main.get().resources.srcDir("src/generated/resources")
-
-// taken from sodium
-// NeoGradle compiles the game, but we don't want to add our common code to the game's code
-val notNeoTask: (Task) -> Boolean = { it: Task -> !it.name.startsWith("neo") && !it.name.startsWith("compileService") }
-tasks.withType<JavaCompile>().matching(notNeoTask).configureEach {
-    source(common.sourceSets.main.get().allSource)
+tasks.getByName<ShadowJar>("shadowJar") {
+    configurations = listOf(shadowBundle)
+    archiveClassifier.set("dev-shadow")
 }
 
-tasks.withType<Javadoc>().matching(notNeoTask).configureEach {
-    source(common.sourceSets.main.get().allJava)
+tasks.withType<RemapJarTask>() {
+    inputFile.set(tasks.getByName<ShadowJar>("shadowJar").archiveFile)
+    dependsOn(tasks.getByName<ShadowJar>("shadowJar"))
 }
 
-tasks.named<Jar>("sourcesJar") {
-    from(common.sourceSets.main.get().allSource)
-}
-
-tasks.withType<ProcessResources>().matching(notNeoTask).configureEach {
-    from(common.sourceSets.main.get().resources)
-}
-
-subsystems {
-    parchment {
-        minecraftVersion = libs.versions.minecraft.get()
-        mappingsVersion = libs.versions.parchment.get()
+if (System.getenv("MODRINTH_TOKEN") != null) {
+    val files = ArrayList<String>()
+    if (withSourcesJar) {
+        files.add("sourcesJar")
     }
-}
-
-minecraft {
-    val atFile = file("src/main/resources/META-INF/accesstransformer.cfg")
-    if (atFile.exists()) {
-        file(atFile)
+    if (withApiJar) {
+        files.add("apiJar")
     }
-}
 
-runs {
-    configureEach {
-        modSource(project.sourceSets.main.get())
+    modrinth {
+        token.set(System.getenv("MODRINTH_TOKEN"))
+        projectId.set(modrinthId)
+        versionNumber.set(project.version.toString())
+        versionName.set(project.version.toString() + " - " + project.name.uppercaseFirstChar())
+        versionType.set(modrinthType)
+        uploadFile.set(tasks.named("remapJar"))
+        additionalFiles.set(files.map { tasks.named(it) })
+        syncBodyFrom.set(rootProject.file("README.md").readText())
+        dependencies {
+            optional.project("emi")
+        }
+        gameVersions.set(listOf(libs.versions.minecraft.get()))
+        loaders.set(listOf("neoforge"))
+        detectLoaders.set(false)
+        changelog.set(file("../CHANGELOG.md").readText())
     }
 }
 
@@ -82,38 +113,4 @@ tasks.register<Jar>("apiJar") {
     include("neoforge.mods.toml")
     include("*.mixins.json")
     include("com/carlschierig/immersivecrafting/api/**")
-}
-
-artifacts {
-    archives(tasks.named("apiJar"))
-    archives(tasks.named("sourcesJar"))
-}
-
-tasks.named("build") {
-    dependsOn(tasks.named("apiJar"))
-    dependsOn(tasks.named("jar"))
-    dependsOn(tasks.named("sourcesJar"))
-}
-
-if (System.getenv("MODRINTH_TOKEN") != null) {
-    modrinth {
-        token.set(System.getenv("MODRINTH_TOKEN"))
-        projectId.set("immersive-crafting")
-        versionNumber.set(project.version.toString())
-        versionName.set(project.version.toString() + " - " + project.name.uppercaseFirstChar())
-        versionType.set("alpha")
-        uploadFile.set(tasks.named<Jar>("jar"))
-        additionalFiles.set(listOf(
-            "sourcesJar",
-            "apiJar"
-        ).map { tasks.named(it) })
-        syncBodyFrom.set(rootProject.file("README.md").readText())
-        dependencies {
-            optional.project("emi")
-        }
-        gameVersions.set(listOf(libs.versions.minecraft.get()))
-        loaders.set(listOf("neoforge"))
-        detectLoaders.set(false)
-        changelog.set(file("../CHANGELOG.md").readText())
-    }
 }

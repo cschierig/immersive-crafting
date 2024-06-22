@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public final class RecipeReloaderFabric extends RecipeReloader implements SimpleSynchronousResourceReloadListener {
     @Override
     public @NotNull ResourceLocation getFabricId() {
-        return new ResourceLocation(ICUtil.MODID, "recipe_reloader");
+        return ICUtil.getId("recipe_reloader");
     }
 
 }

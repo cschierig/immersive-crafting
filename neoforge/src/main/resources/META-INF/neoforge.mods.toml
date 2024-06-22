@@ -6,15 +6,14 @@ issueTrackerURL = "https://github.com/cschierig/immersive-crafting"
 showAsResourcePack = false
 
 [[mods]]
-modId = "immersive_crafting"
-version = "0.4.0"
-displayName = "Immersive Crafting"
+modId = "${modId}"
+version = "${modVersion}"
+displayName = "${modName}"
 authors = "CozyPenguin"
 logoFile = "assets/immersive_crafting/icon.png"
 description = "Library mod adding data-driven in-world crafting."
 
 [[dependencies.immersive_crafting]]
 modId = "emi"
-mandatory = false
 versionRange = "[1.0.19,)"
-
+type = "optional"

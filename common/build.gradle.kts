@@ -1,20 +1,14 @@
-plugins {
-    idea
-    java
-    `maven-publish`
-    alias(libs.plugins.fabric.loom)
+val modId: String by project
+val enabledPlatforms: String by project
+
+architectury {
+    common(enabledPlatforms.split(','))
 }
 
-val modId: String by project
-
 loom {
-    val awFile = file("src/main/resources/${modId}.accesswidener")
+    val awFile = file("src/commonAssets/resources/${modId}.accesswidener")
     if (awFile.exists()) {
         accessWidenerPath.set(awFile)
-    }
-
-    mixin {
-        defaultRefmapName.set("${modId}.refmap.json")
     }
 
     addRemapConfiguration("testModImplementation") {
@@ -25,35 +19,24 @@ loom {
 }
 
 dependencies {
-    minecraft(libs.minecraft)
-    mappings(loom.layered {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${libs.versions.minecraft.get()}:${libs.versions.parchment.get()}@zip")
-    })
+    modImplementation(libs.fabric.loader)
 
-    compileOnly(libs.mixin)
+    modCompileOnly("dev.emi:emi-xplat-intermediary:${libs.versions.emi.get()}:api")
 
-    compileOnly("dev.emi:emi-xplat-mojmap:${libs.versions.emi.get()}:api")
-
-    configurations.getByName("testModImplementation")(libs.fabric.loader)
+    "testModImplementation"(libs.fabric.loader)
     testImplementation(libs.fabric.loader.junit)
 }
 
 sourceSets {
-    named("main") {
+    create("commonAssets") {
         resources {
-            srcDir(file("src/main/generated"))
-            exclude("src/main/generated/.cache")
+            srcDir(file("src/commonAssets/generated"))
+            exclude("src/commonAssets/generated/.cache")
         }
     }
 }
 
+
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-fun api(dep: ExternalModuleDependency) {
-    dep.artifact {
-        classifier = "api"
-    }
 }

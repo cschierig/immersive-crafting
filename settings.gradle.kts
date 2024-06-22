@@ -7,8 +7,12 @@ pluginManagement {
         maven("https://maven.neoforged.net/releases") {
             name = "Neoforge"
         }
+        maven("https://maven.architectury.dev/") {
+            name = "Architectury"
+        }
     }
 }
 
-rootProject.name = "immersive-crafting"
+val modArchiveName: String by extra
+rootProject.name = modArchiveName
 include("common", "fabric", "neoforge")

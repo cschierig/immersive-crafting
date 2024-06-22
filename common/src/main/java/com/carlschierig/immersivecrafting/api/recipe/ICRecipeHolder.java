@@ -1,6 +1,5 @@
-package com.carlschierig.immersivecrafting.impl.recipe;
+package com.carlschierig.immersivecrafting.api.recipe;
 
-import com.carlschierig.immersivecrafting.api.recipe.ICRecipe;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
