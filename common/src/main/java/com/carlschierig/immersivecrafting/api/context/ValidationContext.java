@@ -74,7 +74,7 @@ public final class ValidationContext {
         if (!supersetOf(requirements)) {
             var mismatchs = getMismatch(requirements);
             for (var missing : mismatchs) {
-                ICUtil.LOG.error(missing.toString() + " is required by the condition, but was not provided.");
+                ICUtil.LOG.error("{} is required by the condition, but was not provided.", missing.toString());
             }
             throw new IllegalStateException("Condition has illegal requirements, see the log for details.");
         }

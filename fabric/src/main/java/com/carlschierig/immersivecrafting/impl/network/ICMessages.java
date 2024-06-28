@@ -19,7 +19,6 @@ public class ICMessages {
     }
 
     public static void registerPlayer(ServerGamePacketListenerImpl handler, PacketSender sender, MinecraftServer server, List<ResourceLocation> channels) {
-        // TODO: check if this still works
         if (channels.contains(UpdateRecipesPayload.TYPE.id())) {
             S2CPacketsFabric.PLAYERS.add(handler.player);
         }

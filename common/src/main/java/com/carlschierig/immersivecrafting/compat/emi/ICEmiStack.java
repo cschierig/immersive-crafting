@@ -1,6 +1,6 @@
 package com.carlschierig.immersivecrafting.compat.emi;
 
-import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICStack;
+import com.carlschierig.immersivecrafting.api.predicate.condition.stack.ICStack;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -36,13 +36,9 @@ public class ICEmiStack extends EmiStack {
 
     @Override
     public DataComponentPatch getComponentChanges() {
-        return null;
+        // TODO: actually care about data component patches
+        return DataComponentPatch.EMPTY;
     }
-
-    //@Override
-    //public CompoundTag getNbt() {
-    //    return null;
-    //}
 
     @Override
     public Object getKey() {

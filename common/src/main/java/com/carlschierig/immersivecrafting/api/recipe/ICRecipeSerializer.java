@@ -13,6 +13,7 @@ import net.minecraft.network.codec.StreamCodec;
 public interface ICRecipeSerializer<T extends ICRecipe> {
     /**
      * A codec for serializing {@link ICRecipe}s of type {@link T}.
+     * The codec should validate the ingredients and the predicate using a validation context.
      *
      * @return a codec for serializing {@link ICRecipe}s of type {@link T}.
      */

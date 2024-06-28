@@ -1,13 +1,12 @@
 package com.carlschierig.immersivecrafting.api.recipe;
 
 import com.carlschierig.immersivecrafting.api.context.ContextTypes;
-import com.carlschierig.immersivecrafting.api.context.CraftingContext;
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
 import com.carlschierig.immersivecrafting.api.predicate.ICPredicate;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializers;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICIngredient;
-import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICStack;
+import com.carlschierig.immersivecrafting.api.predicate.condition.stack.ICStack;
 import com.carlschierig.immersivecrafting.impl.recipe.ICRecipeSerializers;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
@@ -23,26 +22,44 @@ import java.util.List;
 
 /**
  * A recipe which is triggered when a player uses an item on a block.
+ * The recipe uses one to two ingredients as inputs.
+ * <p>
+ * The ingredients are determined as follows:
+ * <ol>
+ *     <li>The item in the player's main hand.</li>
+ *     <li>The item in the player's offhand.</li>
+ * </ol>
  */
 public class UseItemOnRecipe extends ICRecipe {
-    public final @NotNull ICIngredient ingredient;
+    private final @NotNull ImmutableList<@NotNull ICIngredient> ingredients;
     private final @NotNull ICPredicate predicate;
     private final List<ICStack> results;
-    private final boolean spawnAtPlayer;
+    private final boolean fromFace;
 
-    public UseItemOnRecipe(@NotNull ICIngredient ingredient,
+    public UseItemOnRecipe(@NotNull List<@NotNull ICIngredient> ingredients,
                            @NotNull ICPredicate predicate,
                            List<ICStack> results,
-                           boolean spawnAtPlayer) {
-        this.ingredient = ingredient;
+                           boolean fromFace) {
+        this.ingredients = ImmutableList.copyOf(ingredients);
         this.predicate = predicate;
         this.results = results;
-        this.spawnAtPlayer = spawnAtPlayer;
+        this.fromFace = fromFace;
     }
 
     @Override
     public boolean matches(RecipeContext context) {
-        return ingredient.test(context) && predicate.test(context);
+        for (int i = 0; i < ingredients.size(); i++) {
+            if (!ingredients.get(i).test(context.forIngredient(i))) {
+                return false;
+            }
+        }
+        for (var result : results) {
+            if (!result.test(context)) {
+                return false;
+            }
+        }
+
+        return predicate.test(context);
     }
 
     @Override
@@ -55,15 +72,25 @@ public class UseItemOnRecipe extends ICRecipe {
     }
 
     @Override
-    public void craft(RecipeContext recipeContext, CraftingContext craftingContext) {
+    public void craft(RecipeContext recipeContext) {
+        for (int i = 0; i < ingredients.size(); i++) {
+            ingredients.get(i).consume(recipeContext.forIngredient(i));
+        }
         for (var stack : results) {
-            stack.craft(recipeContext, craftingContext);
+            stack.craft(recipeContext);
+        }
+    }
+
+    @Override
+    public void consumeIngredients(RecipeContext context) {
+        for (int i = 0; i < ingredients.size(); i++) {
+            ingredients.get(i).test(context.forIngredient(i));
         }
     }
 
     @Override
     public final ImmutableList<ICIngredient> getIngredients() {
-        return ImmutableList.of(ingredient);
+        return ingredients;
     }
 
     @Override
@@ -85,42 +112,43 @@ public class UseItemOnRecipe extends ICRecipe {
             .put(ContextTypes.PLAYER)
             .put(ContextTypes.LEVEL)
             .put(ContextTypes.BLOCK_STATE)
-            .put(ContextTypes.ITEM_STACK)
+            .put(ContextTypes.INGREDIENTS)
             .put(ContextTypes.BLOCK_POSITION)
             .put(ContextTypes.DIRECTION)
+            .put(ContextTypes.RANDOM)
             .build();
 
     @Override
-    public ValidationContext getRequirements() {
+    public ValidationContext getPredicateRequirements() {
         return context;
     }
 
-    private static final ValidationContext ingredientRequirements = ValidationContext.of(ContextTypes.ITEM_STACK);
+    private static final ValidationContext INGREDIENT_REQUIREMENTS = ValidationContext.of(ContextTypes.ITEM_STACK);
 
     @Override
     public ValidationContext getIngredientRequirements() {
-        return ingredientRequirements;
+        return INGREDIENT_REQUIREMENTS;
     }
 
     public static class Serializer implements ICRecipeSerializer<UseItemOnRecipe> {
         public static final MapCodec<UseItemOnRecipe> CODEC = RecordCodecBuilder.mapCodec(
                 instance -> instance.group(
-                        ICIngredient.CODEC.fieldOf("ingredient").forGetter(recipe -> recipe.ingredient),
-                        ICConditionSerializers.PREDICATE.codec().fieldOf("predicate").forGetter(UseItemOnRecipe::getPredicate),
-                        Codec.list(ICStack.CODEC).fieldOf("result").forGetter(UseItemOnRecipe::getResults),
-                        Codec.BOOL.optionalFieldOf("spawn_at_player", false).forGetter(recipe -> recipe.spawnAtPlayer)
+                        Codec.list(ICIngredient.CODEC).fieldOf("ingredients").validate(ingredients -> validateIngredients(ingredients, INGREDIENT_REQUIREMENTS, 1, 2)).forGetter(recipe -> recipe.ingredients),
+                        ICConditionSerializers.PREDICATE.codec().fieldOf("predicate").validate(predicate -> validatePredicate(predicate, context)).forGetter(UseItemOnRecipe::getPredicate),
+                        Codec.list(ICStack.CODEC).fieldOf("result").validate(results -> validateResults(results, context)).forGetter(UseItemOnRecipe::getResults),
+                        Codec.BOOL.optionalFieldOf("from_face", true).forGetter(recipe -> recipe.fromFace)
                 ).apply(instance, UseItemOnRecipe::new)
         );
 
         public static final StreamCodec<RegistryFriendlyByteBuf, UseItemOnRecipe> STREAM_CODEC = StreamCodec.composite(
-                ICIngredient.STREAM_CODEC,
-                recipe -> recipe.ingredient,
+                ICIngredient.STREAM_CODEC.apply(ByteBufCodecs.list()),
+                recipe -> recipe.ingredients,
                 ICConditionSerializers.PREDICATE.streamCodec(),
                 UseItemOnRecipe::getPredicate,
                 ICStack.STREAM_CODEC.apply(ByteBufCodecs.list()),
                 UseItemOnRecipe::getResults,
                 ByteBufCodecs.BOOL,
-                recipe -> recipe.spawnAtPlayer,
+                recipe -> recipe.fromFace,
                 UseItemOnRecipe::new
         );
 
@@ -139,19 +167,30 @@ public class UseItemOnRecipe extends ICRecipe {
      * A builder for creating Use Item On Recipes.
      */
     public static final class Builder {
-        private ICIngredient ingredient;
+        private final ICIngredient[] ingredients = new ICIngredient[2];
         private ICPredicate predicate;
         private final List<ICStack> results = new ArrayList<>();
-        private boolean spawnAtPlayer = false;
+        private boolean fromFace = true;
 
         /**
-         * Sets the ingredient used by the recipe.
+         * Sets the ingredient which has to be in the main hand.
          *
          * @param ingredient the ingredient used by the recipe.
          * @return this Builder.
          */
-        public Builder ingredient(ICIngredient ingredient) {
-            this.ingredient = ingredient;
+        public Builder mainHandIngredient(ICIngredient ingredient) {
+            this.ingredients[0] = ingredient;
+            return this;
+        }
+
+        /**
+         * Sets the ingredient which has to be in the offhand.
+         *
+         * @param ingredient the ingredient used by the recipe.
+         * @return this Builder.
+         */
+        public Builder offHandIngredient(ICIngredient ingredient) {
+            this.ingredients[1] = ingredient;
             return this;
         }
 
@@ -178,24 +217,25 @@ public class UseItemOnRecipe extends ICRecipe {
             return this;
         }
 
-        public Builder spawnAtPlayer() {
-            spawnAtPlayer = true;
-            return this;
-        }
-
-        public Builder spawnAtPlayer(boolean shouldSpawnAtPlayer) {
-            spawnAtPlayer = shouldSpawnAtPlayer;
+        public Builder fromFace(boolean fromFace) {
+            this.fromFace = fromFace;
             return this;
         }
 
         public UseItemOnRecipe build() {
-            if (ingredient == null) {
-                throw new IllegalStateException("ingredient must be set");
+            if (ingredients[0] == null && ingredients[1] == null) {
+                throw new IllegalStateException("A main hand or offhand ingredient must be set.");
             }
             if (predicate == null) {
                 throw new IllegalStateException("predicate must be set");
             }
-            return new UseItemOnRecipe(ingredient, predicate, results, spawnAtPlayer);
+            var ingredients = new ArrayList<ICIngredient>();
+            for (var ing : this.ingredients) {
+                if (ing != null) {
+                    ingredients.add(ing);
+                }
+            }
+            return new UseItemOnRecipe(ingredients, predicate, results, fromFace);
         }
     }
 }

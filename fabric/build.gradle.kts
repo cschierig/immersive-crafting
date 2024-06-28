@@ -165,7 +165,7 @@ if (withApiJar) {
         from(zipTree(tasks.named("remapJar").get().outputs.files.asPath))
         include("fabric.mod.json")
         include("*.mixins.json")
-        include("${modGroup.replace('.', '/')}/api/**")
+        include("${modGroup.replace('.', '/')}/immersivecrafting/api/**")
     }
 
     tasks.named("build") {
@@ -185,7 +185,7 @@ if (System.getenv("MODRINTH_TOKEN") != null) {
     modrinth {
         token.set(System.getenv("MODRINTH_TOKEN"))
         projectId.set(modrinthId)
-        versionNumber.set(project.version.toString())
+        versionNumber.set(project.version.toString() + "+fabric")
         versionName.set(project.version.toString() + " - " + project.name.uppercaseFirstChar())
         versionType.set(modrinthType)
         uploadFile.set(tasks.named("remapJar"))

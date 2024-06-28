@@ -1,20 +1,19 @@
-package com.carlschierig.immersivecrafting.api.predicate.condition.ingredient;
+package com.carlschierig.immersivecrafting.api.predicate.condition.stack;
 
-import com.carlschierig.immersivecrafting.api.context.CraftingContext;
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICCondition;
+import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializer;
+import com.carlschierig.immersivecrafting.api.render.ICFlagRenderable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.List;
-
 /**
- * A stack is an identifiable ingredient that can be crafted and spawned into the world.
+ * A stack is something that can be crafted and spawned into the world.
  */
-public abstract class ICStack implements ICIngredient {
+public abstract class ICStack implements ICCondition, ICFlagRenderable {
     /**
      * A variant of {@link ICCondition#CODEC} which ensures the value is an {@link ICStack}.
      */
@@ -41,12 +40,6 @@ public abstract class ICStack implements ICIngredient {
      */
     public abstract ResourceLocation getIdentifier();
 
-    @Override
-    public List<ICStack> getParts() {
-        return List.of(this);
-    }
-
-    @Override
     public abstract ICStack copy();
 
     /**
@@ -59,8 +52,16 @@ public abstract class ICStack implements ICIngredient {
     /**
      * Craft the stack.
      *
-     * @param recipeContext   contains information of the surroundings.
-     * @param craftingContext contains the necessary location information to spawn the resources.
+     * @param recipeContext contains information of the surroundings.
      */
-    public abstract void craft(RecipeContext recipeContext, CraftingContext craftingContext);
+    public abstract void craft(RecipeContext recipeContext);
+
+    /**
+     * Returns whether this stack is empty.
+     *
+     * @return {@code true} if this stack is empty, {@code false} otherwise.
+     */
+    public abstract boolean isEmpty();
+
+    public abstract ICConditionSerializer<? extends ICStack> getSerializer();
 }

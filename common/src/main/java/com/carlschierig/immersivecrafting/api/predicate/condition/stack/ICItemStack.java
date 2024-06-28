@@ -1,19 +1,15 @@
-package com.carlschierig.immersivecrafting.api.predicate.condition.ingredient;
+package com.carlschierig.immersivecrafting.api.predicate.condition.stack;
 
 import com.carlschierig.immersivecrafting.api.context.ContextTypes;
-import com.carlschierig.immersivecrafting.api.context.CraftingContext;
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializer;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializers;
-import com.carlschierig.immersivecrafting.api.render.ICRenderFlags;
 import com.carlschierig.immersivecrafting.impl.render.FakeScreen;
 import com.carlschierig.immersivecrafting.impl.render.ICRenderHelper;
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -50,45 +46,39 @@ public class ICItemStack extends ICStack {
     }
 
     @Override
-    public void craft(RecipeContext recipeContext, CraftingContext craftingContext) {
-        var chance = craftingContext.random().nextFloat();
-        if (this.chance >= chance) {
-            // TODO: direction might be null
-            Block.popResourceFromFace(craftingContext.level(), craftingContext.pos(), craftingContext.direction(), stack.copy());
-        }
-    }
-
-    @Override
     public Object getKey() {
         return stack.getItem();
     }
 
     @Override
-    public void render(GuiGraphics draw, int x, int y, float delta, int flags) {
-        draw.renderItem(stack, x, y);
-
-        if (ICRenderFlags.RENDER_ICON.test(flags)) {
-            Lighting.setupFor3DItems();
-            draw.renderItem(stack, x, y);
-            draw.renderItemDecorations(Minecraft.getInstance().font, stack, x, y, "");
-        }
-        if (ICRenderFlags.RENDER_AMOUNT.test(flags)) {
-            String count = "";
-            if (getAmount() != 1) {
-                count += getAmount();
+    public void craft(RecipeContext context) {
+        var chance = context.get(ContextTypes.RANDOM).nextFloat();
+        if (this.chance >= chance) {
+            var direction = context.tryGet(ContextTypes.DIRECTION);
+            if (direction.isPresent()) {
+                Block.popResourceFromFace(
+                        context.get(ContextTypes.LEVEL),
+                        context.get(ContextTypes.BLOCK_POSITION),
+                        direction.get(),
+                        stack.copy()
+                );
+            } else {
+                Block.popResource(
+                        context.get(ContextTypes.LEVEL),
+                        context.get(ContextTypes.BLOCK_POSITION),
+                        stack.copy()
+                );
             }
-            ICRenderHelper.renderItemAnnotation(draw, x, y, Component.literal(count));
         }
     }
 
     @Override
-    public int getAmount() {
-        return stack.getCount();
+    public void render(GuiGraphics draw, int x, int y, float delta, int flags) {
+        ICRenderHelper.renderItem(stack, draw, x, y, delta, flags);
     }
 
-    @Override
-    public float getChance() {
-        return chance;
+    private int getAmount() {
+        return stack.getCount();
     }
 
     @Override
@@ -102,22 +92,19 @@ public class ICItemStack extends ICStack {
     }
 
     @Override
-    public ICConditionSerializer<?> getSerializer() {
+    public ICConditionSerializer<? extends ICStack> getSerializer() {
         return ICConditionSerializers.ITEM;
     }
 
-    private static final ValidationContext context = ValidationContext.of(ContextTypes.ITEM_STACK);
+    private static final ValidationContext context = new ValidationContext.Builder()
+            .put(ContextTypes.BLOCK_POSITION)
+            .put(ContextTypes.LEVEL)
+            .put(ContextTypes.RANDOM)
+            .build();
 
     @Override
     public ValidationContext getRequirements() {
         return context;
-    }
-
-    @Override
-    public boolean test(RecipeContext context) {
-        var stackContext = context.get(ContextTypes.ITEM_STACK);
-        // todo: nbt
-        return stack.is(stackContext.getItem()) && stack.getCount() <= stackContext.getCount();
     }
 
     @Override
@@ -133,6 +120,11 @@ public class ICItemStack extends ICStack {
     @Override
     public @NotNull List<ClientTooltipComponent> getTooltip() {
         return FakeScreen.INSTANCE.getTooltipFromItem(stack);
+    }
+
+    @Override
+    public boolean test(RecipeContext recipeContext) {
+        return true;
     }
 
     public static class Serializer implements ICConditionSerializer<ICItemStack> {

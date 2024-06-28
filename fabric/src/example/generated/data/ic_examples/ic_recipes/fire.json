@@ -1,0 +1,38 @@
+{
+  "type": "immersive_crafting:use_item_on",
+  "ingredients": [
+    {
+      "type": "immersive_crafting:item_stack",
+      "stack": {
+        "count": 1,
+        "id": "minecraft:stick"
+      }
+    },
+    {
+      "type": "immersive_crafting:item_stack",
+      "stack": {
+        "count": 1,
+        "id": "minecraft:stick"
+      }
+    }
+  ],
+  "predicate": {
+    "conditions": []
+  },
+  "result": [
+    {
+      "type": "immersive_crafting:block_state",
+      "state": {
+        "Name": "minecraft:fire",
+        "Properties": {
+          "age": "0",
+          "east": "false",
+          "north": "false",
+          "south": "false",
+          "up": "false",
+          "west": "false"
+        }
+      }
+    }
+  ]
+}

@@ -58,8 +58,9 @@ public class RecipeReloader extends ICRecipeManagerImpl implements ResourceManag
             } catch (IOException exception) {
                 ICUtil.LOG.error("Could not load recipes from '{}'", id);
             } catch (JsonSyntaxException exception) {
-                ICUtil.LOG.error("Could not parse '{}' recipe syntax: {}", id, exception.getMessage());
-                throw exception;
+                ICUtil.LOG.error("Could not parse '{}' recipe syntax: {}", id, exception);
+            } catch (IllegalArgumentException | JsonParseException exception) {
+                ICUtil.LOG.error("Could not parse '{}' recipe contents: {}", id, exception);
             }
         }
         setRecipes(recipes);

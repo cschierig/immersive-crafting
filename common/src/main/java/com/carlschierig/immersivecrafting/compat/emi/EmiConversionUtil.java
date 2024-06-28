@@ -1,7 +1,7 @@
 package com.carlschierig.immersivecrafting.compat.emi;
 
 import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICIngredient;
-import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICStack;
+import com.carlschierig.immersivecrafting.api.predicate.condition.stack.ICStack;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 

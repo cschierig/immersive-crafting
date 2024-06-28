@@ -1,27 +1,16 @@
 package com.carlschierig.immersivecrafting.api.context;
 
-import com.google.common.collect.ImmutableMap;
+import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICIngredient;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 /**
  * Provides a context for matching and assembling recipes.
  * The context can be viewed as a snapshot of the level surrounding a player when a recipe is triggered.
- * <p>
- * Use {@link RecipeContext.Builder} to create new contexts.
  */
-public final class RecipeContext {
-    /**
-     * An empty Recipe context without containing no context types.
-     */
-    public static final RecipeContext EMPTY = new RecipeContext(ImmutableMap.of());
-    private final ImmutableMap<ContextType<?>, Object> holders;
-
-    private RecipeContext(ImmutableMap<ContextType<?>, Object> holders) {
-        this.holders = holders;
-    }
-
+public interface RecipeContext {
     /**
      * Returns the object associated with the given type or throws an exception if it isn't present.
      *
@@ -30,43 +19,31 @@ public final class RecipeContext {
      * @return the object associated with the given type.
      * @throws NoSuchElementException if no object of that type is present.
      */
-    @SuppressWarnings("unchecked")
     @NotNull
-    public <T> T get(@NotNull ContextType<T> type) {
-        var holder = holders.get(type);
-        if (holder != null) {
-            // can only break if the insertion logic is messed with
-            return (T) holder;
-        }
-        throw new NoSuchElementException("No '" + type.id() + "' context in this recipe context.");
-    }
+    <T> T get(@NotNull ContextType<T> type);
 
     /**
-     * A builder for creating {@link RecipeContext}s.
+     * Returns the object associated with the given type or empty if there isn't any.
+     *
+     * @param type The type for which the object should be returned.
+     * @param <T>  The type of object which is returned.
+     * @return the object associated with the given type.
      */
-    public static final class Builder {
-        private final ImmutableMap.Builder<ContextType<?>, Object> holders = new ImmutableMap.Builder<>();
+    @NotNull
+    <T> Optional<T> tryGet(@NotNull ContextType<T> type);
 
-        /**
-         * Adds the object to the builder. If an object of that type is already present, it will be replaced.
-         *
-         * @param type   The type of the object which should be added.
-         * @param object The object which should be added.
-         * @param <T>    The type of the object which is added.
-         * @return the builder.
-         */
-        public <T> Builder putHolder(@NotNull ContextType<T> type, @NotNull T object) {
-            holders.put(type, object);
-            return this;
-        }
-
-        /**
-         * Create a {@link RecipeContext} based on the builder.
-         *
-         * @return a {@link RecipeContext} based on the builder.
-         */
-        public RecipeContext build() {
-            return new RecipeContext(holders.build());
-        }
+    /**
+     * Returns a recipe context which can be used to test the {@link ICIngredient} at the given index by
+     * extracting and overlaying the ingredient's context found in the ingredients context list.
+     *
+     * @param index The index of the ingredient
+     * @return this recipe context which the recipe context of the ingredient overlayed on top of it.
+     * @throws NoSuchElementException    if no {@link ContextTypes#INGREDIENTS} is present.
+     * @throws IndexOutOfBoundsException if the ingredients context doesn't contain an element with the given index.
+     * @see ContextTypes#INGREDIENTS
+     */
+    default RecipeContext forIngredient(int index) {
+        var contexts = get(ContextTypes.INGREDIENTS);
+        return new LayeredRecipeContext(contexts.get(index), this);
     }
 }

@@ -1,6 +1,8 @@
 package com.carlschierig.immersivecrafting.api.predicate.condition.ingredient;
 
+import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICCondition;
+import com.carlschierig.immersivecrafting.api.predicate.condition.stack.ICStack;
 import com.carlschierig.immersivecrafting.api.render.ICRenderFlags;
 import com.carlschierig.immersivecrafting.api.render.ICRenderable;
 import com.mojang.serialization.Codec;
@@ -41,6 +43,7 @@ public interface ICIngredient extends ICRenderable, ICCondition {
 
     /**
      * Returns the amount which is needed by the ingredient.
+     * The unit of the return value is dependent on the type of ingredient.
      * <p>
      * For example, if a recipe needs five diamonds to be present, the amount should return 5.
      *
@@ -67,6 +70,12 @@ public interface ICIngredient extends ICRenderable, ICCondition {
     default void render(GuiGraphics draw, int x, int y, float delta, int flags) {
 
     }
+
+    /**
+     * Consume the ingredient from the given context.
+     * Called when a recipe is crafted to consume the ingredients.
+     */
+    void consume(RecipeContext context);
 
     /**
      * Returns the chance that the ingredient is consumed/produced.
@@ -104,11 +113,4 @@ public interface ICIngredient extends ICRenderable, ICCondition {
      */
     @NotNull
     Component getName();
-
-    /**
-     * Returns whether this ingredient is empty.
-     *
-     * @return {@code true} if this ingredient is empty, {@code false} otherwise.
-     */
-    boolean isEmpty();
 }

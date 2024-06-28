@@ -1,6 +1,6 @@
 package com.carlschierig.immersivecrafting.api.predicate;
 
-import com.carlschierig.immersivecrafting.api.context.RecipeContext;
+import com.carlschierig.immersivecrafting.api.context.SimpleRecipeContext;
 import com.carlschierig.immersivecrafting.api.predicate.condition.*;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a predicate which takes a {@link RecipeContext} to test if a recipe is valid.
+ * Represents a predicate which takes a {@link SimpleRecipeContext} to test if a recipe is valid.
  */
 public class ICPredicate extends AndCondition {
     public ICPredicate(ICCondition[] conditions) {

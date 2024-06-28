@@ -2,7 +2,7 @@
 minecraft = "1.21"
 
 minotaur = "2.+"
-parchment = "2024.05.01"
+parchment = "2024.06.23"
 
 fabric_loader = "0.15.+"
 fabric_api = "0.100.3+1.21"
@@ -13,7 +13,7 @@ architectury_loom = "1.6-SNAPSHOT"
 architectury_plugin = "3.4-SNAPSHOT"
 shadow = "8.1.1"
 
-emi = "1.1.7+1.21"
+emi = "1.1.8+1.21"
 rei = "16.0.729"
 jei = "17.3.0.52"
 

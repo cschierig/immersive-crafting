@@ -1,17 +1,20 @@
 package com.carlschierig.immersivecrafting.impl.render;
 
+import com.carlschierig.immersivecrafting.api.render.ICRenderFlags;
 import com.carlschierig.immersivecrafting.mixin.GuiGraphicsAccessor;
+import com.mojang.blaze3d.platform.Lighting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
 public class ICRenderHelper {
-    private static Minecraft CLIENT = Minecraft.getInstance();
+    private static final Minecraft CLIENT = Minecraft.getInstance();
 
 
     public static void renderItemAnnotation(GuiGraphics draw, int x, int y, Component annotation) {
@@ -32,5 +35,21 @@ public class ICRenderHelper {
     public static void renderTooltip(Screen screen, GuiGraphics draw, int x, int y, int maxWidth, List<ClientTooltipComponent> components) {
         y = Math.max(16, y);
         ((GuiGraphicsAccessor) draw).invokeRenderTooltip(CLIENT.font, components, x, y, DefaultTooltipPositioner.INSTANCE);
+    }
+
+    public static void renderItem(ItemStack stack, GuiGraphics draw, int x, int y, float delta, int flags) {
+        if (ICRenderFlags.RENDER_ICON.test(flags)) {
+            Lighting.setupFor3DItems();
+            draw.renderItem(stack, x, y);
+            draw.renderItemDecorations(Minecraft.getInstance().font, stack, x, y, "");
+        }
+        if (ICRenderFlags.RENDER_AMOUNT.test(flags)) {
+            String count = "";
+            var amount = stack.getCount();
+            if (amount != 1) {
+                count += amount;
+            }
+            ICRenderHelper.renderItemAnnotation(draw, x, y, Component.literal(count));
+        }
     }
 }

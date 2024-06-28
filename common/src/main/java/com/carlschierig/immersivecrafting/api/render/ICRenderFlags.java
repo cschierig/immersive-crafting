@@ -1,6 +1,6 @@
 package com.carlschierig.immersivecrafting.api.render;
 
-import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICStack;
+import com.carlschierig.immersivecrafting.api.predicate.condition.stack.ICStack;
 
 /**
  * These flags indicate which parts of an {@link ICStack} should be rendered.

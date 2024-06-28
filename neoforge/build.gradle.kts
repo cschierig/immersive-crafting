@@ -14,6 +14,7 @@ val withApiJar = property("withApiJar").toString().toBoolean()
 val modrinthId: String by project
 val modrinthType: String by project
 val recipeViewer: String by project
+val modGroup: String by project
 
 val commonProject = project(":common")
 
@@ -78,6 +79,21 @@ tasks.withType<RemapJarTask>() {
     dependsOn(tasks.getByName<ShadowJar>("shadowJar"))
 }
 
+if (withApiJar) {
+    tasks.register<Jar>("apiJar") {
+        archiveClassifier.set("api")
+        dependsOn(tasks.named("remapJar"))
+        from(zipTree(tasks.named("remapJar").get().outputs.files.asPath))
+        include("META-INF/neoforge.mods.toml")
+        include("*.mixins.json")
+        include("${modGroup.replace('.', '/')}/immersivecrafting/api/**")
+    }
+
+    tasks.named("build") {
+        dependsOn(tasks.named("apiJar"))
+    }
+}
+
 if (System.getenv("MODRINTH_TOKEN") != null) {
     val files = ArrayList<String>()
     if (withSourcesJar) {
@@ -90,7 +106,7 @@ if (System.getenv("MODRINTH_TOKEN") != null) {
     modrinth {
         token.set(System.getenv("MODRINTH_TOKEN"))
         projectId.set(modrinthId)
-        versionNumber.set(project.version.toString())
+        versionNumber.set(project.version.toString() + "+neoforge")
         versionName.set(project.version.toString() + " - " + project.name.uppercaseFirstChar())
         versionType.set(modrinthType)
         uploadFile.set(tasks.named("remapJar"))
@@ -104,13 +120,4 @@ if (System.getenv("MODRINTH_TOKEN") != null) {
         detectLoaders.set(false)
         changelog.set(file("../CHANGELOG.md").readText())
     }
-}
-
-tasks.register<Jar>("apiJar") {
-    archiveClassifier.set("api")
-    from(sourceSets.main.get().allSource)
-    from(sourceSets.main.get().output)
-    include("neoforge.mods.toml")
-    include("*.mixins.json")
-    include("com/carlschierig/immersivecrafting/api/**")
 }
