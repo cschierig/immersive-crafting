@@ -4,9 +4,8 @@ import com.carlschierig.immersivecrafting.api.context.ContextType;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializer;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeSerializer;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeType;
+import com.carlschierig.immersivecrafting.impl.registry.ICRegistriesImpl;
 import com.carlschierig.immersivecrafting.impl.registry.ICRegistryKeys;
-import com.mojang.serialization.Lifecycle;
-import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 
@@ -20,6 +19,6 @@ public final class ICRegistries {
     public static final Registry<ContextType<?>> CONTEXT_TYPE = createRegistry(ICRegistryKeys.CONTEXT_TYPE);
 
     private static <T> Registry<T> createRegistry(ResourceKey<Registry<T>> registryKey) {
-        return new MappedRegistry<>(registryKey, Lifecycle.stable());
+        return ICRegistriesImpl.INSTANCE.createRegistry(registryKey);
     }
 }
