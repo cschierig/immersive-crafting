@@ -1,10 +1,10 @@
 package com.carlschierig.immersivecrafting.api.context;
 
 import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
+import com.carlschierig.immersivecrafting.impl.registry.ICRegistriesImpl;
 import com.carlschierig.immersivecrafting.impl.util.ICUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -34,6 +34,9 @@ public final class ContextTypes {
 
     private static <T> ContextType<T> register(String name) {
         var id = ICUtil.getId(name);
-        return Registry.register(ICRegistries.CONTEXT_TYPE, id, new ContextType<>(id));
+        return ICRegistriesImpl.register(ICRegistries.CONTEXT_TYPE, id, new ContextType<>(id));
+    }
+
+    public static void init() {
     }
 }

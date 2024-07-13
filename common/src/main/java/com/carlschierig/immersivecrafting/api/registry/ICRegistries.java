@@ -21,4 +21,7 @@ public final class ICRegistries {
     private static <T> Registry<T> createRegistry(ResourceKey<Registry<T>> registryKey) {
         return ICRegistriesImpl.INSTANCE.createRegistry(registryKey);
     }
+
+    public static void init() {
+    }
 }
