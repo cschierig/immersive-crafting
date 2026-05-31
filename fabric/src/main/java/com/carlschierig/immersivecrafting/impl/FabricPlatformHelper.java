@@ -12,6 +12,6 @@ public class FabricPlatformHelper extends PlatformHelper {
 
     @Override
     public <T> Registry<T> createRegistry(ResourceKey<Registry<T>> registryKey) {
-        return FabricRegistryBuilder.create(registryKey).attribute(RegistryAttribute.SYNCED).attribute(RegistryAttribute.OPTIONAL).buildAndRegister();
+        return FabricRegistryBuilder.create(registryKey).attribute(RegistryAttribute.OPTIONAL).buildAndRegister();
     }
 }

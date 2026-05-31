@@ -17,5 +17,4 @@ pluginManagement {
 
 val modName: String by extra
 rootProject.name = modName
-//include("common", "fabric", "neoforge")
-include("common", "fabric")
+include("common", "fabric", "neoforge")

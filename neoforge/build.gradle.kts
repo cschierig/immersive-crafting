@@ -1,119 +1,162 @@
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
 import org.gradle.kotlin.dsl.support.uppercaseFirstChar
-import java.util.*
 
 plugins {
-    java
-    idea
-    `maven-publish`
-    alias(libs.plugins.neoforge.gradle)
+    id("multiloader-loader")
+    alias(libs.plugins.neoforge.moddev)
     alias(libs.plugins.minotaur)
+    alias(libs.plugins.curseforgegradle)
 }
 
 val modId: String by project
+val modGroup: String by project
 val recipeViewer: String by project
-val common = project(":common")
+val withSourcesJar = property("withSourcesJar").toString().toBoolean()
+val withApiJar = property("withApiJar").toString().toBoolean()
+val modrinthId: String by project
+val modrinthType: String by project
+val curseforgeId: String by project
+
+val commonProject = project(":common")
 
 dependencies {
-    implementation("net.neoforged:neoforge:${libs.versions.neoforge.mdk.get()}")
-
-    compileOnly(project(":common"))
-
-    recipeViewer(dependencies)
+//    recipeViewer(dependencies)
 }
 
-fun recipeViewer(deps: DependencyHandler) {
-    // stolen from create fabric
+//fun recipeViewer(deps: DependencyHandler) {
+//    // stolen from create fabric
+//
+//    // emi
+//    deps.compileOnly("dev.emi:emi-neoforge:${libs.versions.emi.get()}:api")
+//
+//    when (recipeViewer.lowercase(Locale.ROOT)) {
+//        "emi" -> deps.runtimeOnly("dev.emi:emi-neoforge:${libs.versions.emi.get()}")
+//        "disabled" -> Unit
+//        else -> println("Unknown recipe viewer specified: $recipeViewer. Must be JEI, REI, EMI, or disabled.")
+//    }
+//}
 
-    // emi
-    deps.compileOnly("dev.emi:emi-neoforge:${libs.versions.emi.get()}:api")
-
-    when (recipeViewer.lowercase(Locale.ROOT)) {
-        "emi" -> deps.runtimeOnly("dev.emi:emi-neoforge:${libs.versions.emi.get()}")
-        "disabled" -> Unit
-        else -> println("Unknown recipe viewer specified: $recipeViewer. Must be JEI, REI, EMI, or disabled.")
+sourceSets {
+    val main by getting
+    main {
+        resources {
+            srcDir(commonProject.file("src/main/generated"))
+            exclude(commonProject.file("src/main/generated/resources/.cache").toString())
+        }
     }
 }
 
-sourceSets.main.get().resources.srcDir("src/generated/resources")
-
-// taken from sodium
-// NeoGradle compiles the game, but we don't want to add our common code to the game's code
-val notNeoTask: (Task) -> Boolean = { it: Task -> !it.name.startsWith("neo") && !it.name.startsWith("compileService") }
-tasks.withType<JavaCompile>().matching(notNeoTask).configureEach {
-    source(common.sourceSets.main.get().allSource)
-}
-
-tasks.withType<Javadoc>().matching(notNeoTask).configureEach {
-    source(common.sourceSets.main.get().allJava)
-}
-
-tasks.named<Jar>("sourcesJar") {
-    from(common.sourceSets.main.get().allSource)
-}
-
-tasks.withType<ProcessResources>().matching(notNeoTask).configureEach {
-    from(common.sourceSets.main.get().resources)
-}
-
-subsystems {
-    parchment {
-        minecraftVersion = libs.versions.minecraft.get()
-        mappingsVersion = libs.versions.parchment.get()
-    }
-}
-
-minecraft {
+neoForge {
+    version = libs.versions.neoforge.mdk.get()
     val atFile = file("src/main/resources/META-INF/accesstransformer.cfg")
     if (atFile.exists()) {
-        file(atFile)
+        accessTransformers.from(atFile)
+    }
+
+    runs {
+        configureEach {
+            systemProperty("neoforge.enabledGameTestNamespaces", modId)
+            ideName = "NeoForge ${name.capitalize()} (${project.path})" // Unify the run config names with fabric
+        }
+        create("client") {
+            client()
+            gameDirectory.set(mkdir(file("runs/client")))
+        }
+        create("server") {
+            server()
+//            file("runs/server").createParentDirectories()
+            gameDirectory.set(mkdir(file("runs/server")))
+        }
+    }
+    mods {
+        create(modId) {
+            sourceSet(sourceSets.main.get())
+        }
     }
 }
 
-runs {
-    configureEach {
-        modSource(project.sourceSets.main.get())
+if (withApiJar) {
+    tasks.register<Jar>("apiJar") {
+        archiveClassifier.set("api")
+        dependsOn(tasks.named("jar"))
+        from(zipTree(tasks.named("jar").get().outputs.files.asPath))
+        include("neoforge.mods.toml")
+        include("*.mixins.json")
+        include("${modGroup.replace('.', '/')}/api/**")
     }
-}
 
-tasks.register<Jar>("apiJar") {
-    archiveClassifier.set("api")
-    from(sourceSets.main.get().allSource)
-    from(sourceSets.main.get().output)
-    include("neoforge.mods.toml")
-    include("*.mixins.json")
-    include("com/carlschierig/immersivecrafting/api/**")
-}
-
-artifacts {
-    archives(tasks.named("apiJar"))
-    archives(tasks.named("sourcesJar"))
-}
-
-tasks.named("build") {
-    dependsOn(tasks.named("apiJar"))
-    dependsOn(tasks.named("jar"))
-    dependsOn(tasks.named("sourcesJar"))
+    tasks.named("build") {
+        dependsOn(tasks.named("apiJar"))
+    }
 }
 
 if (System.getenv("MODRINTH_TOKEN") != null) {
+    val files = ArrayList<String>()
+    if (withSourcesJar) {
+        files.add("sourcesJar")
+    }
+    if (withApiJar) {
+        files.add("apiJar")
+    }
+
     modrinth {
         token.set(System.getenv("MODRINTH_TOKEN"))
-        projectId.set("immersive-crafting")
+        projectId.set(modrinthId)
         versionNumber.set(project.version.toString())
         versionName.set(project.version.toString() + " - " + project.name.uppercaseFirstChar())
-        versionType.set("alpha")
-        uploadFile.set(tasks.named<Jar>("jar"))
-        additionalFiles.set(listOf(
-            "sourcesJar",
-            "apiJar"
-        ).map { tasks.named(it) })
+        versionType.set(modrinthType)
+        uploadFile.set(tasks.named("shadowJar"))
+        additionalFiles.set(files.map { tasks.named(it) })
         syncBodyFrom.set(rootProject.file("README.md").readText())
         dependencies {
-            optional.project("emi")
         }
         gameVersions.set(listOf(libs.versions.minecraft.get()))
         loaders.set(listOf("neoforge"))
         detectLoaders.set(false)
         changelog.set(file("../CHANGELOG.md").readText())
+    }
+    tasks.named("modrinth") { dependsOn(":fabric:runDatagen") }
+}
+
+if (System.getenv("CURSEFORGE_TOKEN") != null) {
+    tasks.register<TaskPublishCurseForge>("curseforge") {
+        apiToken = System.getenv("CURSEFORGE_TOKEN")
+
+        upload(curseforgeId, tasks.named("shadowJar")) {
+            releaseType = modrinthType
+            gameVersions.clear()
+            addGameVersion(libs.versions.minecraft.get())
+            addModLoader("neoforge")
+            changelog = file("../CHANGELOG.md").readText()
+            changelogType = "markdown"
+        }
+
+        disableVersionDetection()
+    }
+    tasks.named("curseforge") { dependsOn(":fabric:runDatagen") }
+}
+
+// Implement mcgradleconventions loader attribute
+val loaderAttribute = Attribute.of("io.github.mcgradleconventions.loader", String::class.java)
+for (variant in arrayOf(
+    "apiElements",
+    "runtimeElements",
+    "sourcesElements",
+    "javadocElements",
+)) {
+    configurations.named(variant) {
+        attributes {
+            attribute(loaderAttribute, "neoforge")
+        }
+    }
+}
+
+sourceSets.configureEach {
+    for (variant in arrayOf(compileClasspathConfigurationName, runtimeClasspathConfigurationName)) {
+        configurations.named(variant) {
+            attributes {
+                attribute(loaderAttribute, "neoforge")
+            }
+        }
     }
 }
