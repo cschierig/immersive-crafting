@@ -1,6 +1,6 @@
 package com.carlschierig.immersivecrafting.api.context;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Used as a key for objects in {@link RecipeContext}s.
@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
  * @param id  The id of the type.
  * @param <T> The type of object this type corresponds to.
  */
-public record ContextType<T>(ResourceLocation id) {
+public record ContextType<T>(Identifier id) {
     @Override
     public String toString() {
         return "<context type " + id.toString() + ">";

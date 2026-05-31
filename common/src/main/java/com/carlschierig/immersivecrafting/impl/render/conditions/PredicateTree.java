@@ -9,7 +9,7 @@ import com.carlschierig.immersivecrafting.api.render.ICRenderable;
 import com.carlschierig.immersivecrafting.impl.render.ICRenderHelper;
 import com.carlschierig.immersivecrafting.impl.util.ICUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -204,21 +204,21 @@ public class PredicateTree implements ICRenderable {
     }
 
     @Override
-    public void render(@NotNull GuiGraphics draw, int x, int y, float delta) {
-        draw.pose().pushPose();
-        draw.pose().translate(xShift, 0, 0);
+    public void render(@NotNull GuiGraphicsExtractor draw, int x, int y, float delta) {
+        draw.pose().pushMatrix();
+        draw.pose().translate(xShift, 0);
         renderSubtree(root, draw, x, y, delta);
-        draw.pose().popPose();
+        draw.pose().popMatrix();
     }
 
-    private void renderSubtree(Node node, GuiGraphics draw, int x, int y, float delta) {
-        draw.pose().pushPose();
-        draw.pose().translate(node.x, node.y, 0);
+    private void renderSubtree(Node node, GuiGraphicsExtractor draw, int x, int y, float delta) {
+        draw.pose().pushMatrix();
+        draw.pose().translate(node.x, node.y);
         // Draw tooltip
         renderTooltip(node, draw, x, y, delta);
         // Draw condition icon
         node.condition.render(draw, x, y, delta);
-        draw.pose().popPose();
+        draw.pose().popMatrix();
 
         // Draw lines
         if (node.hasChild()) {
@@ -247,7 +247,7 @@ public class PredicateTree implements ICRenderable {
         }
     }
 
-    private void renderTooltip(Node node, GuiGraphics draw, int x, int y, float delta) {
+    private void renderTooltip(Node node, GuiGraphicsExtractor draw, int x, int y, float delta) {
         var nodeX = node.x + xShift;
         if (x >= nodeX && x <= nodeX + baseUnit && y >= node.y && y <= node.y + baseUnit) {
             var tooltip = node.condition.getTooltip();

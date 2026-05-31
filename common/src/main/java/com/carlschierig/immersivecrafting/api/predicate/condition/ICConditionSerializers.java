@@ -5,7 +5,7 @@ import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICI
 import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
 import com.carlschierig.immersivecrafting.impl.util.ICUtil;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public final class ICConditionSerializers {
     public static final ICConditionSerializer<ICPredicate> PREDICATE = register("predicate", new ICPredicate.Serializer());
@@ -18,7 +18,7 @@ public final class ICConditionSerializers {
 
 
     private static <T extends ICCondition> ICConditionSerializer<T> register(String id, ICConditionSerializer<T> serializer) {
-        return Registry.register(ICRegistries.CONDITION_SERIALIZER, new ResourceLocation(ICUtil.MODID, id), serializer);
+        return Registry.register(ICRegistries.CONDITION_SERIALIZER, Identifier.tryBuild(ICUtil.MODID, id), serializer);
     }
 
     public static void init() {

@@ -25,4 +25,7 @@ public final class ContextTypes {
         var id = ICUtil.getId(name);
         return Registry.register(ICRegistries.CONTEXT_TYPE, id, new ContextType<>(id));
     }
+
+    public static void init() {
+    }
 }

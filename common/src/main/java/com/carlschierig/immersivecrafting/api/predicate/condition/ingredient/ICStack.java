@@ -7,7 +7,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ public abstract class ICStack implements ICIngredient {
      *
      * @return the identifier of the underlying resource.
      */
-    public abstract ResourceLocation getIdentifier();
+    public abstract Identifier getIdentifier();
 
     @Override
     public List<ICStack> getParts() {

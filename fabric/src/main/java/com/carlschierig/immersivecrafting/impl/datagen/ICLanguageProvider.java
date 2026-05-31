@@ -3,14 +3,14 @@ package com.carlschierig.immersivecrafting.impl.datagen;
 import com.carlschierig.immersivecrafting.api.predicate.condition.*;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeTypes;
 import com.carlschierig.immersivecrafting.impl.util.ICTranslationHelper;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.minecraft.core.HolderLookup;
 
 import java.util.concurrent.CompletableFuture;
 
 public class ICLanguageProvider extends FabricLanguageProvider {
-    protected ICLanguageProvider(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registries) {
+    protected ICLanguageProvider(FabricPackOutput dataOutput, CompletableFuture<HolderLookup.Provider> registries) {
         super(dataOutput, registries);
     }
 

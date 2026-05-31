@@ -1,14 +1,21 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        maven("https://maven.fabricmc.net/") {
-            name = "Fabric"
-        }
-        maven("https://maven.neoforged.net/releases") {
-            name = "Neoforge"
+        mavenCentral()
+        exclusiveContent {
+            forRepository {
+                maven("https://maven.fabricmc.net/") {
+                    name = "Fabric"
+                }
+            }
+            filter {
+                includeGroupAndSubgroups("net.fabricmc")
+            }
         }
     }
 }
 
-rootProject.name = "immersive-crafting"
-include("common", "fabric", "neoforge")
+val modName: String by extra
+rootProject.name = modName
+//include("common", "fabric", "neoforge")
+include("common", "fabric")

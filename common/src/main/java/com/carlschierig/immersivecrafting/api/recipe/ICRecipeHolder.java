@@ -1,13 +1,12 @@
-package com.carlschierig.immersivecrafting.impl.recipe;
+package com.carlschierig.immersivecrafting.api.recipe;
 
-import com.carlschierig.immersivecrafting.api.recipe.ICRecipe;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
-public record ICRecipeHolder<T extends ICRecipe>(ResourceLocation id, T recipe) {
+public record ICRecipeHolder<T extends ICRecipe>(Identifier id, T recipe) {
     public static final StreamCodec<RegistryFriendlyByteBuf, ICRecipeHolder<?>> STREAM_CODEC = StreamCodec.composite(
-            ResourceLocation.STREAM_CODEC,
+            Identifier.STREAM_CODEC,
             ICRecipeHolder::id,
             ICRecipe.STREAM_CODEC,
             ICRecipeHolder::recipe,

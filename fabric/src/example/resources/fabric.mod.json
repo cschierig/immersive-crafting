@@ -18,19 +18,13 @@
     ],
     "fabric-datagen": [
       "com.carlschierig.icexample.datagen.ICExampleDatagen"
-    ],
-    "emi": [
-      "com.carlschierig.immersivecrafting.compat.emi.ICEmiPlugin"
     ]
   },
   "depends": {
-    "fabricloader": ">=0.14.22",
+    "fabricloader": ">=${version_fabricloader}",
     "fabric-api": "*",
-    "minecraft": "1.20.6",
-    "java": ">=21",
+    "minecraft": ">=${version_minecraft}",
+    "java": ">=${version_java}",
     "immersive_crafting": "*"
-  },
-  "suggests": {
-    "emi": ">=1.0.19"
   }
 }

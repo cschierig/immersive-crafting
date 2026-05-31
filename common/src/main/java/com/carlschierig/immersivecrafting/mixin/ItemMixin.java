@@ -28,7 +28,7 @@ public abstract class ItemMixin {
                     .putHolder(ContextTypes.LEVEL, level)
                     .putHolder(ContextTypes.BLOCK_POSITION, context.getClickedPos())
                     .putHolder(ContextTypes.DIRECTION, context.getClickedFace())
-                    .putHolder(ContextTypes.ITEM_STACK, player.getInventory().getSelected())
+                    .putHolder(ContextTypes.ITEM_STACK, player.getInventory().getSelectedItem())
                     .build();
 
             var optRecipe = ICRecipeManager.getRecipe(ICRecipeTypes.USE_ITEM, recipeContext);
@@ -38,7 +38,7 @@ public abstract class ItemMixin {
                 recipe.recipe().craft(recipeContext, new CraftingContext(level, context.getClickedPos(), context.getClickedFace(), level.getRandom()));
 
                 // TODO: random chance
-                player.getInventory().getSelected().shrink(recipe.recipe().getIngredients().getFirst().getAmount());
+                player.getInventory().getSelectedItem().shrink(recipe.recipe().getIngredients().getFirst().getAmount());
 
                 cir.setReturnValue(InteractionResult.SUCCESS);
                 cir.cancel();

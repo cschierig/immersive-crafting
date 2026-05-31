@@ -3,7 +3,6 @@
   "ingredient": {
     "type": "immersive_crafting:item",
     "stack": {
-      "count": 1,
       "id": "minecraft:flint"
     }
   },
@@ -21,7 +20,6 @@
     {
       "type": "immersive_crafting:item",
       "stack": {
-        "count": 1,
         "id": "minecraft:stick"
       }
     }

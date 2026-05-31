@@ -3,14 +3,12 @@ package com.carlschierig.immersivecrafting.api.predicate.condition;
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.impl.util.ICTranslationHelper;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,8 +44,8 @@ public class AndCondition extends CompoundICCondition {
     }
 
     @Override
-    public void render(@NotNull GuiGraphics draw, int x, int y, float delta) {
-        draw.drawString(Minecraft.getInstance().font, getName().getString().toUpperCase(), 0, 0, 0xffffffff);
+    public void render(@NotNull GuiGraphicsExtractor draw, int x, int y, float delta) {
+        draw.text(Minecraft.getInstance().font, getName().getString().toUpperCase(), 0, 0, 0xffffffff);
     }
 
     @Override
@@ -56,12 +54,9 @@ public class AndCondition extends CompoundICCondition {
     }
 
     @Override
-    public @NotNull List<ClientTooltipComponent> getTooltip() {
-        List<ClientTooltipComponent> list = new ArrayList<>(super.getTooltip());
-        list.add(new ClientTextTooltip(
-                Component.translatable(ICTranslationHelper.translateConditionDescription(LANGUAGE_KEY))
-                        .getVisualOrderText()
-        ));
+    public @NotNull List<Component> getTooltip() {
+        var list = new ArrayList<>(super.getTooltip());
+        list.add(Component.translatable(ICTranslationHelper.translateConditionDescription(LANGUAGE_KEY)));
 
         return list;
     }

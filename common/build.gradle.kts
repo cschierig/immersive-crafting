@@ -1,59 +1,66 @@
 plugins {
-    idea
-    java
-    `maven-publish`
-    alias(libs.plugins.fabric.loom)
+    alias(libs.plugins.neoforge.moddev)
 }
 
 val modId: String by project
+val enabledPlatforms: String by project
 
-loom {
-    val awFile = file("src/main/resources/${modId}.accesswidener")
-    if (awFile.exists()) {
-        accessWidenerPath.set(awFile)
-    }
-
-    mixin {
-        defaultRefmapName.set("${modId}.refmap.json")
-    }
-
-    addRemapConfiguration("testModImplementation") {
-        targetConfigurationName.set("test")
-        onCompileClasspath = true
-        onRuntimeClasspath = true
+neoForge {
+    neoFormVersion = libs.versions.neoforge.neoform.get()
+    // Automatically enable AccessTransformers if the file exists
+    val atFile = file("src/main/resources/META-INF/accesstransformer.cfg")
+    if (atFile.exists()) {
+        accessTransformers.from(atFile)
     }
 }
 
 dependencies {
-    minecraft(libs.minecraft)
-    mappings(loom.layered {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${libs.versions.minecraft.get()}:${libs.versions.parchment.get()}@zip")
-    })
-
     compileOnly(libs.mixin)
+    compileOnly(libs.mixinextras.common)
+    annotationProcessor(libs.mixinextras.common)
 
-    compileOnly("dev.emi:emi-xplat-mojmap:${libs.versions.emi.get()}:api")
+//    compileOnly("dev.emi:emi-xplat-mojmap:${libs.versions.emi.get()}:api")
 
-    configurations.getByName("testModImplementation")(libs.fabric.loader)
-    testImplementation(libs.fabric.loader.junit)
+//    configurations.getByName("testModImplementation")(libs.fabric.loader)
+//    testImplementation(libs.fabric.loader.junit)
 }
 
-sourceSets {
-    named("main") {
-        resources {
-            srcDir(file("src/main/generated"))
-            exclude("src/main/generated/.cache")
-        }
+configurations {
+    register("commonJava") {
+        isCanBeResolved = false
+        isCanBeConsumed = true
     }
+    register("commonResources") {
+        isCanBeResolved = false
+        isCanBeConsumed = true
+    }
+}
+
+artifacts {
+    add("commonJava", sourceSets.main.get().java.sourceDirectories.singleFile)
+    add("commonResources", sourceSets.main.get().resources.sourceDirectories.singleFile)
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-fun api(dep: ExternalModuleDependency) {
-    dep.artifact {
-        classifier = "api"
+// Implement mcgradleconventions loader attribute
+val loaderAttribute = Attribute.of("io.github.mcgradleconventions.loader", String::class.java)
+for (variant in arrayOf("apiElements", "runtimeElements", "sourcesElements", "javadocElements")) {
+    configurations.named(variant) {
+        attributes {
+            attribute(loaderAttribute, "common")
+        }
+    }
+}
+
+sourceSets.configureEach {
+    for (variant in arrayOf(compileClasspathConfigurationName, runtimeClasspathConfigurationName)) {
+        configurations.named(variant) {
+            attributes {
+                attribute(loaderAttribute, "common")
+            }
+        }
     }
 }

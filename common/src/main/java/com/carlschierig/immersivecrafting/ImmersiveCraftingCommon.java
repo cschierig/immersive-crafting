@@ -1,5 +1,6 @@
 package com.carlschierig.immersivecrafting;
 
+import com.carlschierig.immersivecrafting.api.context.ContextTypes;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializers;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeTypes;
 import com.carlschierig.immersivecrafting.impl.recipe.ICRecipeSerializers;
@@ -10,5 +11,6 @@ public class ImmersiveCraftingCommon {
         ICRecipeTypes.init();
         ICRecipeSerializers.init();
         ICConditionSerializers.init();
+        ContextTypes.init();
     }
 }

@@ -1,8 +1,9 @@
 {
   "schemaVersion": 1,
   "id": "${modId}",
+  "version": "${modVersion}",
   "name": "${modName}",
-  "description": "Library mod adding data-driven in-world crafting.",
+  "description": "${modDescription}",
   "contact": {
     "issues": "https://github.com/cschierig/immersive-crafting/issues",
     "sources": "https://github.com/cschierig/immersive-crafting"
@@ -10,9 +11,8 @@
   "authors": [
     "CozyPenguin"
   ],
-  "version": "${modVersion}",
   "icon": "assets/immersive_crafting/icon.png",
-  "license": "MIT",
+  "license": "${modLicense}",
   "entrypoints": {
     "main": [
       "com.carlschierig.immersivecrafting.ImmersiveCrafting"
@@ -28,11 +28,8 @@
     "immersive-crafting.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.14.22",
-    "minecraft": "1.20.6",
-    "java": ">=21"
-  },
-  "suggests": {
-    "emi": ">=1.0.19"
+    "fabricloader": ">=${version_fabricloader}",
+    "minecraft": "${version_minecraft}",
+    "java": ">=${version_java}"
   }
 }

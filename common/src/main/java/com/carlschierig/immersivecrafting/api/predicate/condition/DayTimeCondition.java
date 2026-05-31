@@ -7,15 +7,12 @@ import com.carlschierig.immersivecrafting.impl.util.ICTranslationHelper;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +40,8 @@ public class DayTimeCondition implements ICCondition {
     @Override
     public boolean test(RecipeContext recipeContext) {
         var level = recipeContext.get(ContextTypes.LEVEL);
-        var time = level.getDayTime() % 24000;
+        // TODO: check this
+        var time = level.getOverworldClockTime() % 24000;
 
         if (startTime <= endTime) {
             return startTime <= time && time <= endTime;
@@ -53,8 +51,8 @@ public class DayTimeCondition implements ICCondition {
     }
 
     @Override
-    public void render(@NotNull GuiGraphics draw, int x, int y, float delta) {
-        draw.renderItem(new ItemStack(Items.CLOCK), 0, 0);
+    public void render(@NotNull GuiGraphicsExtractor draw, int x, int y, float delta) {
+        draw.item(new ItemStack(Items.CLOCK), 0, 0);
     }
 
     @Override
@@ -63,29 +61,27 @@ public class DayTimeCondition implements ICCondition {
     }
 
     @Override
-    public @NotNull List<ClientTooltipComponent> getTooltip() {
-        List<ClientTooltipComponent> list = new ArrayList<>(ICCondition.super.getTooltip());
+    public @NotNull List<Component> getTooltip() {
+        var list = new ArrayList<>(ICCondition.super.getTooltip());
 
-        ClientTooltipComponent first;
-        ClientTooltipComponent second;
+        Component first;
+        Component second;
         if (startTime <= endTime) {
-            first = new ClientTextTooltip(getTimeComponent(startTime));
-            second = new ClientTextTooltip(getTimeComponent(endTime));
+            first = getTimeComponent(startTime);
+            second = getTimeComponent(endTime);
         } else {
-            first = new ClientTextTooltip(getTimeComponent(endTime));
-            second = new ClientTextTooltip(getTimeComponent(startTime));
+            first = getTimeComponent(endTime);
+            second = getTimeComponent(startTime);
         }
-        list.add(new ClientTextTooltip(
-                Component.translatable(ICTranslationHelper.translateConditionDescription(LANGUAGE_KEY, "timeRange")).getVisualOrderText()));
+        list.add(Component.translatable(ICTranslationHelper.translateConditionDescription(LANGUAGE_KEY, "timeRange")));
         list.add(first);
-        list.add(new ClientTextTooltip(
-                Component.translatable(ICTranslationHelper.translateConditionDescription(LANGUAGE_KEY, "and")).getVisualOrderText()));
+        list.add(Component.translatable(ICTranslationHelper.translateConditionDescription(LANGUAGE_KEY, "and")));
         list.add(second);
 
         return list;
     }
 
-    private FormattedCharSequence getTimeComponent(int time) {
+    private Component getTimeComponent(int time) {
         var timeString = switch ((time + 500) / 1000) {
             case 0 -> "earlyMorning";
             case 1 -> "morning";
@@ -104,12 +100,10 @@ public class DayTimeCondition implements ICCondition {
             default -> "sunrise";
         };
         var textStyle = Style.EMPTY.withColor(0xEEEEEE).withItalic(true);
-        return FormattedCharSequence.composite(
-                FormattedCharSequence.forward(Integer.toString(time), Style.EMPTY),
-                FormattedCharSequence.forward(" (", textStyle),
-                Component.translatable(ICTranslationHelper.translateConditionDescription(LANGUAGE_KEY, timeString)).setStyle(textStyle).getVisualOrderText(),
-                FormattedCharSequence.forward(")", textStyle)
-        );
+        return Component.literal(Integer.toString(time))
+                .append(" ").withStyle(textStyle)
+                .append(Component.translatable(ICTranslationHelper.translateConditionDescription(LANGUAGE_KEY, timeString)).setStyle(textStyle))
+                .append(Component.literal(")").withStyle(textStyle));
     }
 
     @Override

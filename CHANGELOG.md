@@ -1,1 +1,3 @@
-- set up unit tests for common module
+- port to 26.1
+- fix mod crashing on dedicated servers
+- temporarily remove support for EMI, as it is not yet available on 26.1

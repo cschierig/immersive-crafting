@@ -1,17 +1,20 @@
 [versions]
-minecraft = "1.20.6"
+minecraft = "26.1.2"
+java = "25"
 
 minotaur = "2.+"
-parchment = "2024.05.01"
+curseforgegradle = "1.1.+"
 
-fabric_loom = "1.6-SNAPSHOT"
-fabric_loader = "0.15.+"
-fabric_api = "0.99.0+1.20.6"
+fabric_loader = "0.19.2"
+fabric_loom = "1.15.5"
+fabric_api = "0.146.1+26.1.2"
 
-neoforge_gradle = "7.0.+"
-neoforge_mdk = "[20.6,)"
+neoforge_mdk = "26.1.2.15-beta"
+neoforge_moddev = "2.0.141"
+neoforge_neoform = "26.1.2-1"
 
 mixin = "0.8.5"
+mixinextras = "0.5.3"
 
 emi = "1.1.6+1.20.6"
 rei = "15.0.728"
@@ -26,11 +29,10 @@ fabric_loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric_l
 fabric_loader_junit = { module = "net.fabricmc:fabric-loader-junit", version.ref = "fabric_loader" }
 fabric_api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric_api" }
 
-mixin = { module = "org.spongepowered:mixin", version.ref = "mixin" }
+neoforge_mdk = { module = "net.neoforged:neoforge", version.ref = "neoforge_mdk" }
 
-emi_fabric = { module = "dev.emi:emi-fabric", version.ref = "emi" }
-emi_neoforge = { module = "dev.emi:emi-neoforge", version.ref = "emi" }
-emi_common = { module = "dev.emi:emi-xplat-mojmap", version.ref = "emi" }
+mixin = { module = "org.spongepowered:mixin", version.ref = "mixin" }
+mixinextras_common = { module = "io.github.llamalad7:mixinextras-common", version.ref = "mixinextras" }
 
 rei_fabric = { module = "me.shedaniel:RoughlyEnoughItems-fabric", version.ref = "rei" }
 rei_fabric_api = { module = "me.shedaniel:RoughlyEnoughItems-api-fabric", version.ref = "rei" }
@@ -39,8 +41,12 @@ rei_fabric_plugin = { module = "me.shedaniel:RoughlyEnoughItems-default-plugin-f
 junit_jupiter_api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit_jupiter_engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 
-[plugins]
-fabric_loom = { id = "fabric-loom", version.ref = "fabric_loom" }
-neoforge_gradle = { id = "net.neoforged.gradle.userdev", version.ref = "neoforge_gradle" }
-minotaur = { id = "com.modrinth.minotaur", version.ref = "minotaur" }
+compat_modmenu_fabric = { module = "com.terraformersmc:modmenu", version = "18.0.0-alpha.8" }
 
+[plugins]
+minotaur = { id = "com.modrinth.minotaur", version.ref = "minotaur" }
+curseforgegradle = { id = "net.darkhax.curseforgegradle", version.ref = "curseforgegradle" }
+
+fabric_loom = { id = "net.fabricmc.fabric-loom", version.ref = "fabric_loom" }
+
+neoforge_moddev = { id = "net.neoforged.moddev", version.ref = "neoforge_moddev" }

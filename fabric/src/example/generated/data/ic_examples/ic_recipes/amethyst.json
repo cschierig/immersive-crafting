@@ -3,7 +3,6 @@
   "ingredient": {
     "type": "immersive_crafting:item",
     "stack": {
-      "count": 1,
       "id": "minecraft:flint"
     }
   },
@@ -22,7 +21,6 @@
       "type": "immersive_crafting:item",
       "chance": 0.5,
       "stack": {
-        "count": 1,
         "id": "minecraft:amethyst_shard"
       }
     }

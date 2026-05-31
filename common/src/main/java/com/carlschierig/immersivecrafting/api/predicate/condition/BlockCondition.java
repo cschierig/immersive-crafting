@@ -4,7 +4,6 @@ import com.carlschierig.immersivecrafting.api.context.ContextTypes;
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
 import com.carlschierig.immersivecrafting.impl.predicate.RangePredicate;
-import com.carlschierig.immersivecrafting.impl.render.KeyVaueTooltipComponent;
 import com.carlschierig.immersivecrafting.impl.util.ICTranslationHelper;
 import com.carlschierig.immersivecrafting.mixin.BlockStateAccessor;
 import com.mojang.datafixers.util.Either;
@@ -12,15 +11,15 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -65,13 +64,13 @@ public class BlockCondition implements ICCondition {
     }
 
     @Override
-    public void render(@NotNull GuiGraphics draw, int x, int y, float delta) {
+    public void render(@NotNull GuiGraphicsExtractor draw, int x, int y, float delta) {
         var item = block.isPresent() ? BuiltInRegistries.BLOCK.getOptional(block.get().id).map(Block::asItem).orElse(Items.AIR) : Items.AIR;
         if (item != Items.AIR) {
-            draw.renderItem(new ItemStack(item), 0, 0);
+            draw.item(new ItemStack(item), 0, 0);
         } else {
             // TODO: proper question mark texture
-            draw.drawString(Minecraft.getInstance().font, "?", 0, 0, 0xffffffff);
+            draw.text(Minecraft.getInstance().font, "?", 0, 0, 0xffffffff);
         }
     }
 
@@ -81,27 +80,31 @@ public class BlockCondition implements ICCondition {
     }
 
     @Override
-    public @NotNull List<ClientTooltipComponent> getTooltip() {
-        List<ClientTooltipComponent> list = new ArrayList<>(ICCondition.super.getTooltip());
+    public @NotNull List<Component> getTooltip() {
+        var list = new ArrayList<>(ICCondition.super.getTooltip());
         if (block.isPresent()) {
             var block = this.block.get();
             if (block.id != null) {
-                list.add(new KeyVaueTooltipComponent(
+                list.add(getKeyValueText(
                         Component.translatable(ICTranslationHelper.translateConditionDescription(LANGUAGE_KEY, "id")),
                         Component.literal(block.id.toString())));
             } else if (block.tag != null) {
-                list.add(new KeyVaueTooltipComponent(
+                list.add(getKeyValueText(
                         Component.translatable(ICTranslationHelper.translateConditionDescription(LANGUAGE_KEY, "tag")),
                         Component.literal(block.tag.location().toString())));
             }
         }
         if (hardness.isPresent()) {
-            list.add(new KeyVaueTooltipComponent(
+            list.add(getKeyValueText(
                     Component.translatable(ICTranslationHelper.translateConditionDescription(LANGUAGE_KEY, "hardness")),
                     Component.literal(hardness.get().toString())));
         }
 
         return list;
+    }
+
+    private Component getKeyValueText(MutableComponent key, Component value) {
+        return key.append(": ").append(value);
     }
 
     private static final ValidationContext context = ValidationContext.of(ContextTypes.BLOCK_STATE);
@@ -118,11 +121,11 @@ public class BlockCondition implements ICCondition {
 
     private static class BlockValue {
         @Nullable
-        public final ResourceLocation id;
+        public final Identifier id;
         @Nullable
         public final TagKey<Block> tag;
 
-        public BlockValue(ResourceLocation id) {
+        public BlockValue(Identifier id) {
             this.id = id;
             this.tag = null;
         }
@@ -132,13 +135,13 @@ public class BlockCondition implements ICCondition {
             this.id = null;
         }
 
-        public BlockValue(Optional<ResourceLocation> id, Optional<TagKey<Block>> tag) {
+        public BlockValue(Optional<Identifier> id, Optional<TagKey<Block>> tag) {
             this.tag = tag.orElse(null);
             this.id = id.orElse(null);
         }
 
         private static final Codec<BlockValue> RL_CODEC = RecordCodecBuilder.create(
-                instance -> instance.group(ResourceLocation.CODEC.fieldOf("id").forGetter(val -> val.id)).apply(instance, BlockValue::new));
+                instance -> instance.group(Identifier.CODEC.fieldOf("id").forGetter(val -> val.id)).apply(instance, BlockValue::new));
         private static final Codec<BlockValue> KEY_CODEC = RecordCodecBuilder.create(
                 instance -> instance.group(TagKey.codec(Registries.BLOCK).fieldOf("tag").forGetter(val -> val.tag)).apply(instance, BlockValue::new));
 
@@ -159,9 +162,9 @@ public class BlockCondition implements ICCondition {
         );
 
         public static final StreamCodec<RegistryFriendlyByteBuf, BlockValue> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+                ByteBufCodecs.optional(Identifier.STREAM_CODEC),
                 val -> Optional.ofNullable(val.id),
-                ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC.map(id -> TagKey.create(Registries.BLOCK, id), TagKey::location)),
+                ByteBufCodecs.optional(Identifier.STREAM_CODEC.map(id -> TagKey.create(Registries.BLOCK, id), TagKey::location)),
                 val -> Optional.ofNullable(val.tag),
                 BlockValue::new
         );
@@ -201,7 +204,7 @@ public class BlockCondition implements ICCondition {
         }
 
         /**
-         * Uses the {@link ResourceLocation} of the given block as the resource location for the condition.
+         * Uses the {@link Identifier} of the given block as the resource location for the condition.
          *
          * @param block The block whose resource location should be used for the condition.
          * @return this Builder.
@@ -210,7 +213,7 @@ public class BlockCondition implements ICCondition {
             return id(BuiltInRegistries.BLOCK.getKey(block));
         }
 
-        public Builder id(ResourceLocation id) {
+        public Builder id(Identifier id) {
             block = Optional.of(new BlockValue(id));
             return this;
         }
@@ -225,7 +228,7 @@ public class BlockCondition implements ICCondition {
             return this;
         }
 
-        public Builder tag(ResourceLocation tag) {
+        public Builder tag(Identifier tag) {
             block = Optional.of(new BlockValue(TagKey.create(Registries.BLOCK, tag)));
             return this;
         }

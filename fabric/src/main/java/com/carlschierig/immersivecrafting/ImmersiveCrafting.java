@@ -1,13 +1,17 @@
 package com.carlschierig.immersivecrafting;
 
+import com.carlschierig.immersivecrafting.impl.FabricPlatformHelper;
 import com.carlschierig.immersivecrafting.impl.network.ICMessages;
 import com.carlschierig.immersivecrafting.impl.network.S2CPackets;
 import com.carlschierig.immersivecrafting.impl.network.S2CPacketsFabric;
-import com.carlschierig.immersivecrafting.impl.recipe.RecipeReloaderFabric;
+import com.carlschierig.immersivecrafting.impl.recipe.RecipeReloader;
+import com.carlschierig.immersivecrafting.impl.util.ICUtil;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.networking.v1.S2CPlayChannelEvents;
+import net.fabricmc.fabric.api.networking.v1.ClientboundPlayChannelEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
+import net.fabricmc.fabric.api.resource.v1.reloader.ResourceReloaderKeys;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 
 public class ImmersiveCrafting implements ModInitializer {
@@ -16,13 +20,19 @@ public class ImmersiveCrafting implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new RecipeReloaderFabric());
+        new FabricPlatformHelper();
+
+        // resource loader
+        var loaderId = Identifier.fromNamespaceAndPath(ICUtil.MODID, "recipe_reloader");
+        var serverLoader = ResourceLoader.get(PackType.SERVER_DATA);
+        serverLoader.registerReloadListener(loaderId, new RecipeReloader());
+        serverLoader.addListenerOrdering(ResourceReloaderKeys.AFTER_VANILLA, loaderId);
 
         ImmersiveCraftingCommon.init();
 
-        ICMessages.registerPayloadsS2C();
+        ICMessages.registerPayloadsClientbound();
         S2CPackets.INSTANCE = new S2CPacketsFabric();
-        S2CPlayChannelEvents.REGISTER.register(ICMessages::registerPlayer);
+        ClientboundPlayChannelEvents.REGISTER.register(ICMessages::registerPlayer);
 
         ServerPlayConnectionEvents.DISCONNECT.register(ICMessages::unregisterPlayer);
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> S2CPackets.INSTANCE.trySendRecipes(handler.player));

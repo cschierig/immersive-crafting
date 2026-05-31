@@ -9,20 +9,18 @@ import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSer
 import com.carlschierig.immersivecrafting.api.render.ICRenderFlags;
 import com.carlschierig.immersivecrafting.impl.render.FakeScreen;
 import com.carlschierig.immersivecrafting.impl.render.ICRenderHelper;
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
@@ -33,18 +31,18 @@ import java.util.List;
  * ICStack wrapper containing an item stack.
  */
 public class ICItemStack extends ICStack {
-    private final ItemStack stack;
+    private final ItemStackTemplate stack;
     private final float chance;
 
     public ICItemStack(ItemLike item) {
-        this(new ItemStack(item, 1));
+        this(new ItemStackTemplate(item.asItem(), 1));
     }
 
-    public ICItemStack(ItemStack stack) {
+    public ICItemStack(ItemStackTemplate stack) {
         this(stack, 1);
     }
 
-    public ICItemStack(ItemStack stack, float chance) {
+    public ICItemStack(ItemStackTemplate stack, float chance) {
         this.stack = stack;
         this.chance = chance;
     }
@@ -54,23 +52,24 @@ public class ICItemStack extends ICStack {
         var chance = craftingContext.random().nextFloat();
         if (this.chance >= chance) {
             // TODO: direction might be null
-            Block.popResourceFromFace(craftingContext.level(), craftingContext.pos(), craftingContext.direction(), stack.copy());
+            Block.popResourceFromFace(craftingContext.level(), craftingContext.pos(), craftingContext.direction(), stack.create());
         }
     }
 
     @Override
     public Object getKey() {
-        return stack.getItem();
+        return stack.item();
     }
 
     @Override
-    public void render(GuiGraphics draw, int x, int y, float delta, int flags) {
-        draw.renderItem(stack, x, y);
+    public void render(GuiGraphicsExtractor draw, int x, int y, float delta, int flags) {
+        draw.item(stack.create(), x, y);
 
         if (ICRenderFlags.RENDER_ICON.test(flags)) {
-            Lighting.setupFor3DItems();
-            draw.renderItem(stack, x, y);
-            draw.renderItemDecorations(Minecraft.getInstance().font, stack, x, y, "");
+            // TODO: fix this
+//            Lighting.Entry.setupFor3DItems();
+            draw.item(stack.create(), x, y);
+            draw.itemDecorations(Minecraft.getInstance().font, stack.create(), x, y, "");
         }
         if (ICRenderFlags.RENDER_AMOUNT.test(flags)) {
             String count = "";
@@ -83,7 +82,7 @@ public class ICItemStack extends ICStack {
 
     @Override
     public int getAmount() {
-        return stack.getCount();
+        return stack.count();
     }
 
     @Override
@@ -93,12 +92,12 @@ public class ICItemStack extends ICStack {
 
     @Override
     public @NotNull Component getName() {
-        return stack.getDisplayName();
+        return stack.create().getDisplayName();
     }
 
     @Override
     public boolean isEmpty() {
-        return stack.isEmpty();
+        return stack.count() == 0;
     }
 
     @Override
@@ -117,34 +116,34 @@ public class ICItemStack extends ICStack {
     public boolean test(RecipeContext context) {
         var stackContext = context.get(ContextTypes.ITEM_STACK);
         // todo: nbt
-        return stack.is(stackContext.getItem()) && stack.getCount() <= stackContext.getCount();
+        return stack.is(stackContext.getItem()) && stack.count() <= stackContext.getCount();
     }
 
     @Override
-    public ResourceLocation getIdentifier() {
-        return BuiltInRegistries.ITEM.getKey(stack.getItem());
+    public Identifier getIdentifier() {
+        return BuiltInRegistries.ITEM.getKey(stack.item().value());
     }
 
     @Override
     public ICItemStack copy() {
-        return new ICItemStack(stack.copy(), chance);
+        return new ICItemStack(stack, chance);
     }
 
     @Override
-    public @NotNull List<ClientTooltipComponent> getTooltip() {
-        return FakeScreen.INSTANCE.getTooltipFromItem(stack);
+    public @NotNull List<Component> getTooltip() {
+        return FakeScreen.INSTANCE.getTooltipFromItem(stack.create());
     }
 
     public static class Serializer implements ICConditionSerializer<ICItemStack> {
         public static final MapCodec<ICItemStack> CODEC = RecordCodecBuilder.mapCodec(
                 instance -> instance.group(
-                        ItemStack.CODEC.fieldOf("stack").forGetter(stack -> stack.stack),
+                        ItemStackTemplate.CODEC.fieldOf("stack").forGetter(stack -> stack.stack),
                         Codec.floatRange(0, 1).optionalFieldOf("chance", 1f).forGetter(stack -> stack.chance)
                 ).apply(instance, ICItemStack::new)
         );
 
         public static final StreamCodec<RegistryFriendlyByteBuf, ICItemStack> STREAM_CODEC = StreamCodec.composite(
-                ItemStack.STREAM_CODEC,
+                ItemStackTemplate.STREAM_CODEC,
                 stack -> stack.stack,
                 ByteBufCodecs.FLOAT,
                 stack -> stack.chance,

@@ -1,190 +1,240 @@
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
 import org.gradle.kotlin.dsl.support.uppercaseFirstChar
-import java.util.*
 
 plugins {
-    idea
-    java
-    `maven-publish`
+    id("multiloader-loader")
     alias(libs.plugins.fabric.loom)
     alias(libs.plugins.minotaur)
+    alias(libs.plugins.curseforgegradle)
 }
 
 val modId: String by project
+val modGroup: String by project
 val recipeViewer: String by project
-val common = project(":common")
+val withApiJar = property("withApiJar").toString().toBoolean()
+val withSourcesJar = property("withSourcesJar").toString().toBoolean()
+val compatMods = property("compatMods").toString().toBoolean()
+val modrinthId: String by project
+val modrinthType: String by project
+val curseforgeId: String by project
+val withExampleMod = property("withExampleMod").toString().toBoolean()
 
-val exampleModCompileOnlyApi by configurations.creating;
-exampleModCompileOnlyApi.extendsFrom(configurations.modCompileOnlyApi.get())
+val commonProject = project(":common")
 
 
 sourceSets {
-    create("example") {
-        compileClasspath = sourceSets.main.get().compileClasspath
-        compileClasspath += exampleModCompileOnlyApi
-        runtimeClasspath += sourceSets.main.get().runtimeClasspath
+    val main by getting
+    if (withExampleMod) {
+        create("example") {
+            compileClasspath += main.output + main.compileClasspath
+            runtimeClasspath += main.output + main.runtimeClasspath
 
-        resources {
-            srcDir(file("src/example/generated"))
-            exclude("src/example/generated/resources/.cache")
+            resources {
+                srcDir(file("src/example/generated"))
+                exclude("src/example/generated/resources/.cache")
+            }
         }
     }
-    getByName("main") {
+    main {
         resources {
-            srcDir(file("src/main/generated"))
-            exclude("src/main/generated/resources/.cache")
+            srcDir(commonProject.file("src/main/generated"))
+            exclude(commonProject.file("src/main/generated/resources/.cache").toString())
         }
+    }
+}
+
+if (withExampleMod) {
+    configurations {
+        val exampleImplementation by getting {
+            extendsFrom(configurations.implementation.get())
+        }
+
+        val exampleRuntimeOnly by getting {
+            extendsFrom(configurations.runtimeOnly.get())
+        }
+    }
+}
+
+dependencies {
+    minecraft(libs.minecraft)
+
+    implementation(libs.fabric.loader)
+    implementation(libs.fabric.api)
+
+    if (compatMods) {
+        implementation(libs.compat.modmenu.fabric)
     }
 }
 
 loom {
-    val awPath = common.file("src/main/resources/${modId}.accesswidener")
+    val awPath = commonProject.file("src/assets/resources/${modId}.accesswidener")
     if (awPath.exists()) {
         accessWidenerPath.set(awPath)
-    }
-    mixin {
-        defaultRefmapName.set("${modId}.refmap.json")
     }
     runs {
         getByName("client") {
             client()
             configName = "Fabric Client"
             ideConfigGenerated(true)
-            runDir("run")
+            runDir("run/client")
         }
         getByName("server") {
-            client()
+            server()
             configName = "Fabric Server"
             ideConfigGenerated(true)
-            runDir("run")
-        }
-        create("example") {
-            client()
-            configName = "Example Mod"
-            ideConfigGenerated(true)
-            source(project.sourceSets.getByName("example"))
-        }
-        create("exampleServer") {
-            server()
-            configName = "Example Mod Server"
-            ideConfigGenerated(true)
-            source(project.sourceSets.getByName("example"))
-        }
-        create("exampleDatagen") {
-            inherit(getByName("example"))
-            name("Example Mod Data Generation")
-            vmArg("-Dfabric-api.datagen")
-            vmArg("-Dfabric-api.datagen.output-dir=${file("src/example/generated")}")
-            vmArg("-Dfabric-api.datagen.modid=ic_examples")
-
-            runDir("build/exampleDatagen")
+            runDir("run/server")
         }
         create("datagen") {
             inherit(getByName("client"))
             name("Data Generation")
             vmArg("-Dfabric-api.datagen")
-            vmArg("-Dfabric-api.datagen.output-dir=${common.file("src/main/generated")}")
-            vmArg("-Dfabric-api.datagen.modid=immersive_crafting")
+            vmArg("-Dfabric-api.datagen.output-dir=${commonProject.file("src/main/generated")}")
+            vmArg("-Dfabric-api.datagen.modid=$modId")
 
             runDir("build/datagen")
         }
+        if (withExampleMod) {
+            create("example") {
+                client()
+                configName = "Example Mod"
+                ideConfigGenerated(true)
+                source(project.sourceSets.getByName("example"))
+                runDir("run/exampleClient")
+            }
+            create("exampleServer") {
+                server()
+                configName = "Example Mod Server"
+                ideConfigGenerated(true)
+                source(project.sourceSets.getByName("example"))
+                runDir("run/exampleServer")
+            }
+            create("exampleDatagen") {
+                inherit(getByName("example"))
+                name("Example Mod Data Generation")
+                vmArg("-Dfabric-api.datagen")
+                vmArg("-Dfabric-api.datagen.output-dir=${file("src/example/generated")}")
+                vmArg("-Dfabric-api.datagen.modid=ic_examples")
+
+                runDir("build/exampleDatagen")
+            }
+        }
     }
 }
 
-tasks.withType<JavaCompile>().configureEach {
-    source(common.sourceSets.main.get().allSource)
-}
+if (withApiJar) {
+    tasks.register<Jar>("apiJar") {
+        archiveClassifier.set("api")
+        dependsOn(tasks.named("jar"))
+        from(zipTree(tasks.named("jar").get().outputs.files.asPath))
+        include("fabric.mod.json")
+        include("*.mixins.json")
+        include("${modGroup.replace('.', '/')}/api/**")
+    }
 
-tasks.withType<Javadoc>().configureEach {
-    source(common.sourceSets.main.get().allJava)
-}
-
-tasks.named<Jar>("sourcesJar") {
-    from(common.sourceSets.main.get().allSource)
-}
-
-tasks.withType<ProcessResources>() {
-    from(common.sourceSets.main.get().resources)
-}
-
-tasks.register<Jar>("apiJar") {
-    archiveClassifier.set("api")
-    dependsOn(tasks.named("remapJar"))
-    from(zipTree(tasks.named("remapJar").get().outputs.files.asPath))
-    include("fabric.mod.json")
-    include("*.mixins.json")
-    include("com/carlschierig/immersivecrafting/api/**")
-}
-
-tasks.named("build") {
-    dependsOn(tasks.named("apiJar"))
+    tasks.named("build") {
+        dependsOn(tasks.named("apiJar"))
+    }
 }
 
 dependencies {
-    minecraft(libs.minecraft)
-    mappings(loom.layered {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${libs.versions.minecraft.get()}:${libs.versions.parchment.get()}@zip")
-    })
 
-    modImplementation(libs.fabric.loader)
-    modImplementation(libs.fabric.api)
+//    recipeViewer(dependencies)
 
-    implementation(project(":common"))
-
-    recipeViewer(dependencies)
-
-    exampleModCompileOnlyApi(tasks.getByName("apiJar").outputs.files)
+//    exampleModCompileOnlyApi(tasks.getByName("apiJar").outputs.files)
 }
 
-fun recipeViewer(deps: DependencyHandler) {
-    // stolen from create fabric
-
-    // emi
-    deps.modCompileOnly(libs.emi.fabric) { api(this) }
-
-    // rei
-    deps.modCompileOnly(libs.rei.fabric.api)
-    deps.modCompileOnly(libs.rei.fabric.plugin)
-    // jei
-    // deps.modCompileOnly("mezz.jei:jei-${libs.versions.minecraft.get()}-common-api:${libs.versions.jei.get()}")
-    // deps.modCompileOnly("mezz.jei:jei-${libs.versions.minecraft.get()}-fabric-api:${libs.versions.jei.get()}")
-
-    when (recipeViewer.lowercase(Locale.ROOT)) {
-        "emi" -> deps.modLocalRuntime(libs.emi.fabric)
-        "rei" -> deps.modLocalRuntime(libs.rei)
-        // "jei" -> deps.modLocalRuntime("mezz.jei:jei-${libs.versions.minecraft.get()}-fabric:${libs.versions.jei.get()}")
-        "disabled" -> Unit
-        else -> println("Unknown recipe viewer specified: $recipeViewer. Must be JEI, REI, EMI, or disabled.")
-    }
-}
+//fun recipeViewer(deps: DependencyHandler) {
+//    // stolen from create fabric
+//
+//    // emi
+//    deps.modCompileOnly(libs.emi.fabric) { api(this) }
+//
+//    // rei
+//    deps.modCompileOnly(libs.rei.fabric.api)
+//    deps.modCompileOnly(libs.rei.fabric.plugin)
+//    // jei
+//    // deps.modCompileOnly("mezz.jei:jei-${libs.versions.minecraft.get()}-common-api:${libs.versions.jei.get()}")
+//    // deps.modCompileOnly("mezz.jei:jei-${libs.versions.minecraft.get()}-fabric-api:${libs.versions.jei.get()}")
+//
+//    when (recipeViewer.lowercase(Locale.ROOT)) {
+//        "emi" -> deps.modLocalRuntime(libs.emi.fabric)
+//        "rei" -> deps.modLocalRuntime(libs.rei)
+//        // "jei" -> deps.modLocalRuntime("mezz.jei:jei-${libs.versions.minecraft.get()}-fabric:${libs.versions.jei.get()}")
+//        "disabled" -> Unit
+//        else -> println("Unknown recipe viewer specified: $recipeViewer. Must be JEI, REI, EMI, or disabled.")
+//    }
+//}
 
 if (System.getenv("MODRINTH_TOKEN") != null) {
+    val files = ArrayList<String>()
+    if (withSourcesJar) {
+        files.add("sourcesJar")
+    }
+    if (withApiJar) {
+        files.add("apiJar")
+    }
+
     modrinth {
         token.set(System.getenv("MODRINTH_TOKEN"))
-        projectId.set("immersive-crafting")
+        projectId.set(modrinthId)
         versionNumber.set(project.version.toString())
         versionName.set(project.version.toString() + " - " + project.name.uppercaseFirstChar())
-        versionType.set("alpha")
-        uploadFile.set(tasks.named("remapJar"))
-        additionalFiles.set(listOf(
-            "remapSourcesJar",
-            "apiJar"
-        ).map { tasks.named(it) })
+        versionType.set(modrinthType)
+        uploadFile.set(tasks.named("shadowJar"))
+        additionalFiles.set(files.map { tasks.named(it) })
         syncBodyFrom.set(rootProject.file("README.md").readText())
         dependencies {
-            required.project("fabric-api")
-            optional.project("emi")
         }
         gameVersions.set(listOf(libs.versions.minecraft.get()))
-        loaders.set(listOf("fabric", "quilt"))
+        loaders.set(listOf("fabric"))
         detectLoaders.set(false)
         changelog.set(file("../CHANGELOG.md").readText())
     }
     tasks.named("modrinth") { dependsOn("runDatagen") }
 }
 
-fun api(dep: ExternalModuleDependency) {
-    dep.artifact {
-        classifier = "api"
+if (System.getenv("CURSEFORGE_TOKEN") != null) {
+    tasks.register<TaskPublishCurseForge>("curseforge") {
+        apiToken = System.getenv("CURSEFORGE_TOKEN")
+
+        upload(curseforgeId, tasks.named("shadowJar")) {
+            releaseType = modrinthType
+            gameVersions.clear()
+            addGameVersion(libs.versions.minecraft.get())
+            addModLoader("fabric")
+            changelog = file("../CHANGELOG.md").readText()
+            changelogType = "markdown"
+        }
+
+        disableVersionDetection()
+    }
+
+    tasks.named("curseforge") { dependsOn("runDatagen") }
+}
+
+// Implement mcgradleconventions loader attribute
+val loaderAttribute = Attribute.of("io.github.mcgradleconventions.loader", String::class.java)
+for (variant in arrayOf(
+    "apiElements",
+    "runtimeElements",
+    "sourcesElements",
+    "javadocElements",
+    "includeInternal",
+    "modCompileClasspath"
+)) {
+    configurations.named(variant) {
+        attributes {
+            attribute(loaderAttribute, "fabric")
+        }
+    }
+}
+
+sourceSets.configureEach {
+    for (variant in arrayOf(compileClasspathConfigurationName, runtimeClasspathConfigurationName)) {
+        configurations.named(variant) {
+            attributes {
+                attribute(loaderAttribute, "fabric")
+            }
+        }
     }
 }

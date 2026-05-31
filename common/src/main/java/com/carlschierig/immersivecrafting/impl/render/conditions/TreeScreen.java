@@ -1,8 +1,9 @@
 package com.carlschierig.immersivecrafting.impl.render.conditions;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
@@ -10,8 +11,8 @@ public class TreeScreen extends Screen {
     private final PredicateTree tree;
     private final Screen parent;
 
-    private double xShift;
-    private double yShift;
+    private float xShift;
+    private float yShift;
 
     public TreeScreen(PredicateTree tree, Screen parent) {
         super(Component.literal("Condition Tree"));
@@ -21,28 +22,28 @@ public class TreeScreen extends Screen {
 
     @Override
     protected void init() {
-        xShift = (double) width / 2;
-        yShift = (double) height / 2 - 50;
+        xShift = (float) width / 2;
+        yShift = (float) height / 2 - 50;
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         //this.renderDirtBackground(graphics);
-        graphics.drawCenteredString(Minecraft.getInstance().font, "Work in Progress", width / 2, height / 4 - 50, 0xffffffff);
-        graphics.pose().pushPose();
-        graphics.pose().translate(xShift, yShift, 0);
+        graphics.centeredText(Minecraft.getInstance().font, "Work in Progress", width / 2, height / 4 - 50, 0xffffffff);
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(xShift, yShift);
         tree.render(graphics, (int) (mouseX - xShift), (int) (mouseY - yShift), delta);
-        graphics.pose().popPose();
+        graphics.pose().popMatrix();
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            xShift += deltaX;
-            yShift += deltaY;
+    public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+        if (event.button() == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            xShift += (float) dx;
+            yShift += (float) dy;
             return true;
         }
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        return super.mouseDragged(event, dx, dy);
     }
 
     @Override

@@ -5,7 +5,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public abstract class ICRecipeProvider implements DataProvider {
      *
      * @param exporter Offer the recipes to this supplier to save them.
      */
-    public abstract void buildRecipes(@NotNull BiConsumer<ResourceLocation, ICRecipe> exporter);
+    public abstract void buildRecipes(@NotNull BiConsumer<Identifier, ICRecipe> exporter);
 
     @Override
     public CompletableFuture<?> run(CachedOutput writer) {
@@ -47,7 +47,7 @@ public abstract class ICRecipeProvider implements DataProvider {
 
     protected CompletableFuture<?> run(CachedOutput writer, HolderLookup.Provider registries) {
 
-        Set<ResourceLocation> generatedRecipes = new HashSet<>();
+        Set<Identifier> generatedRecipes = new HashSet<>();
         List<CompletableFuture<?>> list = new ArrayList<>();
         buildRecipes((identifier, recipe) -> {
 

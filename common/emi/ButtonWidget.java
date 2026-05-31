@@ -2,7 +2,7 @@ package com.carlschierig.immersivecrafting.compat.emi;
 
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.Widget;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 
 public class ButtonWidget extends Widget {
@@ -18,8 +18,8 @@ public class ButtonWidget extends Widget {
     }
 
     @Override
-    public void render(GuiGraphics draw, int mouseX, int mouseY, float delta) {
-        button.render(draw, mouseX, mouseY, delta);
+    public void render(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
+        button.extractRenderState(draw, mouseX, mouseY, delta);
     }
 
     @Override
