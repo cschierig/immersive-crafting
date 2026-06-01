@@ -53,9 +53,15 @@ dependencies {
     implementation(libs.fabric.loader)
     implementation(libs.fabric.api)
 
+    testImplementation(libs.fabric.loader.junit)
+
     if (compatMods) {
         implementation(libs.compat.modmenu.fabric)
     }
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
 
 loom {

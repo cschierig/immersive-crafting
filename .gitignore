@@ -1,3 +1,6 @@
+# Minecraft
+fabric/.fabric/
+
 # Gradle
 .gradle/
 build/
