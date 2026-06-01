@@ -19,7 +19,7 @@ public class NeoPlatformHelper extends PlatformHelper {
 
     @Override
     public <T> Registry<T> createRegistry(ResourceKey<Registry<T>> registryKey) {
-        var registry = new RegistryBuilder<>(registryKey).create();
+        var registry = new RegistryBuilder<>(registryKey).sync(true).create();
         registries.add(registry);
         return registry;
     }

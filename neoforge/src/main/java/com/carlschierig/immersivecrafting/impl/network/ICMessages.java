@@ -6,7 +6,7 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public class ICMessages {
     @SubscribeEvent
-    public static void register(final RegisterPayloadHandlersEvent event) {
+    public static void register(RegisterPayloadHandlersEvent event) {
         // Sets the current network version
         final PayloadRegistrar registrar = event.registrar("1").optional();
         registrar.playToClient(

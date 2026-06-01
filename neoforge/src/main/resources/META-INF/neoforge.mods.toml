@@ -12,3 +12,6 @@ displayName = "${modName}"
 authors = "CozyPenguin"
 logoFile = "assets/immersive_crafting/icon.png"
 description = "${modDescription}"
+
+[[mixins]]
+config = "immersive-crafting.mixins.json"
