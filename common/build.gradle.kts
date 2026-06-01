@@ -18,11 +18,6 @@ dependencies {
     compileOnly(libs.mixin)
     compileOnly(libs.mixinextras.common)
     annotationProcessor(libs.mixinextras.common)
-
-//    compileOnly("dev.emi:emi-xplat-mojmap:${libs.versions.emi.get()}:api")
-
-//    configurations.getByName("testModImplementation")(libs.fabric.loader)
-//    testImplementation(libs.fabric.loader.junit)
 }
 
 configurations {
@@ -38,7 +33,9 @@ configurations {
 
 artifacts {
     add("commonJava", sourceSets.main.get().java.sourceDirectories.singleFile)
-    add("commonResources", sourceSets.main.get().resources.sourceDirectories.singleFile)
+    sourceSets.main.get().resources.sourceDirectories.files.forEach {
+        add("commonResources", it)
+    }
 }
 
 tasks.withType<Test> {

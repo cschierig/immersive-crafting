@@ -36,16 +36,6 @@ dependencies {
 //    }
 //}
 
-sourceSets {
-    val main by getting
-    main {
-        resources {
-            srcDir(commonProject.file("src/main/generated"))
-            exclude(commonProject.file("src/main/generated/resources/.cache").toString())
-        }
-    }
-}
-
 neoForge {
     version = libs.versions.neoforge.mdk.get()
     val atFile = file("src/main/resources/META-INF/accesstransformer.cfg")

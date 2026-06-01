@@ -22,9 +22,9 @@ val withExampleMod = property("withExampleMod").toString().toBoolean()
 val commonProject = project(":common")
 
 
-sourceSets {
-    val main by getting
-    if (withExampleMod) {
+if (withExampleMod) {
+    sourceSets {
+        val main by getting
         create("example") {
             compileClasspath += main.output + main.compileClasspath
             runtimeClasspath += main.output + main.runtimeClasspath
@@ -35,15 +35,7 @@ sourceSets {
             }
         }
     }
-    main {
-        resources {
-            srcDir(commonProject.file("src/main/generated"))
-            exclude(commonProject.file("src/main/generated/resources/.cache").toString())
-        }
-    }
-}
 
-if (withExampleMod) {
     configurations {
         val exampleImplementation by getting {
             extendsFrom(configurations.implementation.get())

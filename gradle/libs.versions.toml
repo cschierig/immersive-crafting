@@ -16,11 +16,9 @@ neoforge_neoform = "26.1.2-1"
 mixin = "0.8.5"
 mixinextras = "0.5.3"
 
-emi = "1.1.6+1.20.6"
-rei = "15.0.728"
 jei = "17.3.0.52"
 
-junit = "5.10.+"
+junit = "6.1.0"
 
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
@@ -29,17 +27,12 @@ fabric_loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric_l
 fabric_loader_junit = { module = "net.fabricmc:fabric-loader-junit", version.ref = "fabric_loader" }
 fabric_api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric_api" }
 
-neoforge_mdk = { module = "net.neoforged:neoforge", version.ref = "neoforge_mdk" }
-
 mixin = { module = "org.spongepowered:mixin", version.ref = "mixin" }
 mixinextras_common = { module = "io.github.llamalad7:mixinextras-common", version.ref = "mixinextras" }
 
-rei_fabric = { module = "me.shedaniel:RoughlyEnoughItems-fabric", version.ref = "rei" }
-rei_fabric_api = { module = "me.shedaniel:RoughlyEnoughItems-api-fabric", version.ref = "rei" }
-rei_fabric_plugin = { module = "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric", version.ref = "rei" }
-
-junit_jupiter_api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
-junit_jupiter_engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+junit_bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit_jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit_platform_launcher = { module = "org.junit.jupiter:junit-jupiter-engine" }
 
 compat_modmenu_fabric = { module = "com.terraformersmc:modmenu", version = "18.0.0-alpha.8" }
 
