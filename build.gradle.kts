@@ -130,3 +130,13 @@ subprojects {
     }
 }
 
+tasks.register("release") {
+    dependsOn(project("fabric").tasks.named("modrinth").get())
+    dependsOn(project("neoforge").tasks.named("modrinth").get())
+    dependsOn(project("fabric").tasks.named("modrinthSyncBody").get())
+}
+
+tasks.register("releaseCurseforge") {
+    dependsOn(project("fabric").tasks.named("curseforge").get())
+    dependsOn(project("neoforge").tasks.named("curseforge").get())
+}

@@ -2,6 +2,7 @@ package com.carlschierig.immersivecrafting.impl;
 
 import com.carlschierig.immersivecrafting.impl.PlatformHelper;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
@@ -20,6 +21,13 @@ public class NeoPlatformHelper extends PlatformHelper {
     @Override
     public <T> Registry<T> createRegistry(ResourceKey<Registry<T>> registryKey) {
         var registry = new RegistryBuilder<>(registryKey).sync(true).create();
+        registries.add(registry);
+        return registry;
+    }
+
+    @Override
+    public <T> Registry<T> createDefaultedRegistry(ResourceKey<Registry<T>> registryKey, Identifier defaultId) {
+        var registry = new RegistryBuilder<>(registryKey).sync(true).defaultKey(defaultId).create();
         registries.add(registry);
         return registry;
     }

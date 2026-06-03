@@ -15,16 +15,16 @@
   "license": "${modLicense}",
   "entrypoints": {
     "main": [
-      "com.carlschierig.immersivecrafting.ImmersiveCrafting"
+      "com.carlschierig.immersivecrafting.ImmersiveCraftingFabric"
     ],
     "client": [
-      "com.carlschierig.immersivecrafting.ImmersiveCraftingClient"
+      "com.carlschierig.immersivecrafting.ImmersiveCraftingFabricClient"
     ],
     "fabric-datagen": [
       "com.carlschierig.immersivecrafting.impl.datagen.ICDatagen"
     ],
     "jei_mod_plugin": [
-      "com.carlschierig.immersivecrafting.compat.jei.ICJeiPlugin"
+      "com.carlschierig.immersivecrafting.compat.client.jei.ICJeiPlugin"
     ]
   },
   "mixins": [

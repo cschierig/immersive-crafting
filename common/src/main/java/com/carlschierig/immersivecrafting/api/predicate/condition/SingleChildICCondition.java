@@ -3,10 +3,11 @@ package com.carlschierig.immersivecrafting.api.predicate.condition;
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
 import com.carlschierig.immersivecrafting.api.predicate.PredicateVisitor;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 
@@ -21,8 +22,8 @@ public abstract class SingleChildICCondition implements ICCondition {
     }
 
     @Override
-    public void render(@NotNull GuiGraphicsExtractor draw, int x, int y, float delta) {
-        child.render(draw, x, y, delta);
+    public @Nullable Identifier getRenderer() {
+        return child.getRenderer();
     }
 
     @Override

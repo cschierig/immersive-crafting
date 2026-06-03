@@ -59,7 +59,7 @@ on a quartz block with a stack of diamonds at night.
 ## Usage & Dependencies
 
 - Immersive Crafting for Fabric depends on [Fabric API](https://modrinth.com/mod/fabric-api).
-- It is recommended to use EMI to view the recipes. REI and JEI support will be added in the future.
+- It is recommended to use JEI to view the recipes.
 
 <!-- modrinth_exclude.start -->
 

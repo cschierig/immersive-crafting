@@ -5,7 +5,6 @@ import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSer
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeSerializer;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeType;
 import com.carlschierig.immersivecrafting.impl.PlatformHelper;
-import com.carlschierig.immersivecrafting.impl.registry.ICRegistryKeys;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 

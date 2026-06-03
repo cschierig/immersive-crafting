@@ -5,13 +5,12 @@ import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
 import com.carlschierig.immersivecrafting.impl.predicate.RangePredicate;
 import com.carlschierig.immersivecrafting.impl.util.ICTranslationHelper;
+import com.carlschierig.immersivecrafting.impl.util.ICUtil;
 import com.carlschierig.immersivecrafting.mixin.BlockStateAccessor;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -31,16 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class BlockCondition implements ICCondition {
+public record BlockCondition(Optional<BlockValue> block, Optional<RangePredicate> hardness) implements ICCondition {
     public static String LANGUAGE_KEY = "block";
-    private final Optional<BlockValue> block;
-
-    private final Optional<RangePredicate> hardness;
-
-    private BlockCondition(Optional<BlockValue> block, Optional<RangePredicate> hardness) {
-        this.block = block;
-        this.hardness = hardness;
-    }
 
     @Override
     public boolean test(RecipeContext context) {
@@ -64,14 +55,8 @@ public class BlockCondition implements ICCondition {
     }
 
     @Override
-    public void render(@NotNull GuiGraphicsExtractor draw, int x, int y, float delta) {
-        var item = block.isPresent() ? BuiltInRegistries.BLOCK.getOptional(block.get().id).map(Block::asItem).orElse(Items.AIR) : Items.AIR;
-        if (item != Items.AIR) {
-            draw.item(new ItemStack(item), 0, 0);
-        } else {
-            // TODO: proper question mark texture
-            draw.text(Minecraft.getInstance().font, "?", 0, 0, 0xffffffff);
-        }
+    public @Nullable Identifier getRenderer() {
+        return ICUtil.getId("block");
     }
 
     @Override
@@ -119,7 +104,7 @@ public class BlockCondition implements ICCondition {
         return ICConditionSerializers.BLOCK;
     }
 
-    private static class BlockValue {
+    public static class BlockValue {
         @Nullable
         public final Identifier id;
         @Nullable

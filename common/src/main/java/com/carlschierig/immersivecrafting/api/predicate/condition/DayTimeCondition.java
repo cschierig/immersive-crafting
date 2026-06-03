@@ -7,14 +7,11 @@ import com.carlschierig.immersivecrafting.impl.util.ICTranslationHelper;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,11 +45,6 @@ public class DayTimeCondition implements ICCondition {
         } else {
             return startTime <= time && time <= 24000 || 0 <= time && time <= endTime;
         }
-    }
-
-    @Override
-    public void render(@NotNull GuiGraphicsExtractor draw, int x, int y, float delta) {
-        draw.item(new ItemStack(Items.CLOCK), 0, 0);
     }
 
     @Override

@@ -1,13 +1,13 @@
 package com.carlschierig.immersivecrafting.api.predicate.condition;
 
 import com.carlschierig.immersivecrafting.api.context.RecipeContext;
-import com.carlschierig.immersivecrafting.impl.render.ICRenderHelper;
 import com.carlschierig.immersivecrafting.impl.util.ICTranslationHelper;
+import com.carlschierig.immersivecrafting.impl.util.ICUtil;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,9 +30,8 @@ public class InvertedCondition extends SingleChildICCondition {
     }
 
     @Override
-    public void render(@NotNull GuiGraphicsExtractor draw, int x, int y, float delta) {
-        super.render(draw, x, y, delta);
-        ICRenderHelper.renderItemAnnotation(draw, 0, 0, Component.literal("!"));
+    public @Nullable Identifier getRenderer() {
+        return ICUtil.getId("inverted");
     }
 
     @Override

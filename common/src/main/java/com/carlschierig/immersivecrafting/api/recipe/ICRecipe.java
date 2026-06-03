@@ -8,7 +8,7 @@ import com.carlschierig.immersivecrafting.api.predicate.ICPredicate;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICIngredient;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICStack;
 import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
-import com.carlschierig.immersivecrafting.impl.registry.ICRegistryKeys;
+import com.carlschierig.immersivecrafting.api.registry.ICRegistryKeys;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import net.minecraft.network.RegistryFriendlyByteBuf;

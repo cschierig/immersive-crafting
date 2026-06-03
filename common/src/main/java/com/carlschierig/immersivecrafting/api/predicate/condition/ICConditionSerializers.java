@@ -18,7 +18,7 @@ public final class ICConditionSerializers {
 
 
     private static <T extends ICCondition> ICConditionSerializer<T> register(String id, ICConditionSerializer<T> serializer) {
-        return Registry.register(ICRegistries.CONDITION_SERIALIZER, Identifier.tryBuild(ICUtil.MODID, id), serializer);
+        return Registry.register(ICRegistries.CONDITION_SERIALIZER, ICUtil.getId(id), serializer);
     }
 
     public static void init() {

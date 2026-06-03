@@ -5,15 +5,14 @@ import com.carlschierig.immersivecrafting.api.context.ValidationContext;
 import com.carlschierig.immersivecrafting.api.predicate.PredicateVisitor;
 import com.carlschierig.immersivecrafting.api.predicate.Visitable;
 import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
-import com.carlschierig.immersivecrafting.api.render.ICRenderable;
 import com.carlschierig.immersivecrafting.impl.predicate.ICConditionData;
-import com.carlschierig.immersivecrafting.impl.registry.ICRegistryKeys;
+import com.carlschierig.immersivecrafting.api.registry.ICRegistryKeys;
 import com.mojang.serialization.Codec;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,7 +27,7 @@ import java.util.function.Predicate;
  * The condition also provides rendering and tooltip-methods.
  * These have a default implementation, but it is recommended to implement them so that
  */
-public interface ICCondition extends Predicate<RecipeContext>, Visitable, ICRenderable {
+public interface ICCondition extends Predicate<RecipeContext>, Visitable {
     Codec<ICCondition> CODEC = ICRegistries.CONDITION_SERIALIZER
             .byNameCodec()
             .dispatch(ICCondition::getSerializer, ICConditionSerializer::codec);
@@ -77,17 +76,13 @@ public interface ICCondition extends Predicate<RecipeContext>, Visitable, ICRend
     }
 
     /**
-     * Render this instance using the given {@link GuiGraphicsExtractor}.
+     * Return an identifier for a renderer for the condition.
      * <p>
      * Condition icons should not be larger than a typical minecraft texture (16x16).
-     *
-     * @param draw  The {@link GuiGraphicsExtractor} used for rendering.
-     * @param x     the x coordinate of the mouse.
-     * @param y     the y coordinate of the mouse.
-     * @param delta The time delta used for animation.
      */
-    @Override
-    default void render(@NotNull GuiGraphicsExtractor draw, int x, int y, float delta) {
+    @Nullable
+    default Identifier getRenderer() {
+        return null;
     }
 
     @Override

@@ -6,20 +6,17 @@ import com.carlschierig.immersivecrafting.api.context.RecipeContext;
 import com.carlschierig.immersivecrafting.api.context.ValidationContext;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializer;
 import com.carlschierig.immersivecrafting.api.predicate.condition.ICConditionSerializers;
-import com.carlschierig.immersivecrafting.api.render.ICRenderFlags;
-import com.carlschierig.immersivecrafting.impl.render.FakeScreen;
-import com.carlschierig.immersivecrafting.impl.render.ICRenderHelper;
+import com.carlschierig.immersivecrafting.impl.util.ICUtil;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.ItemLike;
@@ -62,28 +59,14 @@ public class ICItemStack extends ICStack {
         return stack.item();
     }
 
-    @Override
-    public void render(GuiGraphicsExtractor draw, int x, int y, float delta, int flags) {
-        draw.item(stack.create(), x, y);
-
-        if (ICRenderFlags.RENDER_ICON.test(flags)) {
-            // TODO: fix this
-//            Lighting.Entry.setupFor3DItems();
-            draw.item(stack.create(), x, y);
-            draw.itemDecorations(Minecraft.getInstance().font, stack.create(), x, y, "");
-        }
-        if (ICRenderFlags.RENDER_AMOUNT.test(flags)) {
-            String count = "";
-            if (getAmount() != 1) {
-                count += getAmount();
-            }
-            ICRenderHelper.renderItemAnnotation(draw, x, y, Component.literal(count));
-        }
-    }
 
     @Override
     public SlotDisplay getDisplay() {
         return new SlotDisplay.ItemStackSlotDisplay(stack);
+    }
+
+    public ItemStackTemplate getStack() {
+        return stack;
     }
 
     @Override
@@ -136,8 +119,13 @@ public class ICItemStack extends ICStack {
     }
 
     @Override
+    public Identifier getRenderer() {
+        return super.getRenderer();
+    }
+
+    @Override
     public @NotNull List<Component> getTooltip() {
-        return FakeScreen.INSTANCE.getTooltipFromItem(stack.create());
+        return ICUtil.getTooltipFromItem(stack.create());
     }
 
     public static class Serializer implements ICConditionSerializer<ICItemStack> {

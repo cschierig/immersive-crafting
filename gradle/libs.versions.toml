@@ -9,7 +9,7 @@ fabric_loader = "0.19.2"
 fabric_loom = "1.15.5"
 fabric_api = "0.146.1+26.1.2"
 
-neoforge_mdk = "26.1.2.15-beta"
+neoforge_mdk = "26.1.2.53-beta"
 neoforge_moddev = "2.0.141"
 neoforge_neoform = "26.1.2-1"
 

@@ -1,17 +1,25 @@
 plugins {
-    alias(libs.plugins.neoforge.moddev)
+    alias(libs.plugins.fabric.loom)
 }
 
 val modId: String by project
 val enabledPlatforms: String by project
 
-neoForge {
-    neoFormVersion = libs.versions.neoforge.neoform.get()
-    // Automatically enable AccessTransformers if the file exists
-    val atFile = file("src/main/resources/META-INF/accesstransformer.cfg")
-    if (atFile.exists()) {
-        accessTransformers.from(atFile)
+//neoForge {
+//    neoFormVersion = libs.versions.neoforge.neoform.get()
+//    // Automatically enable AccessTransformers if the file exists
+//    val atFile = file("src/main/resources/META-INF/accesstransformer.cfg")
+//    if (atFile.exists()) {
+//        accessTransformers.from(atFile)
+//    }
+//}
+loom {
+    val awPath = file("src/assets/resources/${modId}.accesswidener")
+    if (awPath.exists()) {
+        accessWidenerPath.set(awPath)
     }
+
+    splitEnvironmentSourceSets()
 }
 
 sourceSets {
@@ -25,6 +33,8 @@ sourceSets {
 }
 
 dependencies {
+    minecraft(libs.minecraft)
+
     compileOnly(libs.mixin)
     compileOnly(libs.mixinextras.common)
     annotationProcessor(libs.mixinextras.common)
@@ -45,6 +55,7 @@ configurations {
 
 artifacts {
     add("commonJava", sourceSets.main.get().java.sourceDirectories.singleFile)
+    add("commonJava", sourceSets["client"].java.sourceDirectories.singleFile)
     sourceSets.main.get().resources.sourceDirectories.files.forEach {
         add("commonResources", it)
     }
