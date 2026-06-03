@@ -86,7 +86,7 @@ if (System.getenv("MODRINTH_TOKEN") != null) {
         versionNumber.set(project.version.toString())
         versionName.set(project.version.toString() + " - " + project.name.uppercaseFirstChar())
         versionType.set(modrinthType)
-        uploadFile.set(tasks.named("shadowJar"))
+        uploadFile.set(tasks.named("jar"))
         additionalFiles.set(files.map { tasks.named(it) })
         syncBodyFrom.set(rootProject.file("README.md").readText())
         dependencies {
@@ -103,7 +103,7 @@ if (System.getenv("CURSEFORGE_TOKEN") != null) {
     tasks.register<TaskPublishCurseForge>("curseforge") {
         apiToken = System.getenv("CURSEFORGE_TOKEN")
 
-        upload(curseforgeId, tasks.named("shadowJar")) {
+        upload(curseforgeId, tasks.named("jar")) {
             releaseType = modrinthType
             gameVersions.clear()
             addGameVersion(libs.versions.minecraft.get())
