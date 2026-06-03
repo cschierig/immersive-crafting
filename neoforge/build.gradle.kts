@@ -90,6 +90,7 @@ if (System.getenv("MODRINTH_TOKEN") != null) {
         additionalFiles.set(files.map { tasks.named(it) })
         syncBodyFrom.set(rootProject.file("README.md").readText())
         dependencies {
+            optional.project("jei")
         }
         gameVersions.set(listOf(libs.versions.minecraft.get()))
         loaders.set(listOf("neoforge"))
@@ -110,6 +111,9 @@ if (System.getenv("CURSEFORGE_TOKEN") != null) {
             addModLoader("neoforge")
             changelog = file("../CHANGELOG.md").readText()
             changelogType = "markdown"
+
+            // Dependencies
+            addOptional("jei")
         }
 
         disableVersionDetection()
