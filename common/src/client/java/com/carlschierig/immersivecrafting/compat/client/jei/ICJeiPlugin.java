@@ -6,6 +6,7 @@ import com.carlschierig.immersivecrafting.api.recipe.ICRecipeManager;
 import com.carlschierig.immersivecrafting.api.registry.ICRegistries;
 import com.carlschierig.immersivecrafting.impl.util.ICUtil;
 import mezz.jei.api.IModPlugin;
+import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.resources.Identifier;
@@ -13,6 +14,7 @@ import net.minecraft.resources.Identifier;
 import java.util.HashMap;
 import java.util.Map;
 
+@JeiPlugin
 public class ICJeiPlugin implements IModPlugin {
     public static final Identifier PLUGIN_ID = ICUtil.getId("ic_jei_plugin");
 

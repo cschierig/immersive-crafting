@@ -1,5 +1,6 @@
 package com.carlschierig.immersivecrafting.compat.client.jei;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import mezz.jei.api.gui.inputs.IJeiInputHandler;
 import mezz.jei.api.gui.inputs.IJeiUserInput;
 import mezz.jei.api.gui.widgets.IRecipeWidget;
@@ -29,7 +30,7 @@ public class ButtonWidget implements IRecipeWidget, IJeiInputHandler {
     @Override
     public boolean handleInput(double mouseX, double mouseY, IJeiUserInput input) {
         // TODO: don't know if something else would be better
-        if (input.is(Minecraft.getInstance().options.keyAttack)) {
+        if (input.getKey().equals(InputConstants.Type.MOUSE.getOrCreate(0))) {
             if (!input.isSimulate()) {
                 this.button.onClick(null, false);
             }
