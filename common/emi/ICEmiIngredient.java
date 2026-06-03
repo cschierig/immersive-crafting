@@ -1,4 +1,4 @@
-package com.carlschierig.immersivecrafting.compat.emi;
+package com.carlschierig.immersivecrafting.compat.jei;
 
 import com.carlschierig.immersivecrafting.api.predicate.condition.ingredient.ICIngredient;
 import dev.emi.emi.api.stack.EmiIngredient;

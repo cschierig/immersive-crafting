@@ -22,6 +22,9 @@
     ],
     "fabric-datagen": [
       "com.carlschierig.immersivecrafting.impl.datagen.ICDatagen"
+    ],
+    "jei_mod_plugin": [
+      "com.carlschierig.immersivecrafting.compat.jei.ICJeiPlugin"
     ]
   },
   "mixins": [

@@ -1,0 +1,27 @@
+{
+  "type": "immersive_crafting:use_item_on",
+  "ingredient": {
+    "type": "immersive_crafting:item",
+    "stack": {
+      "id": "minecraft:flint"
+    }
+  },
+  "predicate": {
+    "conditions": [
+      {
+        "type": "immersive_crafting:block",
+        "block": {
+          "tag": "minecraft:logs"
+        }
+      }
+    ]
+  },
+  "result": [
+    {
+      "type": "immersive_crafting:item",
+      "stack": {
+        "id": "minecraft:stick"
+      }
+    }
+  ]
+}

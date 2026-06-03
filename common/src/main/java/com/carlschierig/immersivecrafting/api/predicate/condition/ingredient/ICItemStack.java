@@ -21,6 +21,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
@@ -78,6 +79,11 @@ public class ICItemStack extends ICStack {
             }
             ICRenderHelper.renderItemAnnotation(draw, x, y, Component.literal(count));
         }
+    }
+
+    @Override
+    public SlotDisplay getDisplay() {
+        return new SlotDisplay.ItemStackSlotDisplay(stack);
     }
 
     @Override

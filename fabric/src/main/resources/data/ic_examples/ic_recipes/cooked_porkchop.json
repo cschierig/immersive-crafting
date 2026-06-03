@@ -1,0 +1,27 @@
+{
+  "type": "immersive_crafting:use_item_on",
+  "ingredient": {
+    "type": "immersive_crafting:item",
+    "stack": {
+      "id": "minecraft:porkchop"
+    }
+  },
+  "predicate": {
+    "conditions": [
+      {
+        "type": "immersive_crafting:block",
+        "block": {
+          "id": "minecraft:magma_block"
+        }
+      }
+    ]
+  },
+  "result": [
+    {
+      "type": "immersive_crafting:item",
+      "stack": {
+        "id": "minecraft:cooked_porkchop"
+      }
+    }
+  ]
+}

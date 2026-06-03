@@ -1,4 +1,4 @@
-package com.carlschierig.immersivecrafting.compat.emi;
+package com.carlschierig.immersivecrafting.compat.jei;
 
 import com.carlschierig.immersivecrafting.mixin.InventoryMenuAccessor;
 import dev.emi.emi.api.recipe.EmiRecipe;

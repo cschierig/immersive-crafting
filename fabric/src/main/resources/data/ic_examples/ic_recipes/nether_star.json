@@ -1,0 +1,36 @@
+{
+  "type": "immersive_crafting:use_item_on",
+  "ingredient": {
+    "type": "immersive_crafting:item",
+    "stack": {
+      "count": 5,
+      "id": "minecraft:diamond"
+    }
+  },
+  "predicate": {
+    "conditions": [
+      {
+        "type": "immersive_crafting:invert",
+        "condition": {
+          "type": "immersive_crafting:day_time",
+          "end_time": 12999,
+          "start_time": 0
+        }
+      },
+      {
+        "type": "immersive_crafting:block",
+        "block": {
+          "id": "minecraft:quartz_block"
+        }
+      }
+    ]
+  },
+  "result": [
+    {
+      "type": "immersive_crafting:item",
+      "stack": {
+        "id": "minecraft:nether_star"
+      }
+    }
+  ]
+}

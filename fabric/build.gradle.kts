@@ -55,8 +55,10 @@ dependencies {
 
     testImplementation(libs.fabric.loader.junit)
 
+    compileOnly(libs.compat.jei.fabric.api)
     if (compatMods) {
         implementation(libs.compat.modmenu.fabric)
+        runtimeOnly(libs.compat.jei.fabric)
     }
 }
 
@@ -86,7 +88,7 @@ loom {
             inherit(getByName("client"))
             name("Data Generation")
             vmArg("-Dfabric-api.datagen")
-            vmArg("-Dfabric-api.datagen.output-dir=${commonProject.file("src/main/generated")}")
+            vmArg("-Dfabric-api.datagen.output-dir=${commonProject.file("src/generated")}")
             vmArg("-Dfabric-api.datagen.modid=$modId")
 
             runDir("build/datagen")
@@ -134,35 +136,6 @@ if (withApiJar) {
     }
 }
 
-dependencies {
-
-//    recipeViewer(dependencies)
-
-//    exampleModCompileOnlyApi(tasks.getByName("apiJar").outputs.files)
-}
-
-//fun recipeViewer(deps: DependencyHandler) {
-//    // stolen from create fabric
-//
-//    // emi
-//    deps.modCompileOnly(libs.emi.fabric) { api(this) }
-//
-//    // rei
-//    deps.modCompileOnly(libs.rei.fabric.api)
-//    deps.modCompileOnly(libs.rei.fabric.plugin)
-//    // jei
-//    // deps.modCompileOnly("mezz.jei:jei-${libs.versions.minecraft.get()}-common-api:${libs.versions.jei.get()}")
-//    // deps.modCompileOnly("mezz.jei:jei-${libs.versions.minecraft.get()}-fabric-api:${libs.versions.jei.get()}")
-//
-//    when (recipeViewer.lowercase(Locale.ROOT)) {
-//        "emi" -> deps.modLocalRuntime(libs.emi.fabric)
-//        "rei" -> deps.modLocalRuntime(libs.rei)
-//        // "jei" -> deps.modLocalRuntime("mezz.jei:jei-${libs.versions.minecraft.get()}-fabric:${libs.versions.jei.get()}")
-//        "disabled" -> Unit
-//        else -> println("Unknown recipe viewer specified: $recipeViewer. Must be JEI, REI, EMI, or disabled.")
-//    }
-//}
-
 if (System.getenv("MODRINTH_TOKEN") != null) {
     val files = ArrayList<String>()
     if (withSourcesJar) {
@@ -182,6 +155,8 @@ if (System.getenv("MODRINTH_TOKEN") != null) {
         additionalFiles.set(files.map { tasks.named(it) })
         syncBodyFrom.set(rootProject.file("README.md").readText())
         dependencies {
+            required.project("fabric-api")
+            optional.project("jei")
         }
         gameVersions.set(listOf(libs.versions.minecraft.get()))
         loaders.set(listOf("fabric"))
@@ -202,6 +177,10 @@ if (System.getenv("CURSEFORGE_TOKEN") != null) {
             addModLoader("fabric")
             changelog = file("../CHANGELOG.md").readText()
             changelogType = "markdown"
+
+            // Dependencies
+            addRequirement("fabric-api")
+            addOptional("jei")
         }
 
         disableVersionDetection()

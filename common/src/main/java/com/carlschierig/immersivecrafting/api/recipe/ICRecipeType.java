@@ -27,4 +27,6 @@ public interface ICRecipeType<T extends ICRecipe> {
     default ICRenderable getSimplifiedRenderer() {
         return getRenderer();
     }
+
+    Class<T> getRecipeClass();
 }

@@ -13,6 +13,7 @@ val modGroup: String by project
 val recipeViewer: String by project
 val withSourcesJar = property("withSourcesJar").toString().toBoolean()
 val withApiJar = property("withApiJar").toString().toBoolean()
+val compatMods = property("compatMods").toString().toBoolean()
 val modrinthId: String by project
 val modrinthType: String by project
 val curseforgeId: String by project
@@ -20,21 +21,11 @@ val curseforgeId: String by project
 val commonProject = project(":common")
 
 dependencies {
-//    recipeViewer(dependencies)
+    compileOnly(libs.compat.jei.neoforge.api)
+    if (compatMods) {
+        runtimeOnly(libs.compat.jei.neoforge)
+    }
 }
-
-//fun recipeViewer(deps: DependencyHandler) {
-//    // stolen from create fabric
-//
-//    // emi
-//    deps.compileOnly("dev.emi:emi-neoforge:${libs.versions.emi.get()}:api")
-//
-//    when (recipeViewer.lowercase(Locale.ROOT)) {
-//        "emi" -> deps.runtimeOnly("dev.emi:emi-neoforge:${libs.versions.emi.get()}")
-//        "disabled" -> Unit
-//        else -> println("Unknown recipe viewer specified: $recipeViewer. Must be JEI, REI, EMI, or disabled.")
-//    }
-//}
 
 neoForge {
     version = libs.versions.neoforge.mdk.get()

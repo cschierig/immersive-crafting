@@ -16,7 +16,7 @@ neoforge_neoform = "26.1.2-1"
 mixin = "0.8.5"
 mixinextras = "0.5.3"
 
-jei = "17.3.0.52"
+jei = "29.6.2.31"
 
 junit = "6.1.0"
 
@@ -30,9 +30,11 @@ fabric_api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fab
 mixin = { module = "org.spongepowered:mixin", version.ref = "mixin" }
 mixinextras_common = { module = "io.github.llamalad7:mixinextras-common", version.ref = "mixinextras" }
 
-junit_bom = { module = "org.junit:junit-bom", version.ref = "junit" }
-junit_jupiter = { module = "org.junit.jupiter:junit-jupiter" }
-junit_platform_launcher = { module = "org.junit.jupiter:junit-jupiter-engine" }
+compat_jei_common_api = { module = "mezz.jei:jei-26.1.2-common-api", version.ref = "jei" }
+compat_jei_fabric_api = { module = "mezz.jei:jei-26.1.2-fabric-api", version.ref = "jei" }
+compat_jei_fabric = { module = "mezz.jei:jei-26.1.2-fabric", version.ref = "jei" }
+compat_jei_neoforge_api = { module = "mezz.jei:jei-26.1.2-neoforge-api", version.ref = "jei" }
+compat_jei_neoforge = { module = "mezz.jei:jei-26.1.2-neoforge", version.ref = "jei" }
 
 compat_modmenu_fabric = { module = "com.terraformersmc:modmenu", version = "18.0.0-alpha.8" }
 

@@ -1,0 +1,28 @@
+{
+  "type": "immersive_crafting:use_item_on",
+  "ingredient": {
+    "type": "immersive_crafting:item",
+    "stack": {
+      "id": "minecraft:flint"
+    }
+  },
+  "predicate": {
+    "conditions": [
+      {
+        "type": "immersive_crafting:block",
+        "hardness": {
+          "min": 2.5
+        }
+      }
+    ]
+  },
+  "result": [
+    {
+      "type": "immersive_crafting:item",
+      "chance": 0.5,
+      "stack": {
+        "id": "minecraft:amethyst_shard"
+      }
+    }
+  ]
+}

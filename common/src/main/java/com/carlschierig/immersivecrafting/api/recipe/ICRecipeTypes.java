@@ -9,11 +9,16 @@ import net.minecraft.resources.Identifier;
  * Recipe types provided by immersive crafting.
  */
 public final class ICRecipeTypes {
-    public static ICRecipeType<UseItemOnRecipe> USE_ITEM = register("use_item");
+    public static ICRecipeType<UseItemOnRecipe> USE_ITEM = register("use_item", UseItemOnRecipe.class);
 
-    private static <T extends ICRecipe> ICRecipeType<T> register(String name) {
+    private static <T extends ICRecipe> ICRecipeType<T> register(String name, Class<T> type) {
         return Registry.register(
-                ICRegistries.RECIPE_TYPE, Identifier.tryBuild(ICUtil.MODID, name), new ICRecipeType<T>() {
+                ICRegistries.RECIPE_TYPE, ICUtil.getId(name), new ICRecipeType<T>() {
+                    @Override
+                    public Class<T> getRecipeClass() {
+                        return type;
+                    }
+
                     public String toString() {
                         return "<Recipe Type: " + name + ">";
                     }

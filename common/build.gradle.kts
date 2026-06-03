@@ -14,10 +14,22 @@ neoForge {
     }
 }
 
+sourceSets {
+    val main by getting
+    main {
+        resources {
+            srcDir("src/generated")
+            exclude("src/generated/.cache")
+        }
+    }
+}
+
 dependencies {
     compileOnly(libs.mixin)
     compileOnly(libs.mixinextras.common)
     annotationProcessor(libs.mixinextras.common)
+
+    compileOnly(libs.compat.jei.common.api)
 }
 
 configurations {
@@ -36,10 +48,6 @@ artifacts {
     sourceSets.main.get().resources.sourceDirectories.files.forEach {
         add("commonResources", it)
     }
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
 }
 
 // Implement mcgradleconventions loader attribute

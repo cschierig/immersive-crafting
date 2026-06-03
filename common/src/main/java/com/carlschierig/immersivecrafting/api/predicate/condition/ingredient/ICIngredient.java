@@ -9,6 +9,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -68,6 +69,8 @@ public interface ICIngredient extends ICRenderable, ICCondition {
 
     }
 
+    SlotDisplay getDisplay();
+
     /**
      * Returns the chance that the ingredient is consumed/produced.
      * The value must be in the range [0, 1].
@@ -96,6 +99,7 @@ public interface ICIngredient extends ICRenderable, ICCondition {
      * @return a list of stacks which are used by the ingredient.
      */
     List<ICStack> getParts();
+
 
     /**
      * Returns the name of this ingredient.

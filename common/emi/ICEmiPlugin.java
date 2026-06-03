@@ -1,4 +1,4 @@
-package com.carlschierig.immersivecrafting.compat.emi;
+package com.carlschierig.immersivecrafting.compat.jei;
 
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeManager;
 import com.carlschierig.immersivecrafting.api.recipe.ICRecipeType;
@@ -14,21 +14,6 @@ import java.util.Map;
 
 @EmiEntrypoint
 public class ICEmiPlugin implements EmiPlugin {
-    public static final Map<ResourceLocation, EmiRecipeCategory> CATEGORIES = new HashMap<>();
-
-    @Override
-    public void register(EmiRegistry registry) {
-        for (var entry : ICRegistries.RECIPE_TYPE.entrySet()) {
-            var key = entry.getKey().location();
-            var value = entry.getValue();
-
-            var category = new ICRecipeCategory(value);
-            CATEGORIES.put(key, category);
-            registry.addCategory(category);
-            registerRecipeHandler(registry, category);
-            registerRecipes(registry, key, value);
-        }
-    }
 
     private void registerRecipeHandler(EmiRegistry registry, ICRecipeCategory category) {
         registry.addRecipeHandler(null, new ICRecipeHandler(category));
