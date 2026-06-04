@@ -5,14 +5,6 @@ plugins {
 val modId: String by project
 val enabledPlatforms: String by project
 
-//neoForge {
-//    neoFormVersion = libs.versions.neoforge.neoform.get()
-//    // Automatically enable AccessTransformers if the file exists
-//    val atFile = file("src/main/resources/META-INF/accesstransformer.cfg")
-//    if (atFile.exists()) {
-//        accessTransformers.from(atFile)
-//    }
-//}
 loom {
     val awPath = file("src/assets/resources/${modId}.accesswidener")
     if (awPath.exists()) {
